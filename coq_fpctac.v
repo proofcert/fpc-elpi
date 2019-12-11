@@ -58,11 +58,11 @@ maxex 2 (max zero (max1
 }}.
 
 Elpi Tactic fpc.
-Elpi Accumulate File "ljf-polarize.mod".
-Elpi Accumulate File "ljf-kernel.mod".
-Elpi Accumulate File "stlc-fpc.mod".
-Elpi Accumulate File "pairing-fpc.mod".
-Elpi Accumulate File "maximal-fpc.mod".
+Elpi Accumulate File "fpc/ljf-polarize.mod".
+Elpi Accumulate File "fpc/ljf-kernel.mod".
+Elpi Accumulate File "fpc/stlc-fpc.mod".
+Elpi Accumulate File "fpc/pairing-fpc.mod".
+Elpi Accumulate File "fpc/maximal-fpc.mod".
 Elpi Accumulate Db lambda.db.
 Elpi Accumulate Db maxcerts.db.
 Elpi Accumulate lp:{{
@@ -86,20 +86,24 @@ Elpi Accumulate lp:{{
     lambda_to_coq Tm Iform Term.
   %% The predicate translating the term with formula to a Coq term
   pred lambda_to_coq i:tm, i:iform, o:term.
-  lambda_to_coq (lam X as Tm) (T1 imp T2) (fun _name T1' (x\ F x)):-
+  lambda_to_coq (lam X) (T1 imp T2) (fun _name T1' (x\ F x)):-
     iform_to_coq T1 T1',
     pi x y\ lambda_to_coq x T1 y =>
       lambda_to_coq (X x) T2 (F y).
+  % Not working at the moment
+  % lambda_to_coq (ap X Y) Ty (app [X',Y']):-
+  %   lambda_to_coq X (T imp Ty) X',
+  %   lambda_to_coq Y T Y'.
 
   %% The main predicate. Select the example, translate the lambda term to Coq.
   solve [int N] [goal Ctx Ev Ty _] [] :- 
     prop_list L, example N Tm Form, prop_to_coq Tm Form L Ev.
 }}. 
- Elpi Typecheck.
+Elpi Typecheck.
 
 (*Time for tests!*)
 (*Some tests on the lambda Prolog code*)
-(* Elpi Trace "lambda_to_coq" *)
+Elpi Trace "lambda_to_coq".
 Elpi Query lp:{{
   prop_to_coq (lam x\x) (j imp j) [j] X.
   }}.
@@ -114,6 +118,10 @@ Elpi Query lp:{{
 }}.
 Elpi Query lp:{{prop_to_coq (lam x\ lam y\ y) (j imp (l imp l)) [l,j] {{(fun (A B : Prop) (_ : B) (H0 : A) => H0)}}.
 }}.
+(*Elpi Query lp:{{
+  prop_to_coq (lam x\ lam y\ ap x y) ((l imp j) imp (l imp j)) [l,j] X.
+}}. *)
+
 (* Elpi Accumulate lp:{{
 test_all :-
    example X Tm Ty, 
@@ -142,3 +150,6 @@ Lemma example2 : forall A B : Prop, B -> (A -> A).
 elpi fpc 2.
 Show Proof.
 Qed.
+Lemma example3 : forall A B : Prop, (B -> A) -> (B -> A).
+elpi fpc 3.
+  example 3 (lam x\ lam y\ ap x y) ((l imp j) imp (l imp j)).

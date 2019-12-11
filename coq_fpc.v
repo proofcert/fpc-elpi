@@ -95,13 +95,13 @@ Module LKF_Test := LKF (TestParams).
 Import TestParams LKF_Test.
 
 Elpi Command fpc.
-Elpi Accumulate File "coq-fpc.mod".
+Elpi Accumulate File "fpc/coq-fpc.mod".
 Elpi Query "example 1 X Y.".
 Elpi Query "hope 1.".
 Elpi Query "maximize 2 (max X C).".
-Elpi Query "example 1 Tm Ty, debi 0 Tm Deb, polarize- Ty Form, ljf_entry ((lc 0 Deb) <c> (max _ M)) Form.".
-Elpi Accumulate File "maximal-fpc.mod".
-Elpi Accumulate File "pairing-fpc.mod".
+Elpi Query "example 1 Tm Ty, debi 0 Tm Deb, polarize- Ty Form, ljf_entry ((lc 0 Deb) <c> (max N M)) Form.".
+(* Elpi Query "example 1 Tm Ty, polarize- Ty Form, ljf_entry (X <c> (max zero (max1 (maxi (ix X0) (max1 (maxi (ix X0) max0)))))) Form.".
+*)
 Elpi Query "maximize 2 (max X Y).".
 Elpi Query "hope 2.".
 Elpi Query "maximize 2 (max zero C), max->coq C D.".
