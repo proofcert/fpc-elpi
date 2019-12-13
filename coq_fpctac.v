@@ -46,7 +46,7 @@ Elpi Db lambda.db lp:{{
   %% The available propositional contexts, for the solver to look into.
   prop_list [l].
   prop_list [l,j].
-  prop_list [j,k,l].
+  prop_list [l,j,k].
 }}.
 
 (* Examples translated to MaxCert *)
@@ -55,6 +55,36 @@ Elpi Db maxcerts.db lp:{{
 maxex 2 (max zero (max1
  (maxi (ix zero) 
    (max1 (maxi (ix (succ zero)) (max1 (maxi (ix (succ zero)) max0))))))).
+}}.
+
+Elpi Db coq_fpc.db lp:{{
+  %% Coq terms as proof certificates!
+  pred coq_to_iform i:term, o:iform.
+  coq_to_iform (prod _name (sort prop) T) F :- atomic F.
+  coq_to_iform (prod _name T1 T2) (A imp B) :-
+    coq_to_iform T1 A,
+    pi x\ coq_to_iform x A => coq_to_iform T2 B. %% T2 should not be really depending on the abstracted term!
+  %% The forall case should be something in the likes of this
+  % coq_to_iform (prod _name T1 T2) (A imp B) :-
+  %   coq_to_iform T1 A,
+  %   pi x\ coq_to_iform x A => coq_to_iform (T2 x) B.
+  %% Reminder:
+  % type fun  @name -> term -> (term -> term) -> term.         % fun x : t =>
+  % type prod @name -> term -> (term -> term) -> term.         % forall x : t,
+  % type let  @name -> term -> term -> (term -> term) -> term. % let x : T := v in
+  % type app   list term -> term.                   % app [hd|args]
+  kind deb            type.
+  type apply          int -> list deb -> deb.
+  type lc             int ->      deb -> cert.
+  type args           int -> list deb -> cert.    
+  type idx                       int -> index.
+  arr_jc      (lc C D) (lc C D).
+  storeR_jc   (lc C D) (lc C D).
+  releaseR_je (lc C D) (lc C D).
+  storeL_jc   (lc C D) (lc C' D) (idx C) :- C' is C + 1.
+  decideL_je  (lc C (apply H A)) (args C A) (idx V) :- V is C - H - 1.
+  initialL_je (args _C []).
+  arr_je      (args C (A::As)) (lc C A) (args C As).
 }}.
 
 Elpi Tactic fpc.
@@ -85,15 +115,15 @@ Elpi Accumulate lp:{{
   prop_to_coq Tm Iform [] Term :-
     lambda_to_coq Tm Iform Term.
   %% The predicate translating the term with formula to a Coq term
-  pred lambda_to_coq i:tm, i:iform, o:term.
+  type lambda_to_coq tm -> iform -> term -> prop.
   lambda_to_coq (lam X) (T1 imp T2) (fun _name T1' (x\ F x)):-
     iform_to_coq T1 T1',
     pi x y\ lambda_to_coq x T1 y =>
       lambda_to_coq (X x) T2 (F y).
   % Not working at the moment
-  % lambda_to_coq (ap X Y) Ty (app [X',Y']):-
-  %   lambda_to_coq X (T imp Ty) X',
-  %   lambda_to_coq Y T Y'.
+  lambda_to_coq (ap X Y) Ty (app [X',Y']):-
+    lambda_to_coq X (T imp Ty) X',
+    lambda_to_coq Y T Y'.
 
   %% The main predicate. Select the example, translate the lambda term to Coq.
   solve [int N] [goal Ctx Ev Ty _] [] :- 
@@ -103,7 +133,6 @@ Elpi Typecheck.
 
 (*Time for tests!*)
 (*Some tests on the lambda Prolog code*)
-Elpi Trace "lambda_to_coq".
 Elpi Query lp:{{
   prop_to_coq (lam x\x) (j imp j) [j] X.
   }}.
@@ -118,8 +147,11 @@ Elpi Query lp:{{
 }}.
 Elpi Query lp:{{prop_to_coq (lam x\ lam y\ y) (j imp (l imp l)) [l,j] {{(fun (A B : Prop) (_ : B) (H0 : A) => H0)}}.
 }}.
-(*Elpi Query lp:{{
+Elpi Query lp:{{
   prop_to_coq (lam x\ lam y\ ap x y) ((l imp j) imp (l imp j)) [l,j] X.
+}}.
+(*Elpi Query lp:{{
+  prop_to_coq (lam x\ lam y\ ap x y) ((l imp j) imp (l imp j)) [l,j] (fun `A` (sort prop) c0 \ fun `B` (sort prop) c1 \ fun `H` (prod `_` c0 c2 \ c1) c2 \ fun `J` c0 c3 \ app [c2, c3]).
 }}. *)
 
 (* Elpi Accumulate lp:{{
@@ -150,6 +182,15 @@ Lemma example2 : forall A B : Prop, B -> (A -> A).
 elpi fpc 2.
 Show Proof.
 Qed.
-Lemma example3 : forall A B : Prop, (B -> A) -> (B -> A).
+Lemma example3 : forall A B : Prop, (A -> B) -> (A -> B).
+elpi id.
 elpi fpc 3.
-  example 3 (lam x\ lam y\ ap x y) ((l imp j) imp (l imp j)).
+Qed.
+Lemma example4 : forall A B : Prop, A -> (B -> ((A -> A) -> A)).
+elpi fpc 4.
+Qed.
+Lemma example5 : forall A B C : Prop, A -> ((((A->B)->B)->C)->C).
+elpi fpc 5.
+Qed.
+Lemma example6 : forall A B C : Prop, B -> ((((A->B)->B)->C)->C).
+elpi fpc 6.
