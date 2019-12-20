@@ -26,7 +26,7 @@ Elpi Db lambda.db lp:{{
   type debe           int -> tm -> int -> (list deb -> list deb) -> prop.
   type vr             int -> tm -> prop.
   
-  type i,j,k          iform.  % atomic formulas = primitive types
+  type l,j,k          iform.  % atomic formulas = primitive types
   type atomic, non_atomic                   iform -> prop.
   non_atomic tt         & non_atomic ff.
   non_atomic (_ and _)  & non_atomic (_ or _)  &  non_atomic (_ imp _).
