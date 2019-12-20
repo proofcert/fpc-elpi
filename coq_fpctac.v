@@ -59,11 +59,11 @@ maxex 2 (max zero (max1
 
 Elpi Db coq_fpc.db lp:{{
   %% Coq terms as proof certificates!
-  pred coq_to_iform i:term, o:iform.
-  coq_to_iform (prod _name (sort prop) T) F :- atomic F.
-  coq_to_iform (prod _name T1 T2) (A imp B) :-
-    coq_to_iform T1 A,
-    pi x\ coq_to_iform x A => coq_to_iform T2 B. %% T2 should not be really depending on the abstracted term!
+  % pred coq_to_iform i:term, o:iform.
+  % coq_to_iform (prod _name (sort prop) T) F :- atomic F.
+  % coq_to_iform (prod _name T1 T2) (A imp B) :-
+  %   coq_to_iform T1 A,
+  %   pi x\ coq_to_iform x A => coq_to_iform T2 B. %% T2 should not be really depending on the abstracted term!
   %% The forall case should be something in the likes of this
   % coq_to_iform (prod _name T1 T2) (A imp B) :-
   %   coq_to_iform T1 A,
@@ -73,20 +73,59 @@ Elpi Db coq_fpc.db lp:{{
   % type prod @name -> term -> (term -> term) -> term.         % forall x : t,
   % type let  @name -> term -> term -> (term -> term) -> term. % let x : T := v in
   % type app   list term -> term.                   % app [hd|args]
-  kind deb            type.
-  type apply          int -> list deb -> deb.
-  type lc             int ->      deb -> cert.
-  type args           int -> list deb -> cert.    
-  type idx                       int -> index.
-  arr_jc      (lc C D) (lc C D).
-  storeR_jc   (lc C D) (lc C D).
-  releaseR_je (lc C D) (lc C D).
-  storeL_jc   (lc C D) (lc C' D) (idx C) :- C' is C + 1.
-  decideL_je  (lc C (apply H A)) (args C A) (idx V) :- V is C - H - 1.
-  initialL_je (args _C []).
-  arr_je      (args C (A::As)) (lc C A) (args C As).
+  %% The fpc for lambda terms in DeBrujin
+  % kind deb            type.
+  % type apply          int -> list deb -> deb.
+  % type lc             int ->      deb -> cert.
+  % type args           int -> list deb -> cert.    
+  % type idx                       int -> index.
+  % arr_jc      (lc C D) (lc C D).
+  % storeR_jc   (lc C D) (lc C D).
+  % releaseR_je (lc C D) (lc C D).
+  % storeL_jc   (lc C D) (lc C' D) (idx C) :- C' is C + 1.
+  % decideL_je  (lc C (apply H A)) (args C A) (idx V) :- V is C - H - 1.
+  % initialL_je (args _C []).
+  % arr_je      (args C (A::As)) (lc C A) (args C As).
+  type coqcert term -> cert.
+  type coqabs  (term -> term) -> cert.
+  type hold index -> term -> cert.
+  type coqidx  term -> index.
+  type tmofidx index -> term.
+  arr_jc (coqcert (fun _name _type F)) (x\ hold x (F (tmofidx x))).
+  % arr_je (coqcert (app [H,T])) (coqcert T) (coqcert H).
+  arr_je (hold Idx (app [tmofidx Idx, A])) (coqcert A) (coqcert (tmofidx Idx)).
+  storeL_jc (hold Idx T) (coqcert T) Idx.
+  storeR_jc Cert Cert.
+  releaseR_je Cert Cert.
+  decideL_je (coqcert (app [tmofidx Idx,B] as Tm)) (hold Idx Tm) Idx.
+  decideL_je (coqcert (tmofidx Idx as Tm)) (hold Idx Tm) Idx.
+  initialL_je _.
 }}.
 
+Elpi Tactic coq_fpc.
+Elpi Accumulate File "fpc/ljf-polarize.mod".
+Elpi Accumulate File "fpc/ljf-lambda.mod".
+Elpi Accumulate File "fpc/stlc-fpc.mod".
+Elpi Accumulate File "fpc/pairing-fpc.mod".
+Elpi Accumulate File "fpc/maximal-fpc.mod".
+Elpi Accumulate Db coq_fpc.db.
+Elpi Typecheck.
+Elpi Debug "DEBUG".
+Elpi Query lp:{{
+  check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
+}}.
+Elpi Query lp:{{
+  check (coqcert (fun _ _ (x\x))) (async [] (unk (((n j) arr (n j)) arr (n j) arr (n j)))).
+}}.
+
+Elpi Accumulate Db maxcerts.db.
+Elpi Query lp:{{
+  ljf_entry (coqcert (fun _ _ (x\ fun _ _ (y\ y)))) ((n l) arr ((n j) arr (n j))).
+}}.
+Elpi Query lp:{{
+  maxex 2 Cert, ljf_entry (Cert <c> coqcert M) ((n l) arr ((n j) arr (n j))).
+}}.
+ <c> (coqcert M)
 Elpi Tactic fpc.
 Elpi Accumulate File "fpc/ljf-polarize.mod".
 Elpi Accumulate File "fpc/ljf-kernel.mod".
@@ -120,7 +159,6 @@ Elpi Accumulate lp:{{
     iform_to_coq T1 T1',
     pi x y\ lambda_to_coq x T1 y =>
       lambda_to_coq (X x) T2 (F y).
-  % Not working at the moment
   lambda_to_coq (ap X Y) Ty (app [X',Y']):-
     lambda_to_coq X (T imp Ty) X',
     lambda_to_coq Y T Y'.
