@@ -100,8 +100,7 @@ Elpi Query "example 1 X Y.".
 Elpi Query "hope 1.".
 Elpi Query "maximize 2 (max X C).".
 Elpi Query "example 1 Tm Ty, debi 0 Tm Deb, polarize- Ty Form, ljf_entry ((lc 0 Deb) <c> (max N M)) Form.".
-(* Elpi Query "example 1 Tm Ty, polarize- Ty Form, ljf_entry (X <c> (max zero (max1 (maxi (ix X0) (max1 (maxi (ix X0) max0)))))) Form.".
-*)
+Elpi Query "example 1 Tm Ty, polarize- Ty Form, ljf_entry (lc 0 Deb <c> (max zero (max1 (maxi (ix zero) (max1 (maxi (ix zero) max0)))))) Form.".
 Elpi Query "maximize 2 (max X Y).".
 Elpi Query "hope 2.".
 Elpi Query "maximize 2 (max zero C), max->coq C D.".
