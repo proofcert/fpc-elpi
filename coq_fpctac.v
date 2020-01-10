@@ -68,38 +68,36 @@ Elpi Db coq_fpc.db lp:{{
   % coq_to_iform (prod _name T1 T2) (A imp B) :-
   %   coq_to_iform T1 A,
   %   pi x\ coq_to_iform x A => coq_to_iform (T2 x) B.
-  %% Reminder:
-  % type fun  @name -> term -> (term -> term) -> term.         % fun x : t =>
-  % type prod @name -> term -> (term -> term) -> term.         % forall x : t,
-  % type let  @name -> term -> term -> (term -> term) -> term. % let x : T := v in
-  % type app   list term -> term.                   % app [hd|args]
-  %% The fpc for lambda terms in DeBrujin
-  % kind deb            type.
-  % type apply          int -> list deb -> deb.
-  % type lc             int ->      deb -> cert.
-  % type args           int -> list deb -> cert.    
-  % type idx                       int -> index.
-  % arr_jc      (lc C D) (lc C D).
-  % storeR_jc   (lc C D) (lc C D).
-  % releaseR_je (lc C D) (lc C D).
-  % storeL_jc   (lc C D) (lc C' D) (idx C) :- C' is C + 1.
-  % decideL_je  (lc C (apply H A)) (args C A) (idx V) :- V is C - H - 1.
-  % initialL_je (args _C []).
-  % arr_je      (args C (A::As)) (lc C A) (args C As).
   type coqcert term -> cert.
   type coqabs  (term -> term) -> cert.
   type hold index -> term -> cert.
-  type coqidx  term -> index.
+  % type coqidx  term -> index. %% Not used anymore?
   type tmofidx index -> term.
+  pred prop_name o:iform, o:term.
+  pred bootstrap i:term, o:term, o:iform.
+  bootstrap (prod _ (sort prop) Ty) (fun _name (sort prop) F) _:-
+    pi x y z\ atomic z => bootstrap x y z =>
+      bootstrap (Ty x) (F y) _.
+  bootstrap (prod _name T1 T2) _ (A imp B) :-
+    bootstrap T1 _ A,
+    pi x\ bootstrap (T2 x) _ B. %% T2 should not depend on the abstracted term!
+  bootstrap _ F Form :-
+    polarize- Form PForm, ljf_entry (coqcert F) PForm.
   arr_jc (coqcert (fun _name _type F)) (x\ hold x (F (tmofidx x))).
   % arr_je (coqcert (app [H,T])) (coqcert T) (coqcert H).
   arr_je (hold Idx (app [tmofidx Idx, A])) (coqcert A) (coqcert (tmofidx Idx)).
   storeL_jc (hold Idx T) (coqcert T) Idx.
-  storeR_jc Cert Cert.
-  releaseR_je Cert Cert.
   decideL_je (coqcert (app [tmofidx Idx,B] as Tm)) (hold Idx Tm) Idx.
   decideL_je (coqcert (tmofidx Idx as Tm)) (hold Idx Tm) Idx.
   initialL_je _.
+  storeR_jc Cert Cert.
+  releaseR_je Cert Cert.
+  %% New additions for connectives
+  decideR_je Cert Cert.
+  or_je (coqcert {{or_introl lp:T}}) (coqcert lp:T) left.
+  or_je (coqcert {{or_intror lp:T}}) (coqcert lp:T) right.
+  solve [] [goal Ctx Ev Ty _] [] :- 
+    bootstrap Ty Ev Form.
 }}.
 
 Elpi Tactic coq_fpc.
@@ -115,6 +113,12 @@ Elpi Query lp:{{
   check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
 }}.
 Elpi Query lp:{{
+  check (coqcert {{(lp:H: lp:A->lp:B) (lp:J: lp:B) => H J}}) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
+}}.
+Elpi Query lp:{{
+  check (coqcert ({{(fun (A B : Prop) (H : A) (_ : B) => or_introl H)}}) (async [] (unk (((n j) arr (n l)) arr ((n j) or (n l)))))).
+}}.
+Elpi Query lp:{{
   check (coqcert (fun _ _ (x\x))) (async [] (unk (((n j) arr (n j)) arr (n j) arr (n j)))).
 }}.
 
@@ -125,7 +129,6 @@ Elpi Query lp:{{
 Elpi Query lp:{{
   maxex 2 Cert, ljf_entry (Cert <c> coqcert M) ((n l) arr ((n j) arr (n j))).
 }}.
- <c> (coqcert M)
 Elpi Tactic fpc.
 Elpi Accumulate File "fpc/ljf-polarize.mod".
 Elpi Accumulate File "fpc/ljf-kernel.mod".
