@@ -75,11 +75,12 @@ Elpi Db coq_fpc.db lp:{{
   type tmofidx index -> term.
   pred prop_name o:iform, o:term.
   pred bootstrap i:term, o:term, o:iform.
-  bootstrap (prod _ (sort prop) Ty) (fun _name (sort prop) F) _:-
+  bootstrap (prod N (sort prop) Ty) (fun _name (sort prop) F) Form :-
+    coq.say "Ciao nuova" N,
     pi x y z\ atomic z => bootstrap x y z =>
-      bootstrap (Ty x) (F y) _.
+      bootstrap (Ty x) (F y) Form.
   bootstrap (prod _name T1 T2) _ (A imp B) :-
-    bootstrap T1 _ A,
+    bootstrap T1 _ A, coq.say "That's " T1 "so" A,
     pi x\ bootstrap (T2 x) _ B. %% T2 should not depend on the abstracted term!
   bootstrap _ F Form :-
     polarize- Form PForm, ljf_entry (coqcert F) PForm.
@@ -105,10 +106,16 @@ Elpi Accumulate File "fpc/ljf-polarize.mod".
 Elpi Accumulate File "fpc/ljf-lambda.mod".
 Elpi Accumulate File "fpc/stlc-fpc.mod".
 Elpi Accumulate File "fpc/pairing-fpc.mod".
-Elpi Accumulate File "fpc/maximal-fpc.mod".
+Elpi Accumulate File "fpc/dd-fpc.mod".
 Elpi Accumulate Db coq_fpc.db.
 Elpi Typecheck.
 Elpi Debug "DEBUG".
+Elpi Query lp:{{ljf_entry (coqcert (fun _ _ (x\ (fun _ _ (y\y)))))  ((n l) arr ((n j) arr (n j))).}}.
+Elpi Query lp:{{ljf_entry ((coqcert X) <c> (dd (s (zero))))  (((n j) arr (n j))).}}.
+Elpi Query lp:{{ljf_entry ((coqcert X) <c> (dd (s (zero))))  ((n l) arr ((n j) arr (n j))).}}.
+Elpi Query lp:{{ljf_entry (dd (s (s (s (zero)))))  ((n l) arr ((n j) arr (n j))).}}.
+Elpi Query lp:{{bootstrap {{forall A B : Prop, A -> (A->B) -> B}} Tm F.}}.
+
 Elpi Query lp:{{
   check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
 }}.
