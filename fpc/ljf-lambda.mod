@@ -23,7 +23,6 @@ ljf_entry Cert Form :- check Cert (async [] (unk Form)).
 % decide
 check Cert (async [] (str R)) :- decideL_je Cert Cert' Indx,
   storage Indx N, isNeg N,
-  coq.say "Deciding on" N "at" Indx,
   check Cert' (lfoc N R).
 check Cert (async [] (str P)) :-
   isPos P, decideR_je Cert Cert', check Cert' (rfoc P).
@@ -33,7 +32,6 @@ check Cert (rfoc N)   :- isNeg N, releaseR_je Cert Cert', check Cert' (async [] 
 % store
 check Cert (async [C|Theta] R) :- (isNeg C ; isPosAtm C),
   storeL_jc Cert Cert' Indx, 
-  coq.say "Storing" C "at" Indx,
   pi w\ storage (Indx w) C => check (Cert' w) (async Theta R).
 check Cert (async [] (unk D)) :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', check Cert' (async [] (str D)).
@@ -73,8 +71,7 @@ check Cert (async [] (unk (d- R))) :- check Cert (async [] (unk R)).
 
 % Synchronous Rules
 % arrow
-check Cert (lfoc (A arr B) R) :- coq.say "Trying", arr_je Cert CertA CertB,
-  coq.say "Cert checks",
+check Cert (lfoc (A arr B) R) :- arr_je Cert CertA CertB,
   check CertA (rfoc A), check CertB (lfoc B R).
 % disjunction
 check Cert (rfoc (A !+! B)) :- or_je Cert Cert' Choice, 
