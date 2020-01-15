@@ -5,7 +5,7 @@ kind cert, index                         type.
 kind choice                              type.
 type left, right                       choice.
 
-type storeL_jc                     cert -> cert -> index -> prop.
+type storeL_jc                     cert -> (A -> cert) -> (A -> index) -> prop.
 type decideL_je                    cert -> cert -> index -> prop.
 type decideR_je, storeR_jc,
      releaseL_je, releaseR_je      cert -> cert -> prop.
@@ -14,7 +14,7 @@ type initialR_je                   cert -> index -> prop.
 type cut_je                        cert -> cert -> cert -> form -> prop.
 type some_jc, all_jc               cert -> (i -> cert) -> prop.
 type some_je, all_je               cert -> cert -> i -> prop.
-type arr_jc                        cert -> (index -> cert) -> prop.
+type arr_jc                        cert -> cert -> prop.
 type andPos_jc                     cert -> cert -> prop.
 type or_jc, andNeg_jc,
      arr_je, andPos_je             cert ->  cert -> cert -> prop.

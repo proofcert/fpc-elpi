@@ -34,7 +34,7 @@ check Cert (rfoc N)   :- isNeg N, releaseR_je Cert Cert', check Cert' (async [] 
 check Cert (async [C|Theta] R) :- (isNeg C ; isPosAtm C),
   storeL_jc Cert Cert' Indx, 
   coq.say "Storing" C "at" Indx,
-  storage Indx C => check Cert' (async Theta R).
+  pi w\ storage (Indx w) C => check (Cert' w) (async Theta R).
 check Cert (async [] (unk D)) :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', check Cert' (async [] (str D)).
 
@@ -49,7 +49,7 @@ check Cert (async [] (str R)) :- cut_je Cert CertA CertB F,
 % Asynchronous Rules
 % arrow
 check Cert (async [] (unk (A arr B))) :-
-  arr_jc Cert Cert', pi w\ check (Cert' w) (async [A] (unk B)).
+  arr_jc Cert Cert', check Cert' (async [A] (unk B)).
 % disjunction
 check Cert (async [(A !+! B)| Theta] R) :- or_jc Cert CertA CertB,
   check CertA (async [A | Theta] R), check CertB (async [B | Theta] R).
