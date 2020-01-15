@@ -70,26 +70,38 @@ Elpi Db coq_fpc.db lp:{{
   %   pi x\ coq_to_iform x A => coq_to_iform (T2 x) B.
   type coqcert term -> cert.
   type coqabs  (term -> term) -> cert.
-  type hold index -> term -> cert.
+  type hold index -> (term -> term) -> cert.
   % type coqidx  term -> index. %% Not used anymore?
   type tmofidx index -> term.
-  pred prop_name o:iform, o:term.
-  pred bootstrap i:term, o:term, o:iform.
-  bootstrap (prod N (sort prop) Ty) (fun _name (sort prop) F) Form :-
-    coq.say "Ciao nuova" N,
-    pi x y z\ atomic z => bootstrap x y z =>
-      bootstrap (Ty x) (F y) Form.
-  bootstrap (prod _name T1 T2) _ (A imp B) :-
-    bootstrap T1 _ A, coq.say "That's " T1 "so" A,
-    pi x\ bootstrap (T2 x) _ B. %% T2 should not depend on the abstracted term!
-  bootstrap _ F Form :-
-    polarize- Form PForm, ljf_entry (coqcert F) PForm.
-  arr_jc (coqcert (fun _name _type F)) (x\ hold x (F (tmofidx x))).
-  % arr_je (coqcert (app [H,T])) (coqcert T) (coqcert H).
-  arr_je (hold Idx (app [tmofidx Idx, A])) (coqcert A) (coqcert (tmofidx Idx)).
-  storeL_jc (hold Idx T) (coqcert T) Idx.
-  decideL_je (coqcert (app [tmofidx Idx,B] as Tm)) (hold Idx Tm) Idx.
-  decideL_je (coqcert (tmofidx Idx as Tm)) (hold Idx Tm) Idx.
+  type idxoftm term -> index.
+  pred prop_name o:term, o:iform.
+  atomic X :- prop_name _ X.
+  coq_to_iform X Y :-
+    prop_name X Y.
+  coq_to_iform {{lp:X -> lp:Y}} (X' imp Y') :-
+    coq_to_iform X X',
+    coq_to_iform Y Y'.
+  coq_to_iform {{lp:X \/ lp:Y}} (X' or Y') :-
+    coq_to_iform X X',
+    coq_to_iform Y Y'.
+  type bootstrap term -> term -> prop.
+  :if "DEBUG" bootstrap A B :- announce (bootstrap A B).
+  bootstrap (prod N (sort prop) Ty) (fun _name (sort prop) F)  :-
+    pi x y z\ prop_name x y =>
+      bootstrap (Ty x) (F z).
+  bootstrap {{lp:T1 \/ lp:T2}} Term :-
+    coq_to_iform {{lp:T1 \/ lp:T2}} Form,
+    polarize- Form PForm, ljf_entry (<c> (dd (s (s zero))) (coqcert Term)) PForm.
+  bootstrap {{lp:T1 -> lp:T2}} Term :-
+    coq_to_iform {{lp:T1 -> lp:T2}} Form,
+    polarize- Form PForm, ljf_entry (<c> (dd (s (s zero))) (coqcert Term)) PForm.
+  arr_jc (coqcert (fun _name _type F)) (coqabs F).
+  arr_je (coqabs (x\ app [x,T])) (coqcert T) (coqabs (x\ x)).
+  % arr_je (coqabs (x\ x)) (coqcert A) (coqcert (tmofidx Idx)).
+  pred assoc o:index, o:term.
+  storeL_jc (coqabs T) (x\ coqcert (T x)) (x\ idxoftm x). % :- assoc Idx T.
+  decideL_je (coqcert (app [Hd,B])) (coqabs (x\ app [x,B])) (idxoftm Hd). % :- assoc Idx Hd.
+  decideL_je (coqcert Hd) (coqabs (x\ x)) (idxoftm Hd). % :- assoc Idx Tm.
   initialL_je _.
   storeR_jc Cert Cert.
   releaseR_je Cert Cert.
@@ -98,18 +110,39 @@ Elpi Db coq_fpc.db lp:{{
   or_je (coqcert {{or_introl lp:T}}) (coqcert lp:T) left.
   or_je (coqcert {{or_intror lp:T}}) (coqcert lp:T) right.
   solve [] [goal Ctx Ev Ty _] [] :- 
-    bootstrap Ty Ev Form.
+    bootstrap Ty Ev.
 }}.
 
 Elpi Tactic coq_fpc.
 Elpi Accumulate File "fpc/ljf-polarize.mod".
 Elpi Accumulate File "fpc/ljf-lambda.mod".
-Elpi Accumulate File "fpc/stlc-fpc.mod".
+(* Elpi Accumulate File "fpc/stlc-fpc.mod". *)
 Elpi Accumulate File "fpc/pairing-fpc.mod".
 Elpi Accumulate File "fpc/dd-fpc.mod".
 Elpi Accumulate Db coq_fpc.db.
 Elpi Typecheck.
+
 Elpi Debug "DEBUG".
+
+Elpi Query lp:{{
+  check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
+}}.
+Lemma example1 : forall A B: Prop, (A -> B) -> A -> B.
+elpi coq_fpc.
+Show Proof.
+Qed.
+
+Lemma example2 : forall A B : Prop, A -> B -> A \/ B.
+elpi coq_fpc.
+
+(* Elpi Trace. *)
+Elpi Query lp:{{bootstrap {{forall A : Prop, A -> A}} F.}}.
+Elpi Query lp:{{ljf_entry (coqcert (fun _ _ (y\y))) ((n j) arr (n j)).}}.
+Elpi Query lp:{{ljf_entry (coqcert (fun _ _ (x\ (fun _ _ (y\y)))))  ((n l) arr ((n j) arr (n j))).}}.
+Elpi Query lp:{{ljf_entry ((coqcert X) <c> (dd (s (zero))))  (((n j) arr (n j))).}}.
+Elpi Query lp:{{
+  ljf_entry (coqcert {{(fun (A B : Prop) (H : A) (_ : B) => or_introl H)}}) (((n j) arr (n l)) arr ((n j) !+! (n l))).
+}}.
 Elpi Query lp:{{ljf_entry (coqcert (fun _ _ (x\ (fun _ _ (y\y)))))  ((n l) arr ((n j) arr (n j))).}}.
 Elpi Query lp:{{ljf_entry ((coqcert X) <c> (dd (s (zero))))  (((n j) arr (n j))).}}.
 Elpi Query lp:{{ljf_entry ((coqcert X) <c> (dd (s (zero))))  ((n l) arr ((n j) arr (n j))).}}.
