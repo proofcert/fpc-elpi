@@ -7,7 +7,7 @@ module pairing-fpc.
 
 %allCx    (A <c> B) (x\ (C <c> (D x))) T    :- allCx  A C T, allC B D.
 
-storeL_jc   (A <c> B) (L <c> D) (I <i> J)    :- storeL_jc   A L I,   storeL_jc   B D J.
+storeL_jc   (A <c> B) (x\ (L x) <c> (D x)) (x\ (I x) <i> (J x))    :- storeL_jc   A L I,   storeL_jc   B D J.
 decideL_je  (A <c> B) (C <c> D) (I <i> J)     :- decideL_je  A C I,     decideL_je  B D J.
 releaseL_je (A <c> B) (C <c> D)               :- releaseL_je A C,       releaseL_je B D.
 decideR_je (A <c> B) (C <c> D)               :- decideR_je A C,       decideR_je B D.
@@ -21,7 +21,7 @@ andPos_je  (A <c> B) (C <c> D) (E <c> F)     :- andPos_je  A C E,     andPos_je 
 arr_je  (A <c> B) (C <c> D) (E <c> F)     :- arr_je  A C E,     arr_je  B D F.
 or_je   (A <c> B) (C <c> D) E             :- or_je   A C E,     or_je   B D E.
 andNeg_je   (A <c> B) (C <c> D) E             :- andNeg_je   A C E,     andNeg_je   B D E.
-arr_jc    (A <c> B) (x\ (C x) <c> (D x))             :- arr_jc    A C,         arr_jc    B D.
+arr_jc    (A <c> B) (C <c> D)             :- arr_jc    A C,         arr_jc    B D.
 andPos_jc    (A <c> B) (C <c> D)             :- andPos_jc    A C,         andPos_jc    B D.
 true_jc    (A <c> B) (C <c> D)             :- true_jc    A C,         true_jc    B D.
 true_je    (A <c> B)              :- true_je    A,         true_je    B.
