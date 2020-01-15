@@ -1,5 +1,5 @@
 sig pairing-fpc.
-accum_sig lkf-certificates.
+accum_sig ljf-lambda.
 
 
 /* start */
