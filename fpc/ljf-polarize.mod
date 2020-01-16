@@ -17,6 +17,7 @@ polarize+ (forall T) (all B)   :- pi x\ polarize+ (T x) (B x).
 
 polarize- A (n A) :- atomic A.
 polarize- (T imp S) (A arr B) :- polarize- T A, polarize- S B.
+polarize- (T or S) (A !+! B) :- polarize- T A, polarize- S B.
 
 polarizeP A (n A) :- atomic A.
 polarizeN A (n A) :- atomic A.
