@@ -110,7 +110,8 @@ Elpi Db coq_fpc.db lp:{{
   decideR_je Cert Cert.
   or_je (coqcert {{or_introl lp:T}}) (coqcert T) left.
   or_je (coqcert {{or_intror lp:T}}) (coqcert T) right.
-  % or_jc (coqcert {{or_intror lp:T}}) (coqcert lp:T) right.
+  % or_jc (coqabs (x\ app [global (const «or_ind» ), _, _, _, (fun _ _ T1), (fun _ _ T2), x])) (coqabs T1) (coqabs T1).
+  or_jc (coqabs (x\ {{or_ind (fun H0 : lp:_ => lp:T1) (fun H0 : lp:_ => lp:T2) lp:x}})) (coqabs T1) (coqabs T1).
   solve [(int N)] [goal Ctx Ev Ty _] [] :- 
     int_to_nat N Nat,
     bootstrap Ty Ev Nat.
@@ -127,6 +128,16 @@ Elpi Typecheck.
 
 Elpi Debug "DEBUG".
 (* Elpi Trace. *)
+Elpi Query lp:{{bootstrap {{forall A B : Prop, A \/ A -> A}}
+                          {{(fun (A _ : Prop) (H : A \/ A) => or_ind (fun H0 : A => H0) (fun H0 : A => H0) H)}}
+                          (s zero)}}.
+
+Elpi Query lp:{{bootstrap {{forall A B : Prop, A \/ A -> A}}
+                          {{(fun (A _ : Prop) (H : A \/ A) => or_ind (fun H0 : A => H0) (fun H0 : A => H0) H)}}
+                          (s zero)}}.
+
+Lemma example2 : forall A B : Prop, A \/ A -> A.
+elpi coq_fpc 1.
 Elpi Query lp:{{int_to_nat 1 X.}}.
 Lemma example1 : forall A B: Prop, (A -> B) -> A -> B.
 elpi coq_fpc 2.
@@ -134,11 +145,8 @@ Qed.
 
 Lemma example3 : forall A B : Prop, A -> A \/ B.
 elpi coq_fpc 1.
-
-Lemma example2 : forall A B : Prop, A \/ A -> A.
-firstorder.
 Show Proof.
-elpi coq_fpc 1.
+
 Elpi Query lp:{{
   check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
 }}.
