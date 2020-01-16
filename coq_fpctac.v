@@ -76,6 +76,7 @@ Elpi Db coq_fpc.db lp:{{
   type idxoftm term -> index.
   pred prop_name o:term, o:iform.
   atomic X :- prop_name _ X.
+  :if "DEBUG" coq_to_iform A B :- announce (coq_to_iform A B).
   coq_to_iform X Y :-
     prop_name X Y.
   coq_to_iform {{lp:X -> lp:Y}} (X' imp Y') :-
@@ -84,17 +85,17 @@ Elpi Db coq_fpc.db lp:{{
   coq_to_iform {{lp:X \/ lp:Y}} (X' or Y') :-
     coq_to_iform X X',
     coq_to_iform Y Y'.
-  type bootstrap term -> term -> prop.
-  :if "DEBUG" bootstrap A B :- announce (bootstrap A B).
-  bootstrap (prod N (sort prop) Ty) (fun _name (sort prop) F)  :-
+  type bootstrap term -> term -> nat -> prop.
+  :if "DEBUG" bootstrap A B N :- announce (bootstrap A B N).
+  bootstrap (prod _ (sort prop) Ty) (fun _ (sort prop) F) N:-
     pi x y z\ prop_name x y =>
-      bootstrap (Ty x) (F z).
-  bootstrap {{lp:T1 \/ lp:T2}} Term :-
-    coq_to_iform {{lp:T1 \/ lp:T2}} Form,
-    polarize- Form PForm, ljf_entry (<c> (dd (s (s zero))) (coqcert Term)) PForm.
-  bootstrap {{lp:T1 -> lp:T2}} Term :-
+      bootstrap (Ty x) (F z) N.
+  bootstrap {{lp:T1 \/ lp:T2}} Term N :-
+    coq_to_iform {{lp:T1 \/ lp:T2}} Form, coq.say Form,
+    polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
+  bootstrap {{lp:T1 -> lp:T2}} Term N :-
     coq_to_iform {{lp:T1 -> lp:T2}} Form,
-    polarize- Form PForm, ljf_entry (<c> (dd (s (s zero))) (coqcert Term)) PForm.
+    polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   arr_jc (coqcert (fun _name _type F)) (coqabs F).
   arr_je (coqabs (x\ app [x,T])) (coqcert T) (coqabs (x\ x)).
   % arr_je (coqabs (x\ x)) (coqcert A) (coqcert (tmofidx Idx)).
@@ -107,10 +108,12 @@ Elpi Db coq_fpc.db lp:{{
   releaseR_je Cert Cert.
   %% New additions for connectives
   decideR_je Cert Cert.
-  or_je (coqcert {{or_introl lp:T}}) (coqcert lp:T) left.
-  or_je (coqcert {{or_intror lp:T}}) (coqcert lp:T) right.
-  solve [] [goal Ctx Ev Ty _] [] :- 
-    bootstrap Ty Ev.
+  or_je (coqcert {{or_introl lp:T}}) (coqcert T) left.
+  or_je (coqcert {{or_intror lp:T}}) (coqcert T) right.
+  % or_jc (coqcert {{or_intror lp:T}}) (coqcert lp:T) right.
+  solve [(int N)] [goal Ctx Ev Ty _] [] :- 
+    int_to_nat N Nat,
+    bootstrap Ty Ev Nat.
 }}.
 
 Elpi Tactic coq_fpc.
@@ -123,17 +126,25 @@ Elpi Accumulate Db coq_fpc.db.
 Elpi Typecheck.
 
 Elpi Debug "DEBUG".
+(* Elpi Trace. *)
+Elpi Query lp:{{int_to_nat 1 X.}}.
+Lemma example1 : forall A B: Prop, (A -> B) -> A -> B.
+elpi coq_fpc 2.
+Qed.
 
+Lemma example3 : forall A B : Prop, A -> A \/ B.
+elpi coq_fpc 1.
+
+Lemma example2 : forall A B : Prop, A \/ A -> A.
+firstorder.
+Show Proof.
+elpi coq_fpc 1.
 Elpi Query lp:{{
   check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
 }}.
-Lemma example1 : forall A B: Prop, (A -> B) -> A -> B.
-elpi coq_fpc.
 Show Proof.
 Qed.
-
-Lemma example2 : forall A B : Prop, A -> B -> A \/ B.
-elpi coq_fpc.
+Elpi Query lp:{{coq.say {{lp:A \/ lp:B}}.}}.
 
 (* Elpi Trace. *)
 Elpi Query lp:{{bootstrap {{forall A : Prop, A -> A}} F.}}.
