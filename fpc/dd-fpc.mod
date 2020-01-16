@@ -25,3 +25,7 @@ or_je       (dd D) (dd D) _.
 andNeg_je   (dd D) (dd D) _.
 true_je    (dd D).
 true_jc    (dd D) (dd D).
+
+pred int_to_nat i:int, o:nat.
+int_to_nat 0 zero.
+int_to_nat I (s N) :- I' is (I - 1), int_to_nat I' N.
