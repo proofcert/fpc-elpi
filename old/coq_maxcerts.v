@@ -1,3 +1,4 @@
+(* OLD File: provided a simple way to export MaxCerts into MaxCerts in Coq *)
 From elpi Require Import elpi.
 
 Module Type LKF_Params.
