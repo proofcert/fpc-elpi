@@ -11,8 +11,6 @@ Elpi Db coq_fpc.db lp:{{
   type coqcert term -> cert.
   type coqabs  (term -> term) -> cert.
   type hold index -> (term -> term) -> cert.
-  % type coqidx  term -> index. %% Not used anymore?
-  type tmofidx index -> term.
   type idxoftm term -> index.
   pred prop_name o:term, o:iform.
   atomic X :- prop_name _ X.
@@ -46,12 +44,11 @@ Elpi Db coq_fpc.db lp:{{
   initialL_je _.
   storeR_jc Cert Cert.
   releaseR_je Cert Cert.
-  %% New additions for connectives
   decideR_je Cert Cert.
   or_je (coqcert {{or_introl lp:T}}) (coqcert T) left.
   or_je (coqcert {{or_intror lp:T}}) (coqcert T) right.
   % or_jc (coqabs (x\ app [global (const «or_ind» ), _, _, _, (fun _ _ T1), (fun _ _ T2), x])) (coqabs T1) (coqabs T1).
-  or_jc (coqabs (x\ {{or_ind (fun H0 : lp:_ => lp:T1) (fun H0 : lp:_ => lp:T2) lp:x}})) (coqabs T1) (coqabs T1).
+  or_jc (coqabs (x\ {{or_ind lp:{{fun _ _ T1}} lp:{{fun _  _ T2}} lp:x}})) (coqabs T1) (coqabs T1).
   solve [(int N)] [goal Ctx Ev Ty _] [] :- 
     int_to_nat N Nat,
     bootstrap Ty Ev Nat.
@@ -60,7 +57,6 @@ Elpi Db coq_fpc.db lp:{{
 Elpi Tactic coq_fpc.
 Elpi Accumulate File "fpc/ljf-polarize.mod".
 Elpi Accumulate File "fpc/ljf-lambda.mod".
-(* Elpi Accumulate File "fpc/stlc-fpc.mod". *)
 Elpi Accumulate File "fpc/pairing-fpc.mod".
 Elpi Accumulate File "fpc/dd-fpc.mod".
 Elpi Accumulate Db coq_fpc.db.
@@ -68,33 +64,32 @@ Elpi Typecheck.
 
 Elpi Debug "DEBUG".
 (* Elpi Trace. *)
-Elpi Query lp:{{bootstrap {{forall A B : Prop, A \/ A -> A}}
-                          {{(fun (A _ : Prop) (H : A \/ A) => or_ind (fun H0 : A => H0) (fun H0 : A => H0) H)}}
+Elpi Query lp:{{bootstrap {{forall A : Prop, A \/ A -> A}}
+                          {{(fun (A : Prop) (H : A \/ A) => or_ind (fun H0 : A => H0) (fun H0 : A => H0) H)}}
                           (s zero)}}.
 
-Elpi Query lp:{{bootstrap {{forall A B : Prop, A \/ A -> A}}
-                          {{(fun (A _ : Prop) (H : A \/ A) => or_ind (fun H0 : A => H0) (fun H0 : A => H0) H)}}
+Elpi Query lp:{{bootstrap {{forall A : Prop, A \/ A -> A}}
+                          J
                           (s zero)}}.
 
-Lemma example2 : forall A B : Prop, A \/ A -> A.
-elpi coq_fpc 1.
-Elpi Query lp:{{int_to_nat 1 X.}}.
+(* Example lemmas *)
 Lemma example1 : forall A B: Prop, (A -> B) -> A -> B.
 elpi coq_fpc 2.
+Show Proof.
 Qed.
+
+Lemma example2 : forall A : Prop, A \/ A -> A.
+Elpi Trace.
+elpi coq_fpc 1.
 
 Lemma example3 : forall A B : Prop, A -> A \/ B.
 elpi coq_fpc 1.
-Show Proof.
 
+(* Debug queries to check the behaviour on terms *)
+(* Elpi Trace. *)
 Elpi Query lp:{{
   check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
 }}.
-Show Proof.
-Qed.
-Elpi Query lp:{{coq.say {{lp:A \/ lp:B}}.}}.
-
-(* Elpi Trace. *)
 Elpi Query lp:{{bootstrap {{forall A : Prop, A -> A}} F.}}.
 Elpi Query lp:{{ljf_entry (coqcert (fun _ _ (y\y))) ((n j) arr (n j)).}}.
 Elpi Query lp:{{ljf_entry (coqcert (fun _ _ (x\ (fun _ _ (y\y)))))  ((n l) arr ((n j) arr (n j))).}}.
@@ -105,8 +100,6 @@ Elpi Query lp:{{
 Elpi Query lp:{{ljf_entry (coqcert (fun _ _ (x\ (fun _ _ (y\y)))))  ((n l) arr ((n j) arr (n j))).}}.
 Elpi Query lp:{{ljf_entry ((coqcert X) <c> (dd (s (zero))))  (((n j) arr (n j))).}}.
 Elpi Query lp:{{ljf_entry ((coqcert X) <c> (dd (s (zero))))  ((n l) arr ((n j) arr (n j))).}}.
-Elpi Query lp:{{ljf_entry (dd (s (s (s (zero)))))  ((n l) arr ((n j) arr (n j))).}}.
-Elpi Query lp:{{bootstrap {{forall A B : Prop, A -> (A->B) -> B}} Tm F.}}.
 
 Elpi Query lp:{{
   check (coqcert (fun _ _ (x\ (fun _ _ (y\ app [x, y]))))) (async [] (unk (((n j) arr (n l)) arr (n j) arr (n l)))).
@@ -120,4 +113,3 @@ Elpi Query lp:{{
 Elpi Query lp:{{
   check (coqcert (fun _ _ (x\x))) (async [] (unk (((n j) arr (n j)) arr (n j) arr (n j)))).
 }}.
-
