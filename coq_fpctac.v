@@ -17,10 +17,10 @@ Elpi Db coq_fpc.db lp:{{
   :if "DEBUG" coq_to_iform A B :- announce (coq_to_iform A B).
   coq_to_iform X Y :-
     prop_name X Y.
-  coq_to_iform {{lp:X -> lp:Y}} (X' imp Y') :-
+  coq_to_iform {{lp:X -> lp:Y}} (imp X' Y') :-
     coq_to_iform X X',
     coq_to_iform Y Y'.
-  coq_to_iform {{lp:X \/ lp:Y}} (X' or Y') :-
+  coq_to_iform {{lp:X \/ lp:Y}} (or X' Y') :-
     coq_to_iform X X',
     coq_to_iform Y Y'.
   type bootstrap term -> term -> nat -> prop.
