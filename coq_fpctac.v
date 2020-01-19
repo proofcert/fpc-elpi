@@ -73,6 +73,9 @@ Elpi Typecheck.
 
 Elpi Debug "DEBUG".
 (* Elpi Trace. *)
+
+(* These queries with disjunction -- including synthesizing a term -- work.
+However the tactic fails with an assertion violation in coq-elpi... *)
 Elpi Query lp:{{bootstrap {{forall A : Prop, A \/ A -> A}}
                           {{(fun (A : Prop) (H : A \/ A) => or_ind (fun H0 : A => H0) (fun H0 : A => H0) H)}}
                           (s zero)}}.
@@ -90,9 +93,16 @@ Qed.
 Lemma example2 : forall A : Prop, A \/ A -> A.
 Elpi Trace.
 elpi coq_fpc 1.
+Qed.
 
 Lemma example3 : forall A B : Prop, A -> A \/ B.
 elpi coq_fpc 1.
+Qed.
+
+Lemma example4 : forall A B : Prop, A -> B -> A /\ B.
+elpi coq_fpc 1.
+Show Proof.
+Qed.
 
 (* Debug queries to check the behaviour on terms *)
 (* Elpi Trace. *)
