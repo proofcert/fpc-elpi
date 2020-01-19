@@ -8,6 +8,15 @@ Elpi Accumulate lp:{{
 }}. 
 
 Elpi Db coq_fpc.db lp:{{
+  kind iform          type.
+  type imp            iform -> iform -> iform.
+  type forall         (i -> iform) -> iform.
+  type tt, ff         iform.
+  type and, or        iform -> iform -> iform.
+  type exists         (i -> iform) -> iform.
+  infixr and  6.
+  infixr or   5.
+  infixr imp  4.
   type coqcert term -> cert.
   type coqabs  (term -> term) -> cert.
   type hold index -> (term -> term) -> cert.
