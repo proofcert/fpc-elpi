@@ -23,10 +23,14 @@ Elpi Db coq_fpc.db lp:{{
   type idxoftm term -> index.
   pred prop_name o:term, o:iform.
   atomic X :- prop_name _ X.
+  type coq_to_iform term -> iform -> prop.
   :if "DEBUG" coq_to_iform A B :- announce (coq_to_iform A B).
   coq_to_iform X Y :-
     prop_name X Y.
   coq_to_iform {{lp:X -> lp:Y}} (X' imp Y') :-
+    coq_to_iform X X',
+    coq_to_iform Y Y'.
+  coq_to_iform {{lp:X /\ lp:Y}} (X' and Y') :-
     coq_to_iform X X',
     coq_to_iform Y Y'.
   coq_to_iform {{lp:X \/ lp:Y}} (X' or Y') :-
@@ -37,8 +41,11 @@ Elpi Db coq_fpc.db lp:{{
   bootstrap (prod _ (sort prop) Ty) (fun _ (sort prop) F) N:-
     pi x y z\ prop_name x y =>
       bootstrap (Ty x) (F z) N.
+  bootstrap {{lp:T1 /\ lp:T2}} Term N :-
+    coq_to_iform {{lp:T1 /\ lp:T2}} Form,
+    polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   bootstrap {{lp:T1 \/ lp:T2}} Term N :-
-    coq_to_iform {{lp:T1 \/ lp:T2}} Form, coq.say Form,
+    coq_to_iform {{lp:T1 \/ lp:T2}} Form,
     polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   bootstrap {{lp:T1 -> lp:T2}} Term N :-
     coq_to_iform {{lp:T1 -> lp:T2}} Form,
@@ -58,6 +65,16 @@ Elpi Db coq_fpc.db lp:{{
   or_je (coqcert {{or_intror lp:T}}) (coqcert T) right.
   % or_jc (coqabs (x\ app [global (const «or_ind» ), _, _, _, (fun _ _ T1), (fun _ _ T2), x])) (coqabs T1) (coqabs T1).
   or_jc (coqabs (x\ {{or_ind lp:{{fun _ _ T1}} lp:{{fun _  _ T2}} lp:x}})) (coqabs T1) (coqabs T1).
+  andNeg_jc (coqcert {{conj lp:T1 lp:T2}}) (coqcert T1) (coqcert T2).
+  %% TODO: This is not the right way to do conjunction-left
+  andNeg_je (coqabs (x\ {{proj1 lp:x}})) (coqcert T) left.
+  andNeg_je (coqabs (x\ {{proj2 lp:x}})) (coqcert T) right.
+  % Proposal for first order connectives. However, this would require to
+  % handle terms with type term instead of i in the kernel
+  % all_jc (coqcert (fun _ _ F)) (x\ coqcert (F x)). 
+  % all_je (coqabs (x\ app [x, T])) (coqcert T) Term.
+  % some_je (coqcert {{ex_intro lp:T lp:Term lp:Uhm}}) (coqcert T) Term.
+  % some_jc (coqabs (x\ app [x, T])) (x\ app [x, T]).
   solve [(int N)] [goal Ctx Ev Ty _] [] :- 
     int_to_nat N Nat,
     bootstrap Ty Ev Nat.
