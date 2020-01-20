@@ -36,6 +36,10 @@ Elpi Db coq_fpc.db lp:{{
   coq_to_iform {{lp:X \/ lp:Y}} (X' or Y') :-
     coq_to_iform X X',
     coq_to_iform Y Y'.
+  % coq_to_iform {{forall lp:X : lp:Ty, T2}} (forall (x\ T')) :-
+  %   not (Ty = (sort prop)),
+  %   pi x\ term_to_i x X =>
+  %     coq_to_iform {{lp:T2 lp:X}} (T' x).
   type bootstrap term -> term -> nat -> prop.
   :if "DEBUG" bootstrap A B N :- announce (bootstrap A B N).
   bootstrap (prod _ (sort prop) Ty) (fun _ (sort prop) F) N:-
@@ -50,6 +54,10 @@ Elpi Db coq_fpc.db lp:{{
   bootstrap {{lp:T1 -> lp:T2}} Term N :-
     coq_to_iform {{lp:T1 -> lp:T2}} Form,
     polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
+  % bootstrap {{forall lp:X : lp:Ty, T2}} Term N :-
+  %   not (Ty = (sort prop)),
+  %   coq_to_iform {{forall lp:X : lp:Ty, T2}},
+  %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   arr_jc (coqcert (fun _name _type F)) (coqabs F).
   arr_je (coqabs (x\ app [x,T])) (coqcert T) (coqabs (x\ x)).
   % arr_je (coqabs (x\ x)) (coqcert A) (coqcert (tmofidx Idx)).
