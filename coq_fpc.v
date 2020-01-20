@@ -60,11 +60,10 @@ Elpi Db coq_fpc.db lp:{{
   %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   arr_jc (coqcert (fun _name _type F)) (coqabs F).
   arr_je (coqabs (x\ app [x,T])) (coqcert T) (coqabs (x\ x)).
-  % arr_je (coqabs (x\ x)) (coqcert A) (coqcert (tmofidx Idx)).
-  pred assoc o:index, o:term.
-  storeL_jc (coqabs T) (x\ coqcert (T x)) (x\ idxoftm x). % :- assoc Idx T.
-  decideL_je (coqcert (app [Hd,B])) (coqabs (x\ app [x,B])) (idxoftm Hd). % :- assoc Idx Hd.
-  decideL_je (coqcert Hd) (coqabs (x\ x)) (idxoftm Hd). % :- assoc Idx Tm.
+  storeL_jc (coqabs T) (x\ coqcert (T x)) (x\ idxoftm x).
+  decideL_je (coqcert (app [Hd,B])) (coqabs (x\ app [x,B])) (idxoftm Hd).
+  decideL_je (coqcert Hd) (coqabs (x\ x)) (idxoftm Hd).
+  decideL_je (coqcert {{and_ind lp:T lp:Ev}}) (coqabs (x\ {{and_ind lp:T lp:x}})) Idx.
   initialL_je _.
   storeR_jc Cert Cert.
   releaseR_je Cert Cert.
@@ -74,11 +73,14 @@ Elpi Db coq_fpc.db lp:{{
   % or_jc (coqabs (x\ app [global (const «or_ind» ), _, _, _, (fun _ _ T1), (fun _ _ T2), x])) (coqabs T1) (coqabs T1).
   or_jc (coqabs (x\ {{or_ind lp:{{fun _ _ T1}} lp:{{fun _  _ T2}} lp:x}})) (coqabs T1) (coqabs T1).
   andNeg_jc (coqcert {{conj lp:T1 lp:T2}}) (coqcert T1) (coqcert T2).
-  %% TODO: This is not the right way to do conjunction-left
-  andNeg_je (coqabs (x\ {{proj1 lp:x}})) (coqcert T) left.
-  andNeg_je (coqabs (x\ {{proj2 lp:x}})) (coqcert T) right.
-  % Proposal for first order connectives. However, this would require to
-  % handle terms with type term instead of i in the kernel
+  % Instead of using a let-expression, we substitute into the term. Is this good enough?
+  andNeg_je (coqabs T) (coqabs (x\ T {{proj1 lp:x}})) left.
+  andNeg_je (coqabs T) (coqabs (x\ T {{proj2 lp:x}})) right.
+  %% TODO: andPos will be needed, especially in case we want to host classical logic
+  % andPos_jc (coqabs (x\ {{and_ind lp:{{fun _ _ (x\ fun _ _ (y\ T))}} lp:x}})) (coqabs (x\ (y\ T))).
+  % andPos_je (coqcert T) (coqcert T) (coqcert T).
+  %% Proposal for first order connectives. However, this would require to
+  %% handle terms with type term instead of i in the kernel
   % all_jc (coqcert (fun _ _ F)) (x\ coqcert (F x)). 
   % all_je (coqabs (x\ app [x, T])) (coqcert T) Term.
   % some_je (coqcert {{ex_intro lp:T lp:Term lp:Uhm}}) (coqcert T) Term.
@@ -95,7 +97,6 @@ Elpi Accumulate File "fpc/pairing-fpc.mod".
 Elpi Accumulate File "fpc/dd-fpc.mod".
 Elpi Accumulate Db coq_fpc.db.
 Elpi Typecheck.
-
 Elpi Debug "DEBUG".
 (* Elpi Trace. *)
 
@@ -126,9 +127,19 @@ Qed.
 
 Lemma example4 : forall A B : Prop, A -> B -> A /\ B.
 elpi coq_fpc 1.
-Show Proof.
 Qed.
 
+Lemma example5 : forall A B : Prop, A /\ B -> A.
+elpi coq_fpc 1.
+Qed.
+
+(*
+  This query succeeds, even though the behaviour of disjunction elimination seems different from
+the one specified in the fpc. Maybe some form of beta-conversion happens when doing quotations?
+*)
+Elpi Query lp:{{bootstrap {{forall A B : Prop, A /\ B -> A}}
+     {{(fun (A B : Prop) (H : A /\ B) => and_ind (fun (H0 : A) (_ : B) => H0) H) }}
+                          (s zero).}}.
 (* Debug queries to check the behaviour on terms *)
 (* Elpi Trace. *)
 Elpi Query lp:{{
