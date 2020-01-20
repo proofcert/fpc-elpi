@@ -12,8 +12,8 @@ type decideR_je, storeR_jc,
 type initialL_je                   cert -> prop.
 type initialR_je                   cert -> index -> prop.
 type cut_je                        cert -> cert -> cert -> form -> prop.
-type some_jc, all_jc               cert -> (i -> cert) -> prop.
-type some_je, all_je               cert -> cert -> i -> prop.
+type some_jc, all_jc               cert -> (A -> cert) -> prop.
+type some_je, all_je               cert -> cert -> A -> prop.
 type arr_jc                        cert -> cert -> prop.
 type andPos_jc                     cert -> cert -> prop.
 type or_jc, andNeg_jc,

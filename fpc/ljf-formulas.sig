@@ -7,7 +7,7 @@ type d-, d+      form -> form.         % Delays
 type &-&, &+&    form -> form -> form. % Conjunctions
 type !+!         form -> form -> form. % Disjunction
 type arr         form -> form -> form. % Implication
-type all, some   (i -> form)  -> form. % Quantifiers
+type all, some   (A -> form)  -> form. % Quantifiers
 type f, t+, t-                   form. % Units
 
 infixr &-&, &+&  6.
