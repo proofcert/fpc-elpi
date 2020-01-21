@@ -32,4 +32,6 @@ all_je    (A <c> B) (C <c> D) W             :- all_je    A C W,     all_je    B 
 
 % some_jc, all_jc               cert -> (i -> cert) -> prop.
 
+all_jc (A <c> B) (x\ (C x) <c> (D x)) :- all_jc A C, all_jc B D.
+some_jc (A <c> B) (x\ (C x) <c> (D x)) :- some_jc A C, some_jc B D.
 /* end */
