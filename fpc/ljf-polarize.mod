@@ -19,6 +19,8 @@ polarize- A (n A) :- atomic A.
 polarize- (T imp S) (A arr B) :- polarize- T A, polarize- S B.
 polarize- (T or S) (A !+! B) :- polarize- T A, polarize- S B.
 polarize- (T and S) (A &-& B) :- polarize- T A, polarize- S B.
+polarize- (forall B)(all B')  :- pi x\ polarize- (B x) (B' x).
+polarize- (exists B)(some B') :- pi x\ polarize- (B x) (B' x).
 
 polarizeP A (n A) :- atomic A.
 polarizeN A (n A) :- atomic A.
