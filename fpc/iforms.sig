@@ -6,12 +6,12 @@ accum_sig ljf-formulas.
 /* iformsig */
 kind iform, i       type.  
 type imp            iform -> iform -> iform.
-type forall         (i -> iform) -> iform.
+type forall         (A -> iform) -> iform.
 /* end */
 
 type tt, ff         iform.
 type and, or        iform -> iform -> iform.
-type exists         (i -> iform) -> iform.
+type exists         (A -> iform) -> iform.
 
 infixr and  6.
 infixr or   5.
