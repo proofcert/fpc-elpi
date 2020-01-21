@@ -8,12 +8,12 @@ Elpi Accumulate lp:{{
 }}. 
 
 Elpi Db coq_fpc.db lp:{{
-  kind iform          type.
-  type imp            iform -> iform -> iform.
-  type forall         (i -> iform) -> iform.
-  type tt, ff         iform.
-  type and, or        iform -> iform -> iform.
-  type exists         (i -> iform) -> iform.
+  % kind iform          type.
+  % type imp            iform -> iform -> iform.
+  % type forall         (A -> iform) -> iform.
+  % type tt, ff         iform.
+  % type and, or        iform -> iform -> iform.
+  % type exists         (A -> iform) -> iform.
   infixr and  6.
   infixr or   5.
   infixr imp  4.
@@ -22,7 +22,7 @@ Elpi Db coq_fpc.db lp:{{
   type hold index -> (term -> term) -> cert.
   type idxoftm term -> index.
   pred prop_name o:term, o:iform.
-  atomic X :- prop_name _ X.
+  % atomic X :- prop_name _ X.
   type coq_to_iform term -> iform -> prop.
   :if "DEBUG" coq_to_iform A B :- announce (coq_to_iform A B).
   coq_to_iform X Y :-
@@ -36,27 +36,34 @@ Elpi Db coq_fpc.db lp:{{
   coq_to_iform {{lp:X \/ lp:Y}} (X' or Y') :-
     coq_to_iform X X',
     coq_to_iform Y Y'.
-  % coq_to_iform {{forall lp:X : lp:Ty, T2}} (forall (x\ T')) :-
-  %   not (Ty = (sort prop)),
-  %   pi x\ term_to_i x X =>
-  %     coq_to_iform {{lp:T2 lp:X}} (T' x).
+  coq_to_iform (prod _ (sort (typ _)) T2) (forall T') :-
+    pi x y\ term_to_i x y =>
+      coq_to_iform (T2 x) (T' y).
+  coq_to_iform (app [X,Y]) T:-
+    term_to_i Y Y',
+    abs_name X X',
+    T = (X' Y').
   type bootstrap term -> term -> nat -> prop.
   :if "DEBUG" bootstrap A B N :- announce (bootstrap A B N).
+  bootstrap (prod _ (prod _ (sort (typ _)) (x\ sort prop)) Ty) (fun _ (prod _ (sort (typ _)) (x\ sort prop)) F) N:-
+    pi x y z\ abs_name x y =>
+      bootstrap (Ty x) (F z) N.
   bootstrap (prod _ (sort prop) Ty) (fun _ (sort prop) F) N:-
     pi x y z\ prop_name x y =>
       bootstrap (Ty x) (F z) N.
-  bootstrap {{lp:T1 /\ lp:T2}} Term N :-
-    coq_to_iform {{lp:T1 /\ lp:T2}} Form,
+  bootstrap Type Term N :-
+    (Type = {{lp:_ /\ lp:_}}; Type = {{lp:_ \/ lp:_}}; Type = {{lp:_ -> lp:_}}; Type = (prod _ (sort (typ _)) _)),
+    coq_to_iform Type Form,
     polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
-  bootstrap {{lp:T1 \/ lp:T2}} Term N :-
-    coq_to_iform {{lp:T1 \/ lp:T2}} Form,
-    polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
-  bootstrap {{lp:T1 -> lp:T2}} Term N :-
-    coq_to_iform {{lp:T1 -> lp:T2}} Form,
-    polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
-  % bootstrap {{forall lp:X : lp:Ty, T2}} Term N :-
+  % bootstrap {{lp:T1 /\ lp:T2}} Term N :-
+  %   coq_to_iform {{lp:T1 \/ lp:T2}} Form,
+  %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
+  % bootstrap {{lp:T1 -> lp:T2}} Term N :-
+  %   coq_to_iform {{lp:T1 -> lp:T2}} Form,
+  %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
+  % bootstrap (prod _ Ty T2) Term N :-
   %   not (Ty = (sort prop)),
-  %   coq_to_iform {{forall lp:X : lp:Ty, T2}},
+  %   coq_to_iform (prod _ Ty T2) Form,
   %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   arr_jc (coqcert (fun _name _type F)) (coqabs F).
   arr_je (coqabs (x\ app [x,T])) (coqcert T) (coqabs (x\ x)).
@@ -79,18 +86,19 @@ Elpi Db coq_fpc.db lp:{{
   %% TODO: andPos will be needed, especially in case we want to host classical logic
   % andPos_jc (coqabs (x\ {{and_ind lp:{{fun _ _ (x\ fun _ _ (y\ T))}} lp:x}})) (coqabs (x\ (y\ T))).
   % andPos_je (coqcert T) (coqcert T) (coqcert T).
-  %% Proposal for first order connectives. However, this would require to
-  %% handle terms with type term instead of i in the kernel
-  % all_jc (coqcert (fun _ _ F)) (x\ coqcert (F x)). 
-  % all_je (coqabs (x\ app [x, T])) (coqcert T) Term.
-  % some_je (coqcert {{ex_intro lp:T lp:Term lp:Uhm}}) (coqcert T) Term.
-  % some_jc (coqabs (x\ app [x, T])) (x\ app [x, T]).
+  % Proposal for first order connectives.
+  all_jc (coqcert (fun _ _ F)) (x\ coqcert (F x)). 
+  all_je (coqabs (x\ app [x, T])) (coqcert T) Term.
+  some_je (coqcert {{ex_intro lp:T lp:Term lp:Uhm}}) (coqcert T) Term.
+  some_jc (coqabs (x\ app [x, T])) (x\ coqcert (app [x, T])).
   solve [(int N)] [goal Ctx Ev Ty _] [] :- 
     int_to_nat N Nat,
     bootstrap Ty Ev Nat.
 }}.
 
 Elpi Tactic coq_fpc.
+Elpi Accumulate File "fpc/iforms.mod".
+Elpi Accumulate File "fpc/iforms.sig".
 Elpi Accumulate File "fpc/ljf-polarize.mod".
 Elpi Accumulate File "fpc/ljf-lambda.mod".
 Elpi Accumulate File "fpc/pairing-fpc.mod".
@@ -116,10 +124,10 @@ elpi coq_fpc 2.
 Show Proof.
 Qed.
 
-Lemma example2 : forall A : Prop, A \/ A -> A.
+(* Lemma example2 : forall A : Prop, A \/ A -> A.
 Elpi Trace.
 elpi coq_fpc 1.
-Qed.
+Qed. *)
 
 Lemma example3 : forall A B : Prop, A -> A \/ B.
 elpi coq_fpc 1.
@@ -130,6 +138,10 @@ elpi coq_fpc 1.
 Qed.
 
 Lemma example5 : forall A B : Prop, A /\ B -> A.
+elpi coq_fpc 1.
+Qed.
+
+Lemma example6 : forall A : Type -> Prop, forall x : Type, (A x) -> (A x).
 elpi coq_fpc 1.
 Qed.
 
