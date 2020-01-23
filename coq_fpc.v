@@ -8,12 +8,6 @@ Elpi Accumulate lp:{{
 }}. 
 
 Elpi Db coq_fpc.db lp:{{
-  % kind iform          type.
-  % type imp            iform -> iform -> iform.
-  % type forall         (A -> iform) -> iform.
-  % type tt, ff         iform.
-  % type and, or        iform -> iform -> iform.
-  % type exists         (A -> iform) -> iform.
   infixr and  6.
   infixr or   5.
   infixr imp  4.
@@ -36,13 +30,17 @@ Elpi Db coq_fpc.db lp:{{
   coq_to_iform {{lp:X \/ lp:Y}} (X' or Y') :-
     coq_to_iform X X',
     coq_to_iform Y Y'.
-  coq_to_iform (prod _ (sort (typ _)) T2) (forall T') :-
-    pi x y\ term_to_i x y =>
-      coq_to_iform (T2 x) (T' y).
+  coq_to_iform  (app [global Ex_indt, _, (fun _ _ T)]) (exists T') :- 
+    coq.locate "ex" Ex_indt,
+    % pi x y\ term_to_i x y => %% I am now trying to use coq terms in formulas, so this is not needed
+    pi x\ coq_to_iform (T x) (T' x).
+  coq_to_iform (prod _ (sort (typ _)) T) (forall T') :-
+    % pi x y\ term_to_i x y => %% I am now trying to use coq terms in formulas, so this is not needed
+    pi x\  coq_to_iform (T x) (T' x).
   coq_to_iform (app [X,Y]) T:-
-    term_to_i Y Y',
+    % term_to_i Y Y', %% I am now trying to use coq terms in formulas, so this is not needed
     abs_name X X',
-    T = (X' Y').
+    T = (X' Y).
   type bootstrap term -> term -> nat -> prop.
   :if "DEBUG" bootstrap A B N :- announce (bootstrap A B N).
   bootstrap (prod _ (prod _ (sort (typ _)) (x\ sort prop)) Ty) (fun _ (prod _ (sort (typ _)) (x\ sort prop)) F) N:-
@@ -55,24 +53,16 @@ Elpi Db coq_fpc.db lp:{{
     (Type = {{lp:_ /\ lp:_}}; Type = {{lp:_ \/ lp:_}}; Type = {{lp:_ -> lp:_}}; Type = (prod _ (sort (typ _)) _)),
     coq_to_iform Type Form,
     polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
-  % bootstrap {{lp:T1 /\ lp:T2}} Term N :-
-  %   coq_to_iform {{lp:T1 \/ lp:T2}} Form,
-  %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
-  % bootstrap {{lp:T1 -> lp:T2}} Term N :-
-  %   coq_to_iform {{lp:T1 -> lp:T2}} Form,
-  %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
-  % bootstrap (prod _ Ty T2) Term N :-
-  %   not (Ty = (sort prop)),
-  %   coq_to_iform (prod _ Ty T2) Form,
-  %   polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   arr_jc (coqcert (fun _name _type F)) (coqabs F).
   arr_je (coqabs (x\ app [x,T])) (coqcert T) (coqabs (x\ x)).
   storeL_jc (coqabs T) (x\ coqcert (T x)) (x\ idxoftm x).
   decideL_je (coqcert (app [Hd,B])) (coqabs (x\ app [x,B])) (idxoftm Hd).
   decideL_je (coqcert Hd) (coqabs (x\ x)) (idxoftm Hd).
-  decideL_je (coqcert {{and_ind lp:T lp:Ev}}) (coqabs (x\ {{and_ind lp:T lp:x}})) Idx.
+  decideL_je (coqcert {{and_ind lp:T lp:Idx}}) (coqabs (x\ {{and_ind lp:T lp:x}})) (idxoftm Idx).
   initialL_je _.
-  storeR_jc Cert Cert.
+  % initialR_je _ _.
+  releaseL_je Cert Cert. %% This should move from a coqabs to a coqcert?
+  storeR_jc (coqcert T) (coqcert T).
   releaseR_je Cert Cert.
   decideR_je Cert Cert.
   or_je (coqcert {{or_introl lp:T}}) (coqcert T) left.
@@ -86,14 +76,13 @@ Elpi Db coq_fpc.db lp:{{
   %% TODO: andPos will be needed, especially in case we want to host classical logic
   % andPos_jc (coqabs (x\ {{and_ind lp:{{fun _ _ (x\ fun _ _ (y\ T))}} lp:x}})) (coqabs (x\ (y\ T))).
   % andPos_je (coqcert T) (coqcert T) (coqcert T).
-  % Proposal for first order connectives.
   all_jc (coqcert (fun _ _ F)) (x\ coqcert (F x)). 
   all_je (coqabs (x\ app [x, T])) (coqcert T) Term.
-  some_je (coqcert {{ex_intro lp:T lp:Term lp:Uhm}}) (coqcert T) Term.
+  some_je (coqcert {{ex_intro lp:Pred lp:Witness lp:Proof}}) (coqcert Proof) Witness.
   some_jc (coqabs (x\ app [x, T])) (x\ coqcert (app [x, T])).
   solve [(int N)] [goal Ctx Ev Ty _] [] :- 
     int_to_nat N Nat,
-    bootstrap Ty Ev Nat.
+    Ctx => bootstrap Ty Ev Nat.
 }}.
 
 Elpi Tactic coq_fpc.
@@ -105,6 +94,7 @@ Elpi Accumulate File "fpc/pairing-fpc.mod".
 Elpi Accumulate File "fpc/dd-fpc.mod".
 Elpi Accumulate Db coq_fpc.db.
 Elpi Typecheck.
+
 Elpi Debug "DEBUG".
 (* Elpi Trace. *)
 
@@ -145,6 +135,10 @@ Lemma example6 : forall A : Type -> Prop, forall x : Type, (A x) -> (A x).
 elpi coq_fpc 1.
 Qed.
 
+Lemma example7 : forall A : Type -> Prop, forall x, (A x) -> (exists x, (A x)). 
+elpi coq_fpc 2.
+Qed.
+
 (*
   This query succeeds, even though the behaviour of disjunction elimination seems different from
 the one specified in the fpc. Maybe some form of beta-conversion happens when doing quotations?
@@ -180,3 +174,11 @@ Elpi Query lp:{{
 Elpi Query lp:{{
   check (coqcert (fun _ _ (x\x))) (async [] (unk (((n j) arr (n j)) arr (n j) arr (n j)))).
 }}.
+
+Elpi Query lp:{{bootstrap {{(forall A : Type -> Prop, forall x, (A x) -> (exists x, (A x)))}}
+                          {{(fun (A : Type -> Prop) (x : Type) (H : A x) => ex_intro (fun x0 : Type => A x0) x H)}}
+                          (s (s zero)).}}.
+
+Elpi Query lp:{{bootstrap {{(forall A : Type -> Prop, forall x, (A x) -> (exists x, (A x)))}}
+ J %                         {{(fun (A : Type -> Prop) (x : Type) (H : A x) => ex_intro (fun x0 : Type => A x0) x H)}}
+                          (s (s zero)).}}.
