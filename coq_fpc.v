@@ -68,7 +68,7 @@ Elpi Db coq_fpc.db lp:{{
   or_je (coqcert {{or_introl lp:T}}) (coqcert T) left.
   or_je (coqcert {{or_intror lp:T}}) (coqcert T) right.
   % or_jc (coqabs (x\ app [global (const «or_ind» ), _, _, _, (fun _ _ T1), (fun _ _ T2), x])) (coqabs T1) (coqabs T1).
-  or_jc (coqabs (x\ {{or_ind lp:{{fun _ _ T1}} lp:{{fun _  _ T2}} lp:x}})) (coqabs T1) (coqabs T1).
+  or_jc (coqabs (x\ app [global OrInd, _, _, _, fun _ _ T1, fun _  _ T2, x])) (coqabs T1) (coqabs T2) :-
   andNeg_jc (coqcert {{conj lp:T1 lp:T2}}) (coqcert T1) (coqcert T2).
   % Instead of using a let-expression, we substitute into the term. Is this good enough?
   andNeg_je (coqabs T) (coqabs (x\ T {{proj1 lp:x}})) left.
