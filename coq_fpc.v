@@ -7,6 +7,89 @@ Elpi Accumulate lp:{{
     coq.say "goal" Ev "is\n" Ctx "\n-------\n" Ty.
 }}. 
 
+(*
+   Database notes
+   ==============
+
+   Design overview
+   ---------------
+
+   The runtime of coq-elpi calls into the standard `solve` entrypoint. From this
+   point, we call `bootstrap` to set up the tactic and execute it (here, `Ev`
+   needs to be unified with a term, and `Nat` is the depth bound that will be
+   used to control the exploration of the search space).
+
+   The bootstrapping predicate recursively traverses the goal, abstracting over
+   sort `prop` and introducing the propositional variables as needed as clauses
+   of the predicate `prop_names` (initially empty) assumed by hypothetical
+   reasoning (as the context of the goal was before the call to `bootstrap`).
+   The boostrapping process also introduces clauses of `abs_name` for names of
+   first-order predicates. The distinction between the two kinds of names comes
+   down to the fact that the current design can only handle unary names;
+   ideally, we will have ways of creating names of arbitrary arities, even
+   though at the moment we use the "uncurried" form just described.
+
+   At the end of the process, `bootstrap` has introduced both kinds of
+   components to the environment and proceeds to check whether the goal is an
+   actual formula (so we are not introducing names any more), in which case it
+   calls `coq_to_iform`, which reifies the goal into an intuitionistic formula
+   of the object logic, and finally calls the FPC checker.
+
+   We define the logical connectives `and`, `or`, `imp` `to reify a subset of
+   terms of Coq (roughly, those that represent first-order formulas) into
+   formulas of the object logic in the usual manner.
+
+   Observe that the universal quantifier `forall` results from the reification
+   by `coq_to_iform` of the non-dependent case of the Coq produc type, when
+   applied to a term of type `Type` (the identifiers `sort`, `typ`... are Elpi's
+   own names for those, with the underscore following `typ` in place of the
+   parameter used to denote type universes). There is one curious issue related
+   to this step (fine for now?): in the treatment of type universes, if these
+   are manipulated only using quoted Coq syntax in a λProlog environment, they
+   remain logic variables; they are only instantiated while inside the proof
+   proper, say by applying a tactic. This can lead to some parsing problems down
+   the line.
+
+   Terms are embedded into certificates via `coqcert` and `coqabs`. This last
+   constructor is particularly interesting, as it performs an explicit "deep
+   embedding" of the abstraction instead of relying on the abstraction
+   mechanisms of the `term` type proper. This is especially relevant for the
+   handling of the universal clerk: in it, terms get decomposed into two
+   components; it is important to note that the store rule is the one charged
+   with creating the eigenvariable (which requires a small modification in the
+   standard FPC checker).
+
+   The clerks and experts of the built-in FPC certificate definition treat
+   certificates of the two forms just described. Surprisingly, there is little
+   to no duplication in these, and a pleasing symmetry seems apparent, though it
+   needs to be ascertained carefully.
+
+   Comments
+   --------
+
+   The `hold` certificate constructor is vestigial of a former design, and no
+   longer used.
+
+   Throughout the code, two different but a priori equivalent coding conventions
+   to manipulate Coq terms are maintained for technical reasons: on the one
+   hand, the quoting mechanism notation `{{ }}` where λProlog variables are
+   denoted by `lp:`; on the other, direct use of explicit HOAS. Compare, for
+   example, the three clauses of `coq_to_iform` that treat the standard logical
+   connectives and the subsequent clause that deals with function application.
+   In principle, the latter could also be phrased in terms of the quoted syntax,
+   but the result would arguably be less legible. Moreover, in the case of the
+   existential quantifier we encounter some parsing issues while following the
+   quoted approach. (See also comments on universal quantification above.)
+
+   Consider the FPC definition of `and_jc` referenced above. This clerk is only
+   defined for `coqabs` because we expect that it should treat an abstracted
+   variable where the projection should be put.
+
+   The negative conjunction should be a let: deconstructing the conjunction,
+   where instead of the let construct, one performs the substitution directly.
+
+   Connection between Coq `abs` and open binders.
+*)
 Elpi Db coq_fpc.db lp:{{
   infixr and  6.
   infixr or   5.
@@ -80,7 +163,7 @@ Elpi Db coq_fpc.db lp:{{
   all_je (coqabs (x\ app [x, T])) (coqcert T) Term.
   some_je (coqcert {{ex_intro lp:Pred lp:Witness lp:Proof}}) (coqcert Proof) Witness.
   some_jc (coqabs (x\ app [x, T])) (x\ coqcert (app [x, T])).
-  solve [(int N)] [goal Ctx Ev Ty _] [] :- 
+  solve [(int N)] [goal Ctx Ev Ty _] [] :-
     int_to_nat N Nat,
     Ctx => bootstrap Ty Ev Nat.
 }}.
