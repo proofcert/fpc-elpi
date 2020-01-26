@@ -13,7 +13,6 @@ Elpi Db coq_fpc.db lp:{{
   infixr imp  4.
   type coqcert term -> cert.
   type coqabs  (term -> term) -> cert.
-  type hold index -> (term -> term) -> cert.
   type idxoftm term -> index.
   pred prop_name o:term, o:iform.
   % atomic X :- prop_name _ X.
@@ -48,7 +47,7 @@ Elpi Db coq_fpc.db lp:{{
       bootstrap (Ty x) (F z) N.
   bootstrap (prod _ (sort prop) Ty) (fun _ (sort prop) F) N:-
     pi x y z\ prop_name x y =>
-      bootstrap (Ty x) (F z) N.
+      bootstrap (Ty x) (F z) N. %% Should use the same var?
   bootstrap Type Term N :-
     (Type = {{lp:_ /\ lp:_}}; Type = {{lp:_ \/ lp:_}}; Type = {{lp:_ -> lp:_}}; Type = (prod _ (sort (typ _)) _)),
     coq_to_iform Type Form,
@@ -68,7 +67,9 @@ Elpi Db coq_fpc.db lp:{{
   or_je (coqcert {{or_introl lp:T}}) (coqcert T) left.
   or_je (coqcert {{or_intror lp:T}}) (coqcert T) right.
   % or_jc (coqabs (x\ app [global (const «or_ind» ), _, _, _, (fun _ _ T1), (fun _ _ T2), x])) (coqabs T1) (coqabs T1).
+  % or_jc (coqabs (x\ {{or_ind lp:{{fun _ _ T1}} lp:{{fun _  _ T2}} lp:x}})) (coqabs T1) (coqabs T1).
   or_jc (coqabs (x\ app [global OrInd, _, _, _, fun _ _ T1, fun _  _ T2, x])) (coqabs T1) (coqabs T2) :-
+  coq.locate "or_ind" OrInd.
   andNeg_jc (coqcert {{conj lp:T1 lp:T2}}) (coqcert T1) (coqcert T2).
   % Instead of using a let-expression, we substitute into the term. Is this good enough?
   andNeg_je (coqabs T) (coqabs (x\ T {{proj1 lp:x}})) left.
@@ -96,7 +97,35 @@ Elpi Accumulate Db coq_fpc.db.
 Elpi Typecheck.
 
 Elpi Debug "DEBUG".
-(* Elpi Trace. *)
+Elpi Trace.
+(* Fail Elpi Query lp:{{bootstrap {{forall P Q : Type -> Prop, forall x: Type, forall y: Type, ((P x) -> (Q y)) -> (exists x, (P x) -> forall y, (Q y))}} J (s (s (zero))).}}. *)
+Elpi Query lp:{{bootstrap {{forall (P: Prop) (Q: Type -> Prop), (forall x, P -> Q x) -> P -> (forall x, Q x)}}
+J
+                          (s (s zero))}}.
+
+(* Elpi Query lp:{{bootstrap {{forall A B: Prop, (A -> B) -> A -> B}}
+                          J
+                          (s (s zero))}}.
+Lemma example1 : forall A B: Prop, (A -> B) -> A -> B.
+elpi coq_fpc 2.
+Show Proof.
+Qed.
+
+
+Elpi Query lp:{{bootstrap {{forall A B : Prop, A /\ B -> A}}
+                          J
+                          (s zero)}}.
+Elpi Query lp:{{ljf_entry (dd (s (s (s (s zero)))))  (all c6 \
+       all c7 \
+        (n (c1 c6) arr n (c4 c7)) arr
+         (some c8 \ n (c1 c8) arr (all c9 \ n (c4 c9)))))}}.
+Lemma test : forall P Q : Type -> Prop, forall x, forall y, ((P x) -> (Q y)) -> (exists x, (P x) -> forall y, (Q y)).
+firstorder.
+elpi coq_fpc 0.
+
+Elpi Query lp:{{bootstrap {{forall P Q R : Type -> Prop, forall x, exists y, forall z, ((P x) /\ (Q y) /\ (R z)) -> forall z, exists y, forall x, ((P x) /\ (Q y) /\ (R z))}} N (s (s (s (s zero)))).}}.
+Lemma complicated : forall P Q R : Type -> Prop, forall x, exists y, forall z, ((P x) /\ (Q y) /\ (R z)) -> forall z, exists y, forall x, ((P x) /\ (Q y) /\ (R z)).
+elpi coq_fpc 3.
 
 (* These queries with disjunction -- including synthesizing a term -- work.
 However the tactic fails with an assertion violation in coq-elpi... *)
@@ -114,10 +143,9 @@ elpi coq_fpc 2.
 Show Proof.
 Qed.
 
-(* Lemma example2 : forall A : Prop, A \/ A -> A.
-Elpi Trace.
+Lemma example2 : forall A : Prop, A \/ A -> A.
 elpi coq_fpc 1.
-Qed. *)
+Qed.
 
 Lemma example3 : forall A B : Prop, A -> A \/ B.
 elpi coq_fpc 1.
@@ -181,4 +209,4 @@ Elpi Query lp:{{bootstrap {{(forall A : Type -> Prop, forall x, (A x) -> (exists
 
 Elpi Query lp:{{bootstrap {{(forall A : Type -> Prop, forall x, (A x) -> (exists x, (A x)))}}
  J %                         {{(fun (A : Type -> Prop) (x : Type) (H : A x) => ex_intro (fun x0 : Type => A x0) x H)}}
-                          (s (s zero)).}}.
+                          (s (s zero)).}}. *)
