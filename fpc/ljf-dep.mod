@@ -36,7 +36,7 @@ isPosForm {{lp:_ \/ lp:_}}.
 isPos A :- isPosForm A.
 
 pred_type (sort prop).
-pred_type (prod _ (sort (typ _)) (x\ Ty2)) :- pred_type Ty2.
+pred_type (prod _ _ (x\ Ty2)) :- pred_type Ty2.
 
 :if "DEBUG" check Ctx A B T :- announce (check Ctx A B T).
 ljf_entry Cert Form Term :- check [] Cert (async [] (unk Form)) Term.
@@ -71,7 +71,7 @@ check Ctx Cert (async [] (unk D)) T :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', check Ctx Cert' (async [] (str D)) T.
 % Identity rules
 % initial (all atoms are negative)
-check Ctx Cert (lfoc Na Na) (abs (x\ x)) :- isNegAtm Na, initialL_je Cert.
+check Ctx Cert (lfoc Na Na) T :- coq.say "At neg" T, T = (abs (x\ x)), isNegAtm Na, initialL_je Cert.
 % check Ctx Cert (rfoc Pa)    T :- isPosAtm Pa, initialR_je Cert Indx, storage Indx Pa.
 % cut
 % check Ctx Cert (async [] (str R)) :- cut_je Cert CertA CertB F, 
@@ -88,7 +88,8 @@ check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
   pred_type Ty1,
   pi w\ isNegAtm w => check Ctx Cert (async [] (unk (Ty2 w))) (F w).
 % Dependent: if abstraction is over (type) and there is an all_jc, then it's a forall-right
-check Ctx Cert (async [] (unk (prod _ (sort (typ _)) Ty2))) (fun _name Ty1 F) :-
+check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
+  not (pred_type Ty1),
   all_jc Cert Cert',
   pi t\ check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
 %% Disjunction
@@ -120,8 +121,8 @@ check Ctx Cert (lfoc {{lp:A -> lp:B}} R) (abs (x\ U (app [x, T]))) :-
   arr_je Cert CertA CertB,
   check Ctx CertA (rfoc A) T, check Ctx CertB (lfoc B R) (abs U).
 % Forall (dependent, can only depend on type)
-check Ctx Cert (lfoc (prod _ (sort (typ _)) B) R) (abs (x\ app [x, T])):-
-  all_je Cert Cert' Tm, check Ctx Cert' (lfoc (B Tm) R) T.
+check Ctx Cert (lfoc (prod _ _ B) R) (abs (x\ T (app [x, Tm]))):-
+  all_je Cert Cert' Tm, check Ctx Cert' (lfoc (B Tm) R) (abs T).
 % disjunction
 check Ctx Cert (rfoc {{lp:A \/ lp:B}}) T :- or_je Cert Cert' Choice, 
   ((Choice = left, T={{or_introl lp:T'}}, check Ctx Cert' (rfoc A) T');
@@ -131,8 +132,8 @@ check Ctx Cert (rfoc {{lp:A \/ lp:B}}) T :- or_je Cert Cert' Choice,
 %    check Ctx CertA (rfoc A), check Ctx CertB (rfoc B).
 check Ctx Cert (lfoc {{lp:A /\ lp:B}} R) (abs T):-
   andNeg_je Cert Cert' Choice,
-  ((Choice = left,  check Ctx Cert' (lfoc A R) (abs (x\ T {{proj1 lp:x}})));
-   (Choice = right, check Ctx Cert' (lfoc B R) (abs (x\ T {{proj2 lp:x}})))).
+  ((Choice = left,  check Ctx Cert' (lfoc A R) (abs U), T = (x\ U {{proj1 lp:x}}));
+   (Choice = right, check Ctx Cert' (lfoc B R) (abs U), T = (x\ U {{proj2 lp:x}}))).
 % quantifers
 check Ctx Cert (rfoc (ex Type B)) {{ex_intro lp:Pred lp:T lp:Proof}} :-
   some_je Cert Cert' T, check Ctx Cert' (rfoc (B T)) Proof.
