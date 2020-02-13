@@ -9,8 +9,8 @@ decideR_je  (dd (s D)) (dd D).
 storeR_jc   (dd D) (dd D).
 releaseL_je (dd D) (dd D).
 releaseR_je (dd D) (dd D).
-initialL_je (dd D).
-initialR_je (dd D) indx.
+initialL_je (dd _D).
+initialR_je (dd _D) indx.
 some_jc     (dd D) (x\ dd D).
 all_jc      (dd D) (x\ dd D).
 some_je     (dd D) (dd D) _.
@@ -23,7 +23,7 @@ arr_je      (dd D) (dd D) (dd D).
 andPos_je   (dd D) (dd D) (dd D).
 or_je       (dd D) (dd D) _.
 andNeg_je   (dd D) (dd D) _.
-true_je    (dd D).
+true_je    (dd _D).
 true_jc    (dd D) (dd D).
 
 pred int_to_nat i:int, o:nat.
