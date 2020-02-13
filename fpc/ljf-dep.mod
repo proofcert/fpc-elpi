@@ -67,7 +67,7 @@ check Ctx Cert (rfoc N)   T :- isNeg N, releaseR_je Cert Cert', check Ctx Cert' 
 check Ctx Cert (async [C|Theta] R) (abs T) :- (isNeg C ; isPosAtm C),
   storeL_jc Cert Cert' Indx, 
   % pi w\ storage indx w C => coq.say "Storing" C "at" (Indx w),
-  pi w\ coq.say "Storing" C "at" w,
+  pi w\ decl w _Name C =>
     check [(pr w C)| Ctx] (Cert' w) (async Theta R) (T w).
 check Ctx Cert (async [] (unk D)) T :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', check Ctx Cert' (async [] (str D)) T.
@@ -88,12 +88,13 @@ check Ctx Cert (async [] (unk (prod _ Ty1 (x\ Ty2)))) (fun _name Ty1 F) :-
 % Dependent: if the abstracted type is type -> (type -> (... -> prop)) it's a pred var
 check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
   pred_type Ty1,
-  pi w\ isNegAtm w => check Ctx Cert (async [] (unk (Ty2 w))) (F w).
-% Dependent: if abstraction is over (type) and there is an all_jc, then it's a forall-right
+  pi w\ isNegAtm w => decl w _Name Ty1 => check Ctx Cert (async [] (unk (Ty2 w))) (F w).
+% Dependent: if abstraction is not over ...->prop and there is an all_jc, then it's a forall-right
 check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
   not (pred_type Ty1),
   all_jc Cert Cert',
-  pi t\ check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
+  % pi t\ fo_term t => check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
+  pi t\ decl t _Name Ty1 => coq.say "Eigen" t "of" Ty1, check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
 %% Disjunction
 check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A, B, _, fun _ A T1, fun _ B T2, x])):-
   coq.locate "or_ind" OrInd,
@@ -119,11 +120,11 @@ check Ctx Cert (async [] (unk {{lp:A /\ lp:B}})) {{conj lp:T1 lp:T2}} :-
 
 % Synchronous Rules
 % arrow (non dependent)
-check Ctx Cert (lfoc {{lp:A -> lp:B}} R) (abs (x\ U (app [x, T]))) :-
+check Ctx Cert (lfoc {{lp:A -> lp:B}} R) (abs (x\ T (app [x, Tm]))) :-
   arr_je Cert CertA CertB,
-  check Ctx CertA (rfoc A) T, check Ctx CertB (lfoc B R) (abs U).
-% Forall (dependent, can only depend on type)
-check Ctx Cert (lfoc (prod _ _ B) R) (abs (x\ T (app [x, Tm]))):-
+  check Ctx CertA (rfoc A) Tm, check Ctx CertB (lfoc B R) (abs T).
+% Forall (dependent, can not depend on prop)
+check Ctx Cert (lfoc (prod _ _ B) R) (abs (x\ T (app [x, Tm]))) :-
   all_je Cert Cert' Tm, check Ctx Cert' (lfoc (B Tm) R) (abs T).
 % disjunction
 check Ctx Cert (rfoc {{lp:A \/ lp:_B}}) {{or_introl lp:T}} :- or_je Cert Cert' left, 
