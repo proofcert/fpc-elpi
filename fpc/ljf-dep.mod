@@ -1,6 +1,7 @@
 % This modified kernel introduces an eigenvariable with the implication introduction
 % module ljf-dep.
-accumulate spy.
+% accumulate spy.
+accum_sig ljf-lambda-certificates.
 
 type isNegForm, isNegAtm, isPosForm, isPosAtm, isNeg, isPos     term -> prop. 
 type ljf_entry      cert -> term -> term -> prop.
@@ -28,17 +29,18 @@ look [pr X Y|_] X Y.
 look [_|LS]       X Y :- look LS X Y.
 isNegForm {{lp:_ /\ lp:_}} & isNegForm {{lp:_ -> lp:_}}.
 isNegForm (prod _ _ _).
-isNegAtm (app [Hd|Rest]) :- isNegAtm Hd.
+isNegAtm (app [Hd|_Rest]) :- isNegAtm Hd.
 isNeg A :- isNegForm A ; isNegAtm A.
 
 isPosForm {{lp:_ \/ lp:_}}.
 % isPosForm (d+ _)    & isPosForm (some _)  & isPosForm f  &  isPosForm t+.
 isPos A :- isPosForm A.
 
+type pred_type term -> prop.
 pred_type (sort prop).
 pred_type (prod _ _ (x\ Ty2)) :- pred_type Ty2.
 
-:if "DEBUG" check Ctx A B T :- announce (check Ctx A B T).
+:if "DEBUG" check Ctx A B T :- coq.say "check" Ctx A B T, fail.
 ljf_entry Cert Form Term :- check [] Cert (async [] (unk Form)) Term.
 
 % Structural Rules
