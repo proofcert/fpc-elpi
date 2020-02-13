@@ -23,6 +23,19 @@ Qed.
    It builds the expected term *)
 (* Elpi Query lp:{{ljf_entry (dd (s (s zero))) {{forall (Q: Type -> Prop), (forall x : Type, Q x) -> (forall x:Type, Q x)}} J}}.
 
+Goal forall (Q: Prop), Q -> (forall x:nat, Q).
+Proof.
+  elpi coq_fpc 2.
+  Show Proof.
+Qed.
+Goal forall (Q: nat -> Prop), (forall x, Q x) -> Q 0.
+Proof.
+elpi coq_fpc 1.
+Qed.
+Goal forall (P: Prop) (Q: Type -> Prop), (forall x, P -> Q x) -> P -> (forall x, Q x).
+Proof.
+  elpi coq_fpc 2.
+End.
 Elpi Debug "DEBUG".
 (* Elpi Trace. *)
 Elpi Query lp:{{ljf_entry (dd (s zero)) {{forall A: Prop, A -> A}} J.%{{fun (A:Prop) (X:A) => X}}}}.
