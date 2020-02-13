@@ -126,9 +126,10 @@ check Ctx Cert (lfoc {{lp:A -> lp:B}} R) (abs (x\ U (app [x, T]))) :-
 check Ctx Cert (lfoc (prod _ _ B) R) (abs (x\ T (app [x, Tm]))):-
   all_je Cert Cert' Tm, check Ctx Cert' (lfoc (B Tm) R) (abs T).
 % disjunction
-check Ctx Cert (rfoc {{lp:A \/ lp:B}}) T :- or_je Cert Cert' Choice, 
-  ((Choice = left, T={{or_introl lp:T'}}, check Ctx Cert' (rfoc A) T');
-   (Choice = right, T={{or_intror lp:T'}}, check Ctx Cert' (rfoc B) T')).
+check Ctx Cert (rfoc {{lp:A \/ lp:_B}}) {{or_introl lp:T}} :- or_je Cert Cert' left, 
+  check Ctx Cert' (rfoc A) T.
+check Ctx Cert (rfoc {{lp:_A \/ lp:B}}) {{or_intror lp:T}} :- or_je Cert Cert' right, 
+  check Ctx Cert' (rfoc B) T.
 % conjunction
 % check Ctx Cert (rfoc (A &+& B)) :- andPos_je Cert CertA CertB,
 %    check Ctx CertA (rfoc A), check Ctx CertB (rfoc B).
@@ -137,7 +138,8 @@ check Ctx Cert (lfoc {{lp:A /\ lp:B}} R) (abs T):-
   ((Choice = left,  check Ctx Cert' (lfoc A R) (abs U), T = (x\ U {{proj1 lp:x}}));
    (Choice = right, check Ctx Cert' (lfoc B R) (abs U), T = (x\ U {{proj2 lp:x}}))).
 % quantifers
-check Ctx Cert (rfoc (ex Type B)) {{ex_intro lp:Pred lp:T lp:Proof}} :-
+check Ctx Cert (rfoc (app [global Ex_indt, _, (fun _ _ B)])) {{ex_intro lp:_Pred lp:T lp:Proof}} :-
+  coq.locate "ex" Ex_indt,
   some_je Cert Cert' T, check Ctx Cert' (rfoc (B T)) Proof.
 % % Units
 % check Ctx Cert (rfoc t+) :- true_je Cert.
