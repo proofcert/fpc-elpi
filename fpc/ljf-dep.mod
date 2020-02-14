@@ -94,7 +94,7 @@ check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
   not (pred_type Ty1),
   all_jc Cert Cert',
   % pi t\ fo_term t => check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
-  pi t\ decl t _Name Ty1 => coq.say "Eigen" t "of" Ty1, check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
+  pi t\ decl t _Name Ty1 => check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
 %% Disjunction
 check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A, B, _, fun _ A T1, fun _ B T2, x])):-
   coq.locate "or_ind" OrInd,
