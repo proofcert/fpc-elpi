@@ -109,8 +109,15 @@ check Ctx Cert (async [] (unk {{lp:A /\ lp:B}})) {{conj lp:T1 lp:T2}} :-
   andNeg_jc Cert CertA CertB,
   check Ctx CertA (async [] (unk A)) T1, check Ctx CertB (async [] (unk B)) T2.
 % quantifers
-% check Ctx Cert (async [some B | Theta] R) :- some_jc Cert Cert',
-%   pi w\ check Ctx (Cert' w) (async [B w | Theta] R).
+check Ctx Cert (async [app [global Ex_indt, Ty, (fun _ Ty B)] | Theta] R)
+              %  (abs (x\ U (app [global ExInd, Ty, _P, _P0, (fun _ Ty PtoP0), x]))) :-
+              %  (abs (x\ U {{ex_ind lp:Ty lp:_P lp:_P0 lp:_PtoP0 lp:x}})) :-
+               (abs (x\ U {{ex_ind lp:Fun lp:x}})) :-
+  coq.locate "ex" Ex_indt,
+  % coq.locate "ex_ind" ExInd,
+  Fun = (fun _ Ty (x\ fun _ (B x) (y\ fun _ _Ty Proof))),
+  some_jc Cert Cert',
+  pi w\ decl w _Name Ty => check Ctx (Cert' w) (async [B w | Theta] R) (abs Proof).
 % Units
 % check Ctx _Cert (async [] (unk t-)).
 % check Ctx _Cert (async [f | _Theta] _R).
