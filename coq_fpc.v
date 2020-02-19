@@ -166,7 +166,7 @@ Elpi Db coq_fpc.db lp:{{
   some_jc (coqabs (x\ app [x, T])) (x\ coqcert (app [x, T])).
   solve [(int N)] [goal Ctx Ev Ty _] [] :-
     int_to_nat N Nat,
-    Ctx => bootstrap Ty Ev Nat.
+    Ctx => bootstrap Ty Ev1 Nat,  coq.say Ev1, Ev = Ev1.
 }}.
 
 Elpi Tactic coq_fpc.
