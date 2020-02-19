@@ -33,6 +33,7 @@ isNegAtm (app [Hd|_Rest]) :- isNegAtm Hd.
 isNeg A :- isNegForm A ; isNegAtm A.
 
 isPosForm {{lp:_ \/ lp:_}}.
+isPosForm (app [global Ex_indt, _, _]) :- coq.locate "ex" Ex_indt.
 % isPosForm (d+ _)    & isPosForm (some _)  & isPosForm f  &  isPosForm t+.
 isPos A :- isPosForm A.
 
@@ -139,8 +140,11 @@ check Ctx Cert (lfoc {{lp:A /\ lp:B}} R) (abs T):-
   ((Choice = left,  check Ctx Cert' (lfoc A R) (abs U), T = (x\ U {{proj1 lp:x}}));
    (Choice = right, check Ctx Cert' (lfoc B R) (abs U), T = (x\ U {{proj2 lp:x}}))).
 % quantifers
-check Ctx Cert (rfoc (app [global Ex_indt, _, (fun _ _ B)])) {{ex_intro lp:_Pred lp:T lp:Proof}} :-
+check Ctx Cert (rfoc (app [global Ex_indt, _, (fun _ _ B)]))
+               (app [global Ex_intro, _Pred, T, Proof]) :-
+  coq.say "Trying ex-right",
   coq.locate "ex" Ex_indt,
+  coq.locate "ex_intro" Ex_intro,
   some_je Cert Cert' T, check Ctx Cert' (rfoc (B T)) Proof.
 % % Units
 % check Ctx Cert (rfoc t+) :- true_je Cert.
