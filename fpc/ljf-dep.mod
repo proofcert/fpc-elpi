@@ -86,9 +86,9 @@ check Ctx Cert (async [] (unk (prod _ Ty1 (x\ Ty2)))) (fun _name Ty1 F) :-
   arr_jc Cert Cert',
   check Ctx Cert' (async [Ty1] (unk Ty2)) (abs F).
 % Dependent: if the abstracted type is type -> (type -> (... -> prop)) it's a pred var
-check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
+check Ctx Cert (async [] (unk (prod Name Ty1 Ty2))) (fun Name Ty1 F) :-
   pred_type Ty1,
-  pi w\ isNegAtm w => decl w _Name Ty1 => check Ctx Cert (async [] (unk (Ty2 w))) (F w).
+  pi w\ isNegAtm w => decl w Name Ty1 => check Ctx Cert (async [] (unk (Ty2 w))) (F w).
 % Dependent: if abstraction is not over ...->prop and there is an all_jc, then it's a forall-right
 check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
   not (pred_type Ty1),
