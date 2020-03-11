@@ -112,12 +112,13 @@ check Ctx Cert (async [] (unk {{lp:A /\ lp:B}})) {{conj lp:T1 lp:T2}} :-
 check Ctx Cert (async [app [global Ex_indt, Ty, (fun _ Ty B)] | Theta] R)
               %  (abs (x\ U (app [global ExInd, Ty, _P, _P0, (fun _ Ty PtoP0), x]))) :-
               %  (abs (x\ U {{ex_ind lp:Ty lp:_P lp:_P0 lp:_PtoP0 lp:x}})) :-
-               (abs (x\ U {{ex_ind lp:Fun lp:x}})) :-
+               (abs (x\ {{ex_ind lp:Fun lp:x}})) :-
   coq.locate "ex" Ex_indt,
   % coq.locate "ex_ind" ExInd,
-  Fun = (fun _ Ty (x\ fun _ (B x) (y\ fun _ _Ty Proof))),
+  Fun = (fun _ Ty (x\ fun _ (B x) (Proof x))),
+  % Forall = (x\ fun _ (B x) (Proof x)),
   some_jc Cert Cert',
-  pi w\ decl w _Name Ty => check Ctx (Cert' w) (async [B w | Theta] R) (abs Proof).
+  pi w\ decl w _Name Ty => (check Ctx (Cert' w) (async [B w | Theta] R) (abs (x\ (Proof w x)))).
 % Units
 % check Ctx _Cert (async [] (unk t-)).
 % check Ctx _Cert (async [f | _Theta] _R).
@@ -147,8 +148,8 @@ check Ctx Cert (lfoc {{lp:A /\ lp:B}} R) (abs T):-
   ((Choice = left,  check Ctx Cert' (lfoc A R) (abs U), T = (x\ U {{proj1 lp:x}}));
    (Choice = right, check Ctx Cert' (lfoc B R) (abs U), T = (x\ U {{proj2 lp:x}}))).
 % quantifers
-check Ctx Cert (rfoc (app [global Ex_indt, _, (fun _ _ B)]))
-               (app [global Ex_intro, _Pred, T, Proof]) :-
+check Ctx Cert (rfoc (app [global Ex_indt, Ty, (fun _ Ty B)]))
+               (app [global Ex_intro, Ty, (fun _ Ty B), T, Proof]) :-
   coq.say "Trying ex-right",
   coq.locate "ex" Ex_indt,
   coq.locate "ex_intro" Ex_intro,
