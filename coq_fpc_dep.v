@@ -1,11 +1,11 @@
-(* Check ex.
-Check or_ind. *)
 (* An example file using the kernel with dependent types and direct term construction *)
 From elpi Require Import elpi.
 Elpi Db coq_fpc.db lp:{{
   solve [(int N)] [goal Ctx Ev Ty _] [] :- 
     int_to_nat N Nat,
-    Ctx => ljf_entry (dd Nat) Ty Ev1, Ev = Ev1. %% It looks like the unification forces some sort of normalization
+    Ctx => ljf_entry (dd Nat) Ty Ev1,
+           coq.say "Got back with" Ev1,
+           Ev = Ev1. %% It looks like the unification forces some sort of normalization
                                                 %% This is needed for the tactic to work
 }}.
 Elpi Tactic coq_fpc.
@@ -13,12 +13,13 @@ Elpi Accumulate File "fpc/ljf-dep.mod".
 Elpi Accumulate File "fpc/dd-fpc.mod".
 Elpi Accumulate Db coq_fpc.db.
 Elpi Typecheck.
- 
 Elpi Debug "DEBUG".
-
-Elpi Query lp:{{ljf_entry (dd (s (s (s zero)))) {{forall P : nat -> Prop, (exists x, P x)  -> (exists x, P x)}} Term.}}.
-Goal forall P : nat -> Prop, (exists x, P x)  -> (exists x, P x).
+(* Elpi Trace. *)
+Elpi Query lp:{{ljf_entry (dd (s (s (s zero)))) {{forall P Q : Type -> Prop, (exists x, (P x)) -> (forall x, (P x) -> (Q x)) -> (exists x, (Q x))}} Term. }}.
+Goal forall P Q : Type -> Prop, (exists x, (P x)) -> (forall x, (P x) -> (Q x)) -> (exists x, (Q x)).
 elpi coq_fpc 2.
+Qed.
+intros. elim H. intros. exists x. apply H0. exact H1. Show Proof.
 Qed.
 Elpi Query lp:{{coq.typecheck {{(fun (P : nat -> Prop) (H : exists x : nat, P x) => H) }} Ty.}}.
 Elpi Query lp:{{ljf_entry (dd (s (s (s zero)))) {{forall P : nat -> Prop, (exists x, P x)  -> (exists x, P x)}} {{(fun (P : nat -> Prop) (H : exists x : nat, P x) => H)}}.}}.
@@ -45,8 +46,11 @@ elpi coq_fpc 2.
 Qed.
 
 *)
-Elpi Query lp:{{ljf_entry (dd (s zero)) {{forall P: Prop, P \/ P -> P}} X}}.
 
+(* This example with existential now works *)
+Goal forall P : nat -> Prop, (exists x, P x)  -> (exists x, P x).
+elpi coq_fpc 2.
+Qed.
 Goal forall P : Prop, P -> P.
 elpi coq_fpc 1.
 Qed.
