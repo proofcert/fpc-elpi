@@ -1,18 +1,21 @@
 (* An example file using the kernel with dependent types and direct term construction *)
 From elpi Require Import elpi.
 
+(* The first tactic uses the kernel together with the Decide-depth 
+   Proof Certificate definition, specifying a depth bound for the proof *)
 Elpi Tactic dd_fpc.
 Elpi Accumulate File "fpc/ljf-dep.mod".
 Elpi Accumulate File "fpc/dd-fpc.mod".
 Elpi Accumulate lp:{{
   solve [(int N)] [goal Ctx Ev Ty _] [] :- 
     int_to_nat N Nat,
-    Ctx => ljf_entry (dd Nat) Ty Ev1,
-           Ev = Ev1.
-           %% The kernel runs without the constraints imposed on Ev, and we only unify
-           %% afterwards, so that only the complete term is checked.
+    ljf_entry (dd Nat) Ty Ev1,
+    Ev = Ev1.
+    %% The kernel runs without the constraints imposed on Ev, and we only unify
+    %% afterwards, so that only the complete term is checked.
 }}.
 Elpi Typecheck.
+
 (* Elpi Debug "DEBUG". *)
 (* Elpi Trace. *)
 
@@ -46,7 +49,9 @@ Goal forall P Q : Type -> Prop, (exists x, (P x)) -> (forall x, (P x) -> (Q x)) 
 elpi dd_fpc 3.
 Qed.
 
-(* Examples using the De Brujin FPC *)
+(* The second tactic uses the Proof Certificate format of lambda terms
+   in De Brujin format *)
+
 Elpi Tactic deb_fpc.
 Elpi Accumulate lp:{{
   % De Brujin-style certificates are stored here, since right now it is
@@ -63,13 +68,15 @@ Elpi Accumulate lp:{{
 Elpi Accumulate File "fpc/ljf-dep.mod".
 Elpi Accumulate File "fpc/deb-fpc.sig".
 Elpi Accumulate File "fpc/deb-fpc.mod".
+(* The tactic is built in the same way as before: we accumulate the code
+   for the kernel and the fpc specification, and we provide a "solve"
+   predicate that simply calls the kernel on the formula, together with
+   the provided certificate. *)
 Elpi Accumulate lp:{{
   solve [(int Indx)] [goal Ctx Ev Ty _] [] :- 
     deb_certificate Indx Deb,  
     Ctx => ljf_entry (lc 0 Deb) Ty Ev1,
     Ev = Ev1.
-    %% The kernel runs without the constraints imposed on Ev, and we only unify
-    %% afterwards, so that only the complete term is checked.
 }}.
 Elpi Typecheck.
 
