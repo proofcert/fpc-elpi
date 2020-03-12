@@ -46,19 +46,10 @@ ljf_entry Cert Form Term :- check [] Cert (async [] (unk Form)) Term.
 
 % Structural Rules
 % decide
-  % decideL_je (coqcert Hd) (coqabs (x\ x)) (idxoftm Hd).
-  % decideL_je (coqcert {{and_ind lp:T lp:Idx}}) (coqabs (x\ {{and_ind lp:T lp:x}})) (idxoftm Idx).
-  % decideL_je (coqcert (app [Hd,B])) (coqabs (x\ app [x,B])) (idxoftm Hd).
-check Ctx Cert (async [] (str R)) (T Var) :- coq.say "Deciding...", decideL_je Cert Cert' Indx, coq.say "Cert",
-  % sigma A B C\ storage A B C, coq.say "Choosing" Indx N, isNeg N,
-  look Ctx Var N, coq.say "Choosing" N "at" Var,
+check Ctx Cert (async [] (str R)) (T Var) :-
+  decideL_je Cert Cert' Indx,
+  look Ctx Var N, isNeg N,
   check Ctx Cert' (lfoc N R) (abs T).
-% check Ctx Cert (async [] (str R)) (app [Var,B]) :- decideL_je Cert Cert' Indx,
-%   storage Indx Var N, coq.say "Choosing" Indx N, isNeg N, 
-%   check Ctx Cert' (lfoc N R) (abs (x\ app [x,B])).
-% check Ctx Cert (async [] (str R)) {{and_ind lp:T lp:Var}} :- decideL_je Cert Cert' Indx,
-%   storage Indx Var N, coq.say "Choosing" Indx N, isNeg N, 
-%   check Ctx Cert' (lfoc N R) (abs (x\ {{and_ind lp:T lp:x}})).
 check Ctx Cert (async [] (str P)) T :-
   isPos P, decideR_je Cert Cert', check Ctx Cert' (rfoc P) T.
 % release
@@ -67,14 +58,14 @@ check Ctx Cert (rfoc N)   T :- isNeg N, releaseR_je Cert Cert', check Ctx Cert' 
 % store
 check Ctx Cert (async [C|Theta] R) (abs T) :- (isNeg C ; isPosAtm C),
   storeL_jc Cert Cert' Indx, 
-  % pi w\ storage indx w C => coq.say "Storing" C "at" (Indx w),
+  % pi w\ storage Indx w C => 
   pi w\ decl w _Name C =>
     check [(pr w C)| Ctx] (Cert' w) (async Theta R) (T w).
 check Ctx Cert (async [] (unk D)) T :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', check Ctx Cert' (async [] (str D)) T.
 % Identity rules
 % initial (all atoms are negative)
-check Ctx Cert (lfoc Na Na) T :- coq.say "At neg" T, T = (abs (x\ x)), isNegAtm Na, initialL_je Cert.
+check Ctx Cert (lfoc Na Na) T :- T = (abs (x\ x)), isNegAtm Na, initialL_je Cert.
 % check Ctx Cert (rfoc Pa)    T :- isPosAtm Pa, initialR_je Cert Indx, storage Indx Pa.
 % cut
 % check Ctx Cert (async [] (str R)) :- cut_je Cert CertA CertB F, 
@@ -94,7 +85,6 @@ check Ctx Cert (async [] (unk (prod Name Ty1 Ty2))) (fun Name Ty1 F) :-
 check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
   not (pred_type Ty1),
   all_jc Cert Cert',
-  % pi t\ fo_term t => check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
   pi t\ decl t _Name Ty1 => check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
 %% Disjunction
 check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A, B, _, fun _ A T1, fun _ B T2, x])):-
@@ -110,13 +100,9 @@ check Ctx Cert (async [] (unk {{lp:A /\ lp:B}})) {{conj lp:T1 lp:T2}} :-
   check Ctx CertA (async [] (unk A)) T1, check Ctx CertB (async [] (unk B)) T2.
 % quantifers
 check Ctx Cert (async [app [global Ex_indt, Ty, (fun _ Ty B)] | Theta] R)
-              %  (abs (x\ U (app [global ExInd, Ty, _P, _P0, (fun _ Ty PtoP0), x]))) :-
-              %  (abs (x\ U {{ex_ind lp:Ty lp:_P lp:_P0 lp:_PtoP0 lp:x}})) :-
                (abs (x\ {{ex_ind lp:Fun lp:x}})) :-
   coq.locate "ex" Ex_indt,
-  % coq.locate "ex_ind" ExInd,
   Fun = (fun _ Ty (x\ fun _ (B x) (Proof x))),
-  % Forall = (x\ fun _ (B x) (Proof x)),
   some_jc Cert Cert',
   pi w\ decl w _Name Ty => (check Ctx (Cert' w) (async [B w | Theta] R) (abs (x\ (Proof w x)))).
 % Units
@@ -150,7 +136,6 @@ check Ctx Cert (lfoc {{lp:A /\ lp:B}} R) (abs T):-
 % quantifers
 check Ctx Cert (rfoc (app [global Ex_indt, Ty, (fun _ Ty B)]))
                (app [global Ex_intro, Ty, (fun _ Ty B), T, Proof]) :-
-  coq.say "Trying ex-right",
   coq.locate "ex" Ex_indt,
   coq.locate "ex_intro" Ex_intro,
   some_je Cert Cert' T, check Ctx Cert' (rfoc (B T)) Proof.
