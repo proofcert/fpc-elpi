@@ -1,6 +1,5 @@
 sig deb-fpc.
 accum_sig ljf-certificates.
-accum_sig ljf-polarize, ljf-kernel.
 accum_sig deb-fpc.
 
 kind deb            type.
@@ -12,18 +11,18 @@ type idx                       int -> index.
 type lambda          deb -> deb.
 
 kind tm             type.
-type app            tm -> tm -> tm.
-type lam            (tm -> tm) -> tm.
+type ap             tm -> tm -> tm.
+type la             (tm -> tm) -> tm.
 
-type debi           int -> tm -> deb -> o.
-type debe           int -> tm -> int -> (list deb -> list deb) -> o.
-type var            int -> tm -> o.
+type debi           int -> tm -> deb -> prop.
+type debe           int -> tm -> int -> (list deb -> list deb) -> prop.
+type vr             int -> tm -> prop.
 
-type i,j,k          iform.  % atomic formulas = primitive types
+% type i,j,k          iform.  % atomic formulas = primitive types
 
-type of                  tm -> iform -> o.
-type example      int -> tm -> iform -> o.
-type hope                        int -> o.
-type test_all                           o.
+% type of                  tm -> iform -> prop.
+% type example      int -> tm -> iform -> prop.
+% type hope                        int -> prop.
+% type test_all                           prop.
 
 
