@@ -49,6 +49,45 @@ Goal forall P Q : Type -> Prop, (exists x, (P x)) -> (forall x, (P x) -> (Q x)) 
 elpi dd_fpc 3.
 Qed.
 
+Goal forall P Q, P /\ Q -> P.
+  elpi dd_fpc 1.
+Qed.
+
+Goal forall P Q, P /\ Q -> Q.
+  elpi dd_fpc 1.
+Qed.
+
+Goal forall P Q, P /\ Q -> Q /\ P.
+  elpi dd_fpc 1.
+Qed.
+
+Goal forall P Q R, P /\ (Q /\ R) -> (P /\ Q) /\ R.
+  elpi dd_fpc 1.
+Qed.
+
+Goal forall P Q : Prop, P -> P \/ Q.
+  elpi dd_fpc 2.
+Qed.
+
+(* Transparent biconditional. *)
+Goal forall P Q : Prop, ((P -> Q) /\ (Q -> P)) -> ((Q -> P) /\ (Q -> P)).
+  elpi dd_fpc 2.
+Qed.
+
+Goal forall P Q R, P \/ (Q /\ R) -> (P \/ Q) /\ (P \/ R).
+  elpi dd_fpc 2.
+Qed.
+
+(* Goal forall P Q R, (P \/ Q) /\ (P \/ R) -> P \/ (Q /\ R). *)
+
+(* Goal forall (X : Type) (P Q : X -> Prop), *)
+(*     (exists x, P x \/ Q x) -> (exists x, P x) \/ (exists x, Q x). *)
+
+Goal forall (P Q : nat -> Prop),
+    (exists x, P x) \/ (exists x, Q x) -> (exists x, P x \/ Q x).
+  elpi dd_fpc 2.
+Qed.
+
 (* The second tactic uses the Proof Certificate format of lambda terms
    in De Brujin format *)
 
