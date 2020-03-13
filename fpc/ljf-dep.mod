@@ -33,6 +33,7 @@ isNegAtm (app [Hd|_Rest]) :- isNegAtm Hd.
 isNeg A :- isNegForm A ; isNegAtm A.
 
 isPosForm {{lp:_ \/ lp:_}}.
+isPosForm {{False}}.
 isPosForm (app [global Ex_indt, _, _]) :- coq.locate "ex" Ex_indt.
 % isPosForm (d+ _)    & isPosForm (some _)  & isPosForm f  &  isPosForm t+.
 isPos A :- isPosForm A.
@@ -92,6 +93,9 @@ check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A
   or_jc Cert CertA CertB,
   check Ctx CertA (async [A | Theta] R) (abs T1),
   check Ctx CertB (async [B | Theta] R) (abs T2).
+%% Negation
+check Ctx Cert (async [{{False}}| _Theta] _R) (abs (x\ app [global FalseInd, _, x])):-
+  coq.locate "False_ind" FalseInd.
 % conjunction
 % check Ctx Cert (async [(A &+& B )| Theta] R) :- andPos_jc Cert Cert',
 %   check Ctx Cert' (async [A , B | Theta] R).

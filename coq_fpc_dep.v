@@ -87,6 +87,27 @@ Goal forall (P Q : nat -> Prop),
   elpi dd_fpc 2.
 Qed.
 
+(* Transparent negation. *)
+Goal forall P : Prop, False -> P.
+  elpi dd_fpc 1.
+Qed.
+
+Goal forall P : Prop, (P -> False) -> (forall Q : Prop, P -> Q).
+  elpi dd_fpc 2.
+Qed.
+
+Goal False -> False.
+  elpi dd_fpc 1.
+Qed.
+
+Goal forall P Q : Prop, (P /\ (P -> False)) -> Q.
+  elpi dd_fpc 2.
+Qed.
+
+Goal forall P : Prop, (P /\ (P -> False)) -> False.
+  elpi dd_fpc 2.
+Qed.
+
 (* The second tactic uses the Proof Certificate format of lambda terms
    in De Brujin format *)
 
