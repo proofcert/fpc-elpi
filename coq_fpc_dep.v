@@ -92,9 +92,9 @@ Goal forall P : Prop, False -> P.
   elpi dd_fpc 1.
 Qed.
 
-Goal forall P : Prop, (P -> False) -> (forall Q : Prop, P -> Q).
+(* Goal forall P : Prop, (P -> False) -> (forall Q : Prop, P -> Q).
   elpi dd_fpc 2.
-Qed.
+Qed. *)
 
 Goal False -> False.
   elpi dd_fpc 1.
@@ -108,6 +108,9 @@ Goal forall P : Prop, (P /\ (P -> False)) -> False.
   elpi dd_fpc 2.
 Qed.
 
+Goal forall P: Prop, P -> ((P -> False) -> False).
+elpi dd_fpc 2.
+Qed.
 (* The second tactic uses the Proof Certificate format of lambda terms
    in De Brujin format *)
 

@@ -33,10 +33,10 @@ isNegAtm (app [Hd|_Rest]) :- isNegAtm Hd.
 isNeg A :- isNegForm A ; isNegAtm A.
 
 isPosForm {{lp:_ \/ lp:_}}.
-isPosForm {{False}}.
+isPosAtm {{False}}.
 isPosForm (app [global Ex_indt, _, _]) :- coq.locate "ex" Ex_indt.
 % isPosForm (d+ _)    & isPosForm (some _)  & isPosForm f  &  isPosForm t+.
-isPos A :- isPosForm A.
+isPos A :- isPosForm A; isPosAtm A.
 
 type pred_type term -> prop.
 pred_type (sort prop).
@@ -67,7 +67,7 @@ check Ctx Cert (async [] (unk D)) T :- (isPos D ; isNegAtm D),
 % Identity rules
 % initial (all atoms are negative)
 check Ctx Cert (lfoc Na Na) T :- T = (abs (x\ x)), isNegAtm Na, initialL_je Cert.
-% check Ctx Cert (rfoc Pa)    T :- isPosAtm Pa, initialR_je Cert Indx, storage Indx Pa.
+check Ctx Cert (rfoc Pa)    Var :- isPosAtm Pa, initialR_je Cert Indx, look Ctx Var Pa.% storage Indx Pa.
 % cut
 % check Ctx Cert (async [] (str R)) :- cut_je Cert CertA CertB F, 
 %   check Ctx CertA (async [] (unk F)), check Ctx CertB (async [F] (str R)).
@@ -94,7 +94,7 @@ check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A
   check Ctx CertA (async [A | Theta] R) (abs T1),
   check Ctx CertB (async [B | Theta] R) (abs T2).
 %% Negation
-check Ctx Cert (async [{{False}}| _Theta] _R) (abs (x\ app [global FalseInd, _, x])):-
+check Ctx Cert (async [{{False}}| _Theta] (unk R)) (abs (x\ app [global FalseInd, R, x])):-
   coq.locate "False_ind" FalseInd.
 % conjunction
 % check Ctx Cert (async [(A &+& B )| Theta] R) :- andPos_jc Cert Cert',
