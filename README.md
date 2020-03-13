@@ -25,7 +25,7 @@ OPAM package manager, using the standard [OCaml OPAM
 repository](https://opam.ocaml.org/) as well as the official [Coq OPAM
 repository](https://coq.inria.fr/opam/released/).
 
-`coq` 8.11.0
+- `coq` 8.11.0
 
 - `coq-elpi` 1.3.1
 
