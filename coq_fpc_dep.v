@@ -78,10 +78,9 @@ Goal forall P Q R, P \/ (Q /\ R) -> (P \/ Q) /\ (P \/ R).
   elpi dd_fpc 2.
 Qed.
 
-(* Goal forall P Q R, (P \/ Q) /\ (P \/ R) -> P \/ (Q /\ R). *)
-
-(* Goal forall (X : Type) (P Q : X -> Prop), *)
-(*     (exists x, P x \/ Q x) -> (exists x, P x) \/ (exists x, Q x). *)
+Goal forall P Q R, (P \/ Q) /\ (P \/ R) -> P \/ (Q /\ R).
+  elpi dd_fpc 4.
+Qed.
 
 Goal forall (P Q : nat -> Prop),
     (exists x, P x) \/ (exists x, Q x) -> (exists x, P x \/ Q x).
