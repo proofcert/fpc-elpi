@@ -25,14 +25,24 @@ OPAM package manager, using the standard [OCaml OPAM
 repository](https://opam.ocaml.org/) as well as the official [Coq OPAM
 repository](https://coq.inria.fr/opam/released/).
 
-- `coq` 8.11.0
+`coq` 8.10.2
+
+- `coq-elpi` 1.3.0
+
+- `elpi` 1.10.2
+
+`coq` 8.11.0
 
 - `coq-elpi` 1.3.1
 
 - `elpi` 1.10.2
 
-Either the Coq toplevel or an interactive editor like Visual Studio Code with
-Coq and ELPI addons installed can be used.
+These toolchains should work with recent versions of OCaml (between 4.05.0 and
+4.09.1).
+
+Support to use FPC-Elpi interactively is offered by either the Coq toplevel or
+the Visual Studio Code editor with `coq`, `Elpi lang` and `Coq Elpi lang` addons
+installed.
 
 ## Examples
 
