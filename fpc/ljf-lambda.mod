@@ -1,4 +1,6 @@
 % This modified kernel introduces an eigenvariable with the implication introduction
+% This is achieved by changing storeL_jc to introduce an eigenvariable 
+% and allowing the index (use for storage) to incorporate that eigenvariable.
 module ljf-kernel.
 accumulate spy.
 
