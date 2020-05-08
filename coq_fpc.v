@@ -40,7 +40,7 @@ Elpi Accumulate lp:{{
    formulas of the object logic in the usual manner.
 
    Observe that the universal quantifier `forall` results from the reification
-   by `coq_to_iform` of the non-dependent case of the Coq produc type, when
+   by `coq_to_iform` of the non-dependent case of the Coq product type, when
    applied to a term of type `Type` (the identifiers `sort`, `typ`... are Elpi's
    own names for those, with the underscore following `typ` in place of the
    parameter used to denote type universes). There is one curious issue related
@@ -81,7 +81,7 @@ Elpi Accumulate lp:{{
    existential quantifier we encounter some parsing issues while following the
    quoted approach. (See also comments on universal quantification above.)
 
-   Consider the FPC definition of `and_jc` referenced above. This clerk is only
+   Consider the FPC definition of `andNeg_jc` referenced above. This clerk is only
    defined for `coqabs` because we expect that it should treat an abstracted
    variable where the projection should be put.
 
