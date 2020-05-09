@@ -111,6 +111,16 @@ Qed.
 Goal forall P: Prop, P -> ((P -> False) -> False).
 elpi dd_fpc 2.
 Qed.
+
+Theorem frobenius1: forall (P : Prop), forall (Q : nat -> Prop),
+    (exists x, P /\ Q x) -> P /\ (exists x, Q x).
+Proof. elpi dd_fpc 3. Qed.
+
+Goal forall (P Q : nat -> Prop),
+    (forall x, P x) /\ (forall x, Q x) -> (forall x, P x /\ Q x).
+  elpi dd_fpc 1.
+Qed.
+
 (* The second tactic uses the Proof Certificate format of lambda terms
    in De Brujin format *)
 
@@ -126,6 +136,8 @@ Elpi Accumulate lp:{{
   deb_certificate 4 (lambda (lambda (lambda (apply 0 [apply 0 [apply 2 []]])))).
   deb_certificate 5 (lambda (lambda (apply 0 [lambda (apply 0 [apply 2 []])]))).
   deb_certificate 6 (lambda (lambda (apply 0 [lambda (apply 2 [])]))).
+  deb_certificate 7 (lambda (lambda (apply 0 [lambda (apply 2 [apply 0 []])]))).
+  deb_certificate 8 (lambda (apply 0 [lambda (apply 0 [lambda (apply 2 [lambda (apply 1 [])])])])).
 }}.
 Elpi Accumulate File "fpc/ljf-dep.mod".
 Elpi Accumulate File "fpc/deb-fpc.sig".
@@ -165,3 +177,9 @@ Qed.
 Goal forall P Q R: Prop, (P -> ((((Q -> P) -> P) -> R) -> R)).
 elpi deb_fpc 6.
 Qed.
+
+Theorem dneg_exc_mid : forall P Q : Prop, ((P -> Q) -> ((P -> Q) -> Q) -> Q).
+Proof. elpi deb_fpc 7. Qed.
+
+Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q).
+Proof. elpi deb_fpc 8. Qed.
