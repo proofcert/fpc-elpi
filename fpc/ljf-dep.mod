@@ -95,7 +95,8 @@ check Ctx Cert (async [] (unk (prod _ Ty1 Ty2))) (fun _name Ty1 F) :-
   all_jc Cert Cert',
   pi t\ decl t _Name Ty1 => check Ctx (Cert' t) (async [] (unk (Ty2 t))) (F t).
 %% Disjunction
-check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A, B, _, fun _ A T1, fun _ B T2, x])):-
+check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A, B, F, fun _ A T1, fun _ B T2, x])):-
+  (R = unk F; R = str F),
   coq.locate "or_ind" OrInd,
   or_jc Cert CertA CertB,
   check Ctx CertA (async [A | Theta] R) (abs T1),
@@ -117,7 +118,7 @@ check Ctx Cert (async [app [global Ex_indt, Ty, (fun _ Ty B)] | Theta] R)
   coq.locate "ex" Ex_indt,
   Fun = (fun _ Ty (x\ fun _ (B x) (Proof x))),
   some_jc Cert Cert',
-  pi w\ decl w _Name Ty => (check Ctx (Cert' w) (async [B w | Theta] R) (abs (x\ (Proof w x)))).
+  pi w\ decl w _Name Ty => (check Ctx (Cert' w) (async [B w | Theta] R) (abs (Proof w)).
 % Units
 % check Ctx _Cert (async [] (unk t-)).
 % check Ctx _Cert (async [f | _Theta] _R).
