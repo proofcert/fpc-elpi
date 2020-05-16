@@ -118,7 +118,7 @@ check Ctx Cert (async [app [global Ex_indt, Ty, (fun _ Ty B)] | Theta] R)
   coq.locate "ex" Ex_indt,
   Fun = (fun _ Ty (x\ fun _ (B x) (Proof x))),
   some_jc Cert Cert',
-  pi w\ decl w _Name Ty => (check Ctx (Cert' w) (async [B w | Theta] R) (abs (Proof w)).
+  pi w\ decl w _Name Ty => check Ctx (Cert' w) (async [B w | Theta] R) (abs (Proof w)).
 % Units
 % check Ctx _Cert (async [] (unk t-)).
 % check Ctx _Cert (async [f | _Theta] _R).
