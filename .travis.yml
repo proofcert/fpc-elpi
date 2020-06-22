@@ -6,12 +6,11 @@ install:
   - sudo add-apt-repository ppa:avsm/ppa -y
   - sudo apt update
   - sudo apt-get install opam
-  - opam init -a ${BASE_REMOTE}
   - opam init --bare -a
   - eval $(opam config env)
   - opam update
   - opam switch create 4.10.0
   - opam repo add coq-released https://coq.inria.fr/opam/released
-  - opam install coq-elpi
+  - opam install -y coq-elpi
 script:
   - coqc coq_fpc.v
