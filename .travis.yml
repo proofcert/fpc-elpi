@@ -6,7 +6,7 @@ install:
   - sudo add-apt-repository ppa:avsm/ppa -y
   - sudo apt update
   - sudo apt-get install opam
-  opam init -a ${BASE_REMOTE}
+  - opam init -a ${BASE_REMOTE}
   - opam init --bare -a
   - eval $(opam config env)
   - opam update
