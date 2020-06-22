@@ -4,7 +4,7 @@ git:
   depth: false
 install:
   - sudo apt-get install opam
-  - opam init --comp=4.10.0
+  - opam init --bare
   - opam update
   - opam switch create 4.10.0
   - opam repo add coq-released https://coq.inria.fr/opam/released
