@@ -1,8 +1,10 @@
-dist: eoan
+dist: bionic
 language: bash
 git:
   depth: false
 install:
+  - sudo add-apt-repository ppa:avsm/ppa
+  - sudo apt update
   - sudo apt-get install opam
   - opam init --bare
   - opam update
