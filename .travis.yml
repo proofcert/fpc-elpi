@@ -12,5 +12,6 @@ install:
   - opam switch create 4.10.0
   - opam repo add coq-released https://coq.inria.fr/opam/released
   - opam install -y -v coq-elpi
+  - eval $(opam env) 
 script:
   - coqc coq_fpc.v
