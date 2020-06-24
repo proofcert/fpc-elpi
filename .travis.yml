@@ -1,7 +1,8 @@
 dist: bionic
 language: bash
 cache:
-  - $HOME/.opam
+  directories:
+    - $HOME/.opam
 install:
   - sudo add-apt-repository ppa:avsm/ppa -y
   - sudo apt update
