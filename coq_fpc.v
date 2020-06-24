@@ -15,6 +15,9 @@ Elpi Accumulate lp:{{
     %% afterwards, so that only the complete term is checked.
 }}.
 Elpi Typecheck.
+(* Elpi Debug "DEBUG". *)
+(* Elpi Trace. *)
+
 (* Examples using the decide depth fpc *)
 
 Goal forall P : Prop, P -> P.
@@ -63,6 +66,10 @@ Qed.
 
 Goal forall P Q : Prop, P -> P \/ Q.
   elpi dd_fpc 2.
+Qed.
+
+Goal forall A B C D : Prop, A -> (A -> B) -> (A -> B -> C) -> (A -> B -> C -> D) -> D.
+elpi dd_fpc 4.
 Qed.
 
 (* Transparent biconditional. *)
@@ -115,6 +122,11 @@ Proof. elpi dd_fpc 3. Qed.
 Goal forall (P Q : nat -> Prop),
     (forall x, P x) /\ (forall x, Q x) -> (forall x, P x /\ Q x).
   elpi dd_fpc 1.
+Qed.
+
+Goal forall (P : Prop), forall (Q : nat -> Prop),
+     (exists x, P \/ Q x) -> P \/ (exists x, Q x).
+     elpi dd_fpc 3.
 Qed.
 
 (* The second tactic uses the Proof Certificate format of lambda terms
