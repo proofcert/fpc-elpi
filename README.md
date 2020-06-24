@@ -34,12 +34,12 @@ repository](https://coq.inria.fr/opam/released/).
 
 `coq` 8.11.0
 
-- `coq-elpi` 1.3.1
+- `coq-elpi` 1.4.1
 
-- `elpi` 1.10.2
+- `elpi` 1.11.2
 
 These toolchains should work with recent versions of OCaml (between 4.05.0 and
-4.09.1).
+4.10.0).
 
 Support to use FPC-Elpi interactively is offered by either the Coq toplevel or
 the Visual Studio Code editor with `coq`, `Elpi lang` and `Coq Elpi lang` addons
@@ -47,7 +47,7 @@ installed.
 
 ## Examples
 
-The main entry point is file `coq_fpc_dep.v`. In it we define a number of
+The main entry point is file `coq_fpc.v`. In it we define a number of
 tactics for intuitionistic formulas in Coq-Elpi using the FPC definitions
 contained in the homonymous `fpc` directory:
 

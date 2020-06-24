@@ -14,4 +14,4 @@ install:
   - opam install -y -v coq-elpi
   - eval $(opam env) 
 script:
-  - coqc coq_fpc_dep.v
+  - coqc coq_fpc.v
