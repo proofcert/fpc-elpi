@@ -141,15 +141,14 @@ Elpi Db coq_fpc.db lp:{{
     coq_to_iform Type Form,
     polarize- Form PForm, ljf_entry (<c> (dd N) (coqcert Term)) PForm.
   arr_jc (coqcert (fun _name _type F)) (coqabs F).
-  arr_je (coqabs (x\ app [x,T])) (coqcert T) (coqabs (x\ x)).
+  arr_je (coqabs (x\ T (app [x,Tm]))) (coqcert Tm) (coqabs T).
   storeL_jc (coqabs T) (x\ coqcert (T x)) (x\ idxoftm x).
-  decideL_je (coqcert (app [Hd,B])) (coqabs (x\ app [x,B])) (idxoftm Hd).
-  decideL_je (coqcert Hd) (coqabs (x\ x)) (idxoftm Hd).
-  decideL_je (coqcert {{and_ind lp:T lp:Idx}}) (coqabs (x\ {{and_ind lp:T lp:x}})) (idxoftm Idx).
-  initialL_je _.
-  % initialR_je _ _.
-  releaseL_je Cert Cert. %% This should move from a coqabs to a coqcert?
-  storeR_jc (coqcert T) (coqcert T).
+  decideL_je (coqcert Term) (coqabs T) (idxoftm Var) :-
+    Term = (T Var).
+  initialL_je (coqabs (x\ x)).
+  initialR_je (coqterm Var) (idxoftm Var).
+  releaseL_je Cert Cert. %% Should this move from a coqabs to a coqcert?
+  storeR_jc Cert Cert.
   releaseR_je Cert Cert.
   decideR_je Cert Cert.
   or_je (coqcert {{or_introl lp:T}}) (coqcert T) left.
@@ -159,16 +158,17 @@ Elpi Db coq_fpc.db lp:{{
   or_jc (coqabs (x\ app [global OrInd, _, _, _, fun _ _ T1, fun _  _ T2, x])) (coqabs T1) (coqabs T2) :-
   coq.locate "or_ind" OrInd.
   andNeg_jc (coqcert {{conj lp:T1 lp:T2}}) (coqcert T1) (coqcert T2).
-  % Instead of using a let-expression, we substitute into the term. Is this good enough?
   andNeg_je (coqabs T) (coqabs (x\ T {{proj1 lp:x}})) left.
   andNeg_je (coqabs T) (coqabs (x\ T {{proj2 lp:x}})) right.
   %% TODO: andPos will be needed, especially in case we want to host classical logic
   % andPos_jc (coqabs (x\ {{and_ind lp:{{fun _ _ (x\ fun _ _ (y\ T))}} lp:x}})) (coqabs (x\ (y\ T))).
   % andPos_je (coqcert T) (coqcert T) (coqcert T).
   all_jc (coqcert (fun _ _ F)) (x\ coqcert (F x)). 
-  all_je (coqabs (x\ app [x, T])) (coqcert T) Term.
+  all_je (coqabs (x\ T (app [x, Tm]))) (coqabs T) Term.
   some_je (coqcert {{ex_intro lp:Pred lp:Witness lp:Proof}}) (coqcert Proof) Witness.
-  some_jc (coqabs (x\ app [x, T])) (x\ coqcert (app [x, T])).
+  some_jc (coqabs (x\ {{ex_ind lp:Fun lp:x}})) (x\ coqabs (Proof x)) :-
+    Fun = (fun _ Ty (x\ fun _ (B x) (Proof x))).
+
   solve [(int N)] [goal Ctx Ev Ty _] [] :-
     int_to_nat N Nat,
     Ctx => bootstrap Ty Ev1 Nat,  coq.say Ev1, Ev = Ev1.
@@ -186,16 +186,33 @@ Elpi Typecheck.
 
 Elpi Debug "DEBUG".
 (* Elpi Trace. *)
-(* Fail Elpi Query lp:{{bootstrap {{forall P Q : Type -> Prop, forall x: Type, forall y: Type, ((P x) -> (Q y)) -> (exists x, (P x) -> forall y, (Q y))}} J (s (s (zero))).}}. *)
+
+Lemma example1 : forall A B: Prop, (A -> B) -> A -> B.
+elpi coq_fpc 2.
+Show Proof.
+Qed.
+
+Lemma example2 : forall A : Prop, A \/ A -> A.
+elpi coq_fpc 1.
+Qed.
+
+Lemma example3 : forall A B : Prop, A -> A \/ B.
+elpi coq_fpc 1.
+Qed.
+
+Lemma example4 : forall A B : Prop, A -> B -> A /\ B.
+elpi coq_fpc 1.
+Qed.
+
 Elpi Query lp:{{bootstrap {{forall (P: Prop) (Q: Type -> Prop), (forall x, P -> Q x) -> P -> (forall x, Q x)}}
 J
                           (s (s zero))}}.
 
-Elpi Query lp:{{bootstrap {{forall A B: Prop, (A -> B) -> A -> B}}
+Fail Elpi Query lp:{{bootstrap {{forall A B: Prop, (A -> B) -> A -> B}}
                           J
                           (s (s zero))}}.
 
-Elpi Query lp:{{bootstrap {{forall A B : Prop, A /\ B -> A}}
+Fail Elpi Query lp:{{bootstrap {{forall A B : Prop, A /\ B -> A}}
                           J
                           (s zero)}}.
 

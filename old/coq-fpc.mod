@@ -1,3 +1,7 @@
+%%%% LEGACY FILE
+%%%% This was used to produce maximal certificates, in order to
+%%%% check them with a sequent calculus formalization in Coq.
+%%%% No longer relevant for the current structure of the code.
 %% The first part of this file is the old stlc-examples file
 %% Examples from the stlc fpc are then translated to maxcerts and sent to Coq
 %% For the coq-elpi interaction, scroll down

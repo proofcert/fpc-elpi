@@ -1,3 +1,7 @@
+%%%% LEGACY FILE
+%%%% This was used to produce maximal certificates, in order to
+%%%% check them with a sequent calculus formalization in Coq.
+%%%% No longer relevant for the current structure of the code.
 sig coq-fpc.
 accum_sig ljf-polarize, ljf-kernel.
 accum_sig stlc-fpc.
