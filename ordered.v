@@ -24,15 +24,11 @@ coq.locate "le" (indt LE), coq.env.indt LE _ _ _ T C Ts.
 }}.
 
 Elpi Query lp:{{
-  coq.locate "ocn" Name, coq.env.typeof Name Ty, gethead Ty Hd Args.
-}}.
-
-Elpi Query lp:{{
   coq.locate "ordered" GR,   coq.say "ordered is:" GR,
   coq.env.typeof GR Ty, coq.say "The type of ordered is:" Ty.  
 }}.
 
 Elpi Query lp:{{
     coq.locate "ordered" (indt GR),
-    coq.env.indt GR _tt _uhm _mah Type Kn Types.   % get the names of the constructors
+    coq.env.indt GR _ _ _ Type Kn Types.   % get the names of the constructors
  }}.
