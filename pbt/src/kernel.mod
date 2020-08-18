@@ -4,16 +4,16 @@ module kernel.
 % Helper predicates %
 %%%%%%%%%%%%%%%%%%%%%
 
-memb X (X :: L).
-memb X (Y :: L) :- memb X L.
+memb X (X :: _L).
+memb X (_Y :: L) :- memb X L.
 
 %%%%%%%%%%%%%%%
 % Interpreter %
 %%%%%%%%%%%%%%%
 
 interp {{True}}.
-interp {{nat}}.
-interp (sort _).
+interp {{nat}}. % :- coq.says "axiom nat", true.
+interp (sort _) . %:- coq.says "axiom sort".
 
 interp {{lp:G1 /\ lp:G2}} :-
 	interp G1,
@@ -31,20 +31,20 @@ interp {{lp:G1 \/ lp:G2}} :-
 
 interp {{lp:G = lp:G}}.
 
-% interp (prod _ Ty G) :-
-%   cl Ty =>
-%   interp (G X).
 
-% interp A :-
-% 	cl Ty,
-% 	backchain Ty A.
-interp (app [global (indt Prog) | Args] as Head) :-
-    coq.env.indt Prog _ _ _ Type Kn Types,
-	memb G Types,
-	backchain G Head.
+interp (app [global (indt Prog) | Args] as Atom) :-
+ % coq.say "prog: " Prog,
+  % coq.say "args: " Args,
+    coq.env.indt Prog _ _ _ _Type _Kn Clauses,
+	memb D Clauses,
+%	 coq.say "selected: " D
+	backchain D Atom.
 
-interp G :- cl C Var, backchain C G.
-backchain A B :- coq.say "backchain" A B, fail.
+% commented -AM
+% interp G :- cl C Var, backchain C G.
+
+% trace changed  -AM
+% backchain A B :- coq.say "backchain with clause: " A, fail.
 backchain (prod _ Ty P) G :- backchain (P X) G, interp Ty.
 backchain G G.
 
@@ -82,18 +82,15 @@ check Cert {{lp:G1 \/ lp:G2}} :-
 % check Cert (nabla G) :-
 % 	pi x\ check Cert (G x).
 
-interp (app [global (indt Prog) | Args] as Head) :-
-    coq.env.indt Prog _tt _uhm _mah Type Kn Types,
-	memb G Types,
-	backchain G Head.
+% interp (app [global (indt Prog) | Args] as Atom) :-
+%     coq.env.indt Prog _tt _uhm _mah Type Kn Clauses,
+% 	memb G Clauses,
+% 	backchain G Atom.
 
-% The unfold rule lets the expert inspect the available clauses (this should
-% be done with great care, ideally limiting the information to a list of names,
-% set and immutable) and can restrict their selection by name.
-check Cert (app [global (indt Prog) | Args] as Head) :-
-    coq.env.indt Prog _ _ _ Type Kn Types,
-	unfold_expert Types Cert Cert' K,
+check Cert (app [global (indt Prog) | _Args] ) :-
+    coq.env.indt Prog _ _ _ _Type Kn Clauses,
+	unfold_expert Clauses Cert Cert' K,
 	%% Use the selected constructor as key to find its
 	%% clause in the zipped list of constructors and clauses.
-	std.lookup {std.zip Kn Types} K G, 
+	std.lookup {std.zip Kn Clauses} K G, 
 	check Cert' G.

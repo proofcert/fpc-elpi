@@ -11,13 +11,15 @@ type   some, nabla   (A -> term) -> term.
 type   eq            A -> A -> term.
 
 % Program and interpreter
-type   prog      term -> term -> o.
+% type   prog      term -> term -> o.
 
-kind   nterm   type.
-type   np        string -> term -> nterm.
-type   progs     term -> list nterm -> o.
+% kind   nterm   type.
+% type   np        string -> term -> nterm.
+% type   progs     term -> list nterm -> o.
 
 type   interp    term -> o.
+% added -AM
+type   backchain    term -> term -> o.
 
 % Certificates
 kind   choice        type.

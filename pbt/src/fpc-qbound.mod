@@ -23,12 +23,12 @@ unfold_expert _ (qgen (qsize In Out)) (qgen (qsize In' Out)) _ :-
 	In > 0,
 	In' is In - 1.
 
-some_expert (qgen Bound) (qgen Bound) T.
+% some_expert (qgen Bound) (qgen Bound) T.
 
 %%%%%%%%%%%%%%%%%
 % Strict bounds %
 %%%%%%%%%%%%%%%%%
-
+/* commented out right now -am
 %% Size bounds.
 
 tt_expert (qgen (qidsize _)).
@@ -109,3 +109,4 @@ and_expert (qgen (qrgheight Max Min)) (qgen (qheight Max')) (qgen (qrgheight Max
 unfold_expert _ (qgen (qrgheight Max Min)) (qgen (qrgheight Max' Min)) _ :-
 	Max > 0,
 	Max' is Max - 1.
+*/
