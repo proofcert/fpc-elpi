@@ -30,11 +30,16 @@ Inductive insert (x : nat) : list nat -> list nat -> Prop:=
  eauto 10.
   Qed.
   
+  (* this should be provable*)
   Conjecture pres: forall x xs ys, ordered ys -> insert x xs ys -> ordered ys.
-  
-Elpi Command pbt.
+  (* this is false and we should get a cex*)
+  Conjecture pres_bad: forall x xs ys, ordered_bad ys -> insert x xs ys -> ordered_bad ys.
+
+  Elpi Command pbt.
 Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
+(* this does not compile*)
+(* Elpi Accumulate File "pbt/src/test-lst.mod".*)
 Elpi Typecheck.
 
 Elpi Query lp:{{
@@ -91,7 +96,7 @@ Elpi Query lp:{{
   interp {{ordered 1 :: ?L.}}.
   }}. *)
 
-  Elpi Query lp:{{
+Elpi Query lp:{{
 	check  (qgen (qheight 4)) {{ (ordered [1;2]).}}.       
   }}.
 
