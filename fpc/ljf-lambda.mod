@@ -17,7 +17,8 @@ isPosForm (_ !+! _) & isPosForm (_ &+& _).
 isPosForm (d+ _)    & isPosForm (some _)  & isPosForm f  &  isPosForm t+.
 isPos A :- isPosForm A ; isPosAtm A.
 
-:if "DEBUG" check A B :- announce (check A B).
+% :if "DEBUG"
+check A B :- announce (check A B).
 ljf_entry Cert Form :- check Cert (async [] (unk Form)).
 
 % :if "DEBUG" check A B :- spy (check A B).

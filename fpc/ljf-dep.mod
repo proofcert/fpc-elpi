@@ -1,4 +1,5 @@
-% This modified kernel introduces an eigenvariable with the implication introduction
+% This modified kernel uses (first order) dependent types instead of
+% intuitionistic formulas
 % module ljf-dep.
 % accumulate spy.
 accum_sig ljf-lambda-certificates.
