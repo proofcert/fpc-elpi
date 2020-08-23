@@ -9,14 +9,14 @@ accumulate fpc-qbound.
 %%%%%%%%%
 
 cex_ord_bad X L :-
-	check  (qgen (qheight 4)) {{ (ordered_bad L).}},
-	  interp {{insert X L O.}},
-	not(	  interp {{ordered_bad O.}}).
+	check  (qgen (qheight 4)) {{ordered_bad lp:L}},
+	  interp {{insert lp:X lp:L lp:O}},
+	not(	  interp {{ordered_bad lp:O}}).
 
 cex_ord_bad2  :-
-	check  (qgen (qheight 4)) {{ (ordered_bad L).}},
-	  interp {{insert X L O.}},
-	not(	  interp {{ordered_bad O.}}).
+	check  (qgen (qheight 4)) {{ (ordered_bad lp:L).}},
+	  interp {{insert lp:X lp:L lp:O.}},
+	not(	  interp {{ordered_bad lp:O.}}).
 
 
 
