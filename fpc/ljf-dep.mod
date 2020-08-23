@@ -1,4 +1,5 @@
-% This modified kernel introduces an eigenvariable with the implication introduction
+% This modified kernel uses (first order) dependent types instead of
+% intuitionistic formulas
 % module ljf-dep.
 % accumulate spy.
 accum_sig ljf-lambda-certificates.
@@ -103,7 +104,7 @@ check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A
   check Ctx CertB (async [B | Theta] R) (abs T2).
 %% Negation
 % check Ctx Cert (async [{{False}}| _Theta] (unk R)) (abs (x\ app [global FalseInd, R, x])):-
-check Ctx Cert (async [{{False}}| _Theta] R) (abs (x\ app [global FalseInd, F, x])):-
+check Ctx _Cert (async [{{False}}| _Theta] R) (abs (x\ app [global FalseInd, F, x])):-
   (R = unk F; R = str F),
   coq.locate "False_ind" FalseInd.
 % conjunction
