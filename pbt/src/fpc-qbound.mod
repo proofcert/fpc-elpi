@@ -16,10 +16,12 @@ and_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
 or_expert (qgen (qheight H)) (qgen (qheight H)) Ch.
 or_expert (qgen (qsize In Out)) (qgen (qsize In Out)) Ch.
 
-unfold_expert _ (qgen (qheight H)) (qgen (qheight H')) _ :-
+unfold_expert Kn (qgen (qheight H)) (qgen (qheight H')) K :-
+	std.mem Kn K,
 	H > 0,
 	H' is H - 1.
-unfold_expert _ (qgen (qsize In Out)) (qgen (qsize In' Out)) _ :-
+unfold_expert Kn (qgen (qsize In Out)) (qgen (qsize In' Out)) K :-
+	std.mem Kn K,
 	In > 0,
 	In' is In - 1.
 
