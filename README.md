@@ -1,8 +1,10 @@
-# FPC-Elpi [![Build Status](https://api.travis-ci.com/manmatteo/fpc-elpi.svg?branch=master)](https://travis-ci.com/manmatteo/fpc-elpi)
+# FPC-Elpi - Warning: experimental branch!
 
 This repository contains a development that integrates the Foundational Proof
 Certificate (FPC) framework into the Coq proof assistant by way of ELPI, an
 embeddable λProlog interpreter.
+
+This branch contains experimental code that accepts classical proofs.
 
 ## Description
 
