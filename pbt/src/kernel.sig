@@ -33,7 +33,7 @@ type   eq_expert       cert -> o.
 type   or_expert       cert -> cert -> choice -> o.
 type   and_expert      cert -> cert -> cert -> o.
 type   some_expert     cert -> cert -> A -> o.
-type   unfold_expert   list term -> cert -> cert -> constructor -> o.
+type   unfold_expert   list constructor -> cert -> cert -> constructor -> o.
 
 % Checker
-type   check   cert -> term -> o.
+type   check   cert -> list term -> term -> term -> o.

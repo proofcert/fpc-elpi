@@ -2,6 +2,19 @@ From elpi Require Import elpi.
 Require Import Arith List. Import ListNotations.
 Require Import Coq.Lists.List.
 
+Elpi Tactic pbt.
+Elpi Accumulate File "pbt/src/kernel.mod".
+Elpi Accumulate File "pbt/src/fpc-qbound.mod".
+(* this does not compile*)
+(* Elpi Accumulate File "pbt/src/test-lst.mod". *)
+Elpi Accumulate lp:{{
+  solve [int N] [goal Ctx Ev Ty _] [] :-
+    check (qgen (qheight N)) [] Ty Ev1,
+    coq.say "Ottenuto" Ev1,
+    Ev = Ev1.
+}}.
+Elpi Typecheck.
+
 Inductive ordered : list nat -> Prop :=
 	onl : ordered []
   | oss : forall x : nat, ordered [x]
@@ -14,9 +27,16 @@ Inductive ordered_bad : list nat -> Prop :=
   | ossb : forall x : nat, ordered_bad [x]
   | ocnb : forall (x y : nat) (l : list nat),
                 ordered_bad l  -> x <= y -> ordered_bad (x:: y :: l).         
+
 Hint  Constructors ordered.
+Hint Constructors list.
+
+Goal ordered [0;0;0].
+elpi pbt 10.
+Qed.
+
 Goal ordered [1;2;3;4;5;5;12;13].
-auto 20.
+elpi pbt 20.
 Qed.
 
 
@@ -35,12 +55,13 @@ Inductive insert (x : nat) : list nat -> list nat -> Prop:=
   (* this is false and we should get a cex*)
   Conjecture pres_bad: forall x xs ys, ordered_bad ys -> insert x xs ys -> ordered_bad ys.
 
-  Elpi Command pbt.
-Elpi Accumulate File "pbt/src/kernel.mod".
-Elpi Accumulate File "pbt/src/fpc-qbound.mod".
-(* this does not compile*)
-(* Elpi Accumulate File "pbt/src/test-lst.mod".*)
-Elpi Typecheck.
+Elpi Query lp:{{
+	check  (qgen (qheight 4)) {{ (ordered [1;2]).}}.       
+  }}.
+Elpi Query lp:{{
+  coq.locate "ordered" (indt LE), coq.env.indt-decl LE X.
+}}.
+
 
 Elpi Query lp:{{
   interp {{ 1 <= 2}}.
