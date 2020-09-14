@@ -1,4 +1,65 @@
 (*
+
+
+
+In PPDP19 there is a clear correspondence between the sequent calculus (fig 4) and
+the implementation of check (fig 5) and interp (fig.9). Lacking that
+I have trouble following the implementation and my observations maybe be completely off
+
+- the proof theury behibf interp and check should be the same, except that check 
+threads the certificate along. However, they are now quite different, as far as rules are concerned
+(minor point:  we have interp {{nat}} but not check for that)
+
+- the pi left/right rule have no expert; same for init. Is that intended? 
+Why is it different from say the and-right rule?
+
+- the proof term of pi left is puzzling (I was expecting an application), as well as the fact that it is linear
+in the assumptions: there is no general Ctx,  and prod is not contracted. By reference
+here is a left rule for -> with proof terms from Pfenning's notes
+
+Γ, u:A ⊃ B ⇒ J : A
+Γ, u:A ⊃ B, w:B ⇒ I : C
+------------------------------
+Γ, u:A ⊃ B ⇒ [u J/w]I : C
+
+- not sure why we need to put an atom in whd in unfold
+[BTW, in the elpi documentation it says
+
+% Note that the solve goal is not under a context containg the decl/def
+% entries.  It is up to the user to eventually load the context as follows
+%  solve _ [goal Ctx _ Ty] _ :- Ctx => unwind {whd Ty []} WhdTy.]
+
+- I don't understand the unfold rule fully, but two things are worrying me:
+1. it's very inefficient, since we are not doing indexing on the goalwhile selecting
+the clause to match -- it seems we pick them chrologiavlly and try them in order
+2. we should not be in the business of checking that 0 is a nat or [0] is a nat list
+(it's like doing dynamic typing, which is ironic in Coq)
+, 
+- how do we write tactic pbt so that is
+checks preconditions and interp negation of conclusion?
+
+- pbt sould actually be called "chk" for fpc driven
+lp and keep pbt the whole thing
+
+-
+Could we write check hypothetically instead of a explicit Ctx
+
+How we we know that Term : Type (in Coq?) or coq.typecheck Term Type  if
+check etc is provable?
+
+- check Cert [A] A (fun _ A (x\x)).
+
+ => should it be more general?
+
+ check Cert L A (fun _ A (x\x)) :- memb A L.
+
+ => should there be a axiom expert?
+
+
+*)
+
+
+(*
 the atomic case of the interpreter:
 interp (app [global (indt Prog) | Args] as Atom)
 
@@ -19,6 +80,10 @@ interp {{nat}}.
 interp (sort _) .
 *)
 
+(* lp casts term into whatever, eg Prop
+
+{{_}} quote a Coq exp into "term"
+*)
 
 (* WHY [auto] SUCKS:
 
