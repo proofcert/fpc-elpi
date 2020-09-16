@@ -9,9 +9,8 @@ Elpi Accumulate File "pbt/src/fpc-qbound.mod".
 (* Elpi Accumulate File "pbt/src/test-lst.mod". *)
 Elpi Accumulate lp:{{
   solve [int N] [goal Ctx Ev Ty _] [] :-
-    check (qgen (qheight N)) [] Ty Ev1,
-    coq.say "Ottenuto" Ev1,
-    Ev = Ev1.
+    check (qgen (qheight N)) [] Ty,
+    coq.say "Ottenuto" Ty.
 }}.
 Elpi Typecheck.
 
@@ -31,14 +30,15 @@ Inductive ordered_bad : list nat -> Prop :=
 Hint  Constructors ordered.
 Hint Constructors list.
 
-Goal ordered [0;0;0].
+(*
+Goal ordered [0;0].
 elpi pbt 10.
 Qed.
 
 Goal ordered [1;2;3;4;5;5;12;13].
 elpi pbt 20.
 Qed.
-
+*)
 
 Inductive insert (x : nat) : list nat -> list nat -> Prop:=
  | inil: insert  x [] [x]
@@ -54,6 +54,25 @@ Inductive insert (x : nat) : list nat -> list nat -> Prop:=
   Conjecture pres: forall x xs ys, ordered ys -> insert x xs ys -> ordered ys.
   (* this is false and we should get a cex*)
   Conjecture pres_bad: forall x xs ys, ordered_bad ys -> insert x xs ys -> ordered_bad ys.
+
+  Goal exists x xs ys, ordered_bad xs /\ insert x xs ys /\ not (ordered_bad ys).
+exists 0.
+exists [0;1;0].
+eexists. split.
+- constructor. constructor. auto.
+- econstructor. econstructor. auto.
+intro. inversion H; subst; clear H.
+inversion H4; subst; clear H4.
+inversion H2; subst; clear H2.
+inversion H4.
+Qed.
+
+(*the PBT query: loops for now*)
+Elpi Query lp:{{
+  check (qgen (qheight 4)) {{ordered_bad lp:Xs.}},
+  interp {{insert lp:X lp:Xs lp:Rs.}}, 
+  not (interp {{ordered_bad lp:Rs.}}).
+  }}.
 
 Elpi Query lp:{{
 	check  (qgen (qheight 4)) {{ (ordered [1;2]).}}.       
@@ -112,10 +131,10 @@ Qed.
   }}.
 
 
-(* what about gvar?
+(* what about gvar? *)
 Elpi Query lp:{{
-  interp {{ordered 1 :: ?L.}}.
-  }}. *)
+  interp {{ordered lp: Xs.}}.
+  }}. 
 
 Elpi Query lp:{{
 	check  (qgen (qheight 4)) {{ (ordered [1;2]).}}.       

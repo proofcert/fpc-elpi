@@ -1,7 +1,17 @@
 (*
+kernel.mod:
 
+the axiom and pi-left rule assume that Ctx contains at most one formula.
+This may hold in our application, but is generally false -- 
+just try check _ [] (prod _ T (prod  : T T))
 
+why has pi-right a clerk and left an expert? Just terminology
 
+check could be written hypothetically as hyp/conc
+
+But why not have backchain eben in check ? Why we need the context? why pi-right?
+----------------------------
+OLD(ish)
 In PPDP19 there is a clear correspondence between the sequent calculus (fig 4) and
 the implementation of check (fig 5) and interp (fig.9). Lacking that
 I have trouble following the implementation and my observations maybe be completely off
