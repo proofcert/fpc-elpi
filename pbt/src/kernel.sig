@@ -38,4 +38,7 @@ type   some_expert     cert -> cert -> A -> o.
 type   unfold_expert   list constructor -> cert -> cert -> constructor -> o.
 
 % Checker
-type   check   cert -> list term -> term -> o.
+kind   goal type.
+type   go   term -> goal.
+type   bc   term -> term -> goal.
+type   check   cert -> goal -> o.

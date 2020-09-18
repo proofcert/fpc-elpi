@@ -53,39 +53,35 @@ backchain G G.
 % Checker %
 %%%%%%%%%%%
 
-check Cert Ctx Type :- coq.say "check" Cert Ctx Type, fail.
+% check Cert Type :- coq.say "check" Cert Type, fail.
 
-check Cert [A] A.
-check Cert _ (sort _) :-
+check Cert (bc A A).
+check Cert (go (sort _)) :-
 	tt_expert Cert.
-check Cert _ {{nat}} :-
+check Cert (go {{nat}}) :-
 	tt_expert Cert.
-check Cert _ {{True}} :-
+check Cert (go {{True}}) :-
 	tt_expert Cert.
 
-check Cert Ctx {{lp:G1 /\ lp:G2}}:-
+check Cert (go {{lp:G1 /\ lp:G2}}):-
 	and_expert Cert Cert1 Cert2,
-	check Cert1 Ctx G1,
-	check Cert2 Ctx G2.
+	check Cert1 (go G1),
+	check Cert2 (go G2).
 
-check Cert Ctx {{lp:G1 \/ lp:G2}} :-
+check Cert (go {{lp:G1 \/ lp:G2}}) :-
 	or_expert Cert Cert' Choice,
 	(
-		(Choice = left, check Cert' Ctx G1)
+		(Choice = left, check Cert' (go G1))
 	;
-		(Choice = right, check Cert' Ctx G2)
+		(Choice = right, check Cert' (go G2))
 	).
 
-check Cert Ctx (prod _ Ty1 Ty2) :-
-    prod_clerk Cert Cert',
-	pi x\ check Cert' [Ty1 | Ctx] (Ty2 x).
-
-check Cert [prod _ Ty1 Ty2] Goal :-
+check Cert (bc (prod _ Ty1 Ty2) Goal) :-
   prod_expert Cert Cert1 Cert2,
-  check Cert1 [(Ty2 X)] Goal,
-  check Cert2 [] Ty1.
+  check Cert1 (bc (Ty2 X) Goal),
+  check Cert2 (go Ty1).
 
-check Cert [] Atom :-
+check Cert (go Atom) :-
     whd Atom [] (global (indt Prog)) Args, %% Coq-Elpi predicate!
     coq.env.indt Prog _ _ _ _Type Kn Clauses,
 	unfold_expert Kn Cert Cert' K,
@@ -93,6 +89,4 @@ check Cert [] Atom :-
 	%% clause in the zipped list of constructors and clauses.
 	std.lookup {std.zip Kn Clauses} K Clause, 
 	% coq.say "Key" K "for" Atom,
-	Kons = global (indc K),
-	% coq.say "But OutTerm is" OutTerm,
-	check Cert' [Clause] Atom.
+	check Cert' (bc Clause Atom).

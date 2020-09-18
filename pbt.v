@@ -34,6 +34,14 @@ rnl : forall acc, revA [] acc acc
 Inductive rev2 : list nat -> list nat -> Prop :=
 r: forall xs ys, revA xs [] ys -> rev2 xs ys.
 
+Inductive is_nat : nat -> Prop :=
+nz: is_nat 0
+| ns: forall n: nat, is_nat n -> is_nat (S n).
+
+Inductive is_natlist : list nat -> Prop :=
+nl: is_natlist []
+| nlcons: forall l: list nat, forall n:nat, is_natlist l ->  is_nat n -> is_natlist (cons n l).
+
 Elpi Tactic pbt.
 Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
@@ -50,18 +58,35 @@ Elpi Accumulate lp:{{
   env_type [decl Var _ Ty|_] Var Ty.
   env_type [decl _ _ _|L] Var Ty :- env_type L Var Ty.
 
+  type env_clauses goal-ctx -> list prop -> prop.
+  env_clauses [decl Var _ Ty] [(copy Var Ty :- !)].
+  env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
+    env_clauses L Cs.
+
   solve [trm Prog] [goal Ctx Ev Ty Who] OutGoals :-
     build_clauses Ctx Cs,
-    env_type Ctx Prog ProgType,
+    env_clauses Ctx Progs,
+    Progs => copy Prog ProgType,
+    coq.say ProgType,
     Cs => copy ProgType ProgGoal,
-    check (qgen (qheight 4)) [] ProgGoal,
+    coq.say ProgGoal,
+    check (qgen (qheight 9)) (go ProgGoal),
+    coq.say "Program: " ProgGoal,
     Cs => copy Ty PropGoal,
-    not (interp PropGoal),
-    coq.say PropGoal.
+    coq.say "Property: " PropGoal,
+    not (interp PropGoal).
+    % coq.say PropGoal.
 }}.
 Elpi Typecheck.
 (* Elpi Query lp:{{not (interp {{rev [] []}})}}. *)
+Elpi Trace.
+Elpi Bound Steps 20.
+Elpi Query lp:{{
+   check (qgen (qheight 5)) (go {{is_natlist lp:X /\ ordered lp:X}}),coq.say X,fail.
+}}. 
 
-Goal forall x: list nat, ordered x -> ordered_bad x.
+
+Goal forall x y: list nat, is_natlist x -> is_natlist y -> rev x y -> rev y x.
 intros.
-elpi pbt (H).
+elpi pbt (H /\ H0 /\ H1).
+
