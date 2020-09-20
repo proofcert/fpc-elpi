@@ -81,8 +81,7 @@ check Cert (bc (prod _ Ty1 Ty2) Goal) :-
   check Cert1 (bc (Ty2 X) Goal),
   check Cert2 (go Ty1).
 
-check Cert (go Atom) :-
-    whd Atom [] (global (indt Prog)) Args, %% Coq-Elpi predicate!
+check Cert (go (app [global (indt Prog) | _Args ] as Atom)) :-
     coq.env.indt Prog _ _ _ _Type Kn Clauses,
 	unfold_expert Kn Cert Cert' K,
 	%% Use the selected constructor as key to find its
