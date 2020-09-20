@@ -13,8 +13,8 @@ memb X (_Y :: L) :- memb X L.
 
 % interp X :- coq.say "interp" X, fail.
 interp {{True}}.
-interp {{nat}}. % :- coq.says "axiom nat", true.
-interp (sort _) . %:- coq.says "axiom sort".
+% interp {{nat}}. % :- coq.says "axiom nat", true.
+% interp (sort _) . %:- coq.says "axiom sort".
 
 interp {{lp:G1 /\ lp:G2}} :-
 	interp G1,
@@ -41,13 +41,19 @@ interp (app [global (indt Prog) | Args] as Atom) :-
 	%  coq.say "selected: " D,
 	backchain D Atom.
 
-% commented -AM
-% interp G :- cl C Var, backchain C G.
+% differentiating between dep and non-dep products  -AM 
+backchain {{lp:G -> lp:D}} A :-
+	  !,
+	  backchain D A,
+%	   coq.say "imp-l: " D,
+	  interp G.
+backchain (prod _ _Ty (x\ D x)) A :-
+%	  !,
+%	   coq.say "backchain : " (D X),
+	  backchain (D X) A.
 
-% trace changed  -AM
-% backchain A B :- coq.say "backchain with clause: " A, fail.
-backchain (prod _ Ty P) G :- backchain (P X) G, interp Ty.
-backchain G G.
+backchain A A :- !, coq.say "proven: " A.
+
 
 %%%%%%%%%%%
 % Checker %
