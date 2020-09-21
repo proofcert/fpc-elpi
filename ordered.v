@@ -5,8 +5,6 @@ Require Import Coq.Lists.List.
 Elpi Tactic pbt.
 Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
-(* this does not compile*)
-(* Elpi Accumulate File "pbt/src/test-lst.mod". *)
 
 Elpi Query lp:{{
   interp {{ 0 <= 5}}.
@@ -19,7 +17,7 @@ Elpi Accumulate lp:{{
 }}.
 Elpi Typecheck.
 
-Inductive ordered : list nat -> Prop :=
+ Inductive ordered : list nat -> Prop :=
 	onl : ordered []
   | oss : forall x : nat, ordered [x]
   | ocn : forall (x y : nat) (l : list nat),
@@ -60,6 +58,7 @@ Inductive insert (x : nat) : list nat -> list nat -> Prop:=
   (* this is false and we should get a cex*)
   Conjecture pres_bad: forall x xs ys, ordered_bad ys -> insert x xs ys -> ordered_bad ys.
 
+  (* pres_bad negated, knowing the cex already*)
   Goal exists x xs ys, ordered_bad xs /\ insert x xs ys /\ not (ordered_bad ys).
 exists 0.
 exists [0;1;0].
@@ -72,12 +71,30 @@ inversion H2; subst; clear H2.
 inversion H4.
 Qed.
 
-(*the PBT query: loops for now*)
+
+
+Inductive natlist : list nat -> Prop :=
+natn : natlist []
+| natc : forall (x  : nat) (l : list nat),
+       natlist l  -> natlist (x :: l).
+
+
+(*the PBT query with manual generator: loops for now*)
 Elpi Query lp:{{
-  check (qgen (qheight 4)) {{ordered_bad lp:Xs.}},
-  interp {{insert lp:X lp:Xs lp:Rs.}}, 
+  check (qgen (qheight 4)) [] {{natlist lp:Xs /\ ordered_bad lp:Xs.}},
+  interp {{insert 0 lp:Xs lp:Rs.}}, 
   not (interp {{ordered_bad lp:Rs.}}).
   }}.
+
+
+(*the PBT query, cheating: *)
+Elpi Query lp:{{
+  check (qgen (qheight 4)) [] {{ordered_bad [0;1;0].}},
+  interp {{insert lp:X [0;1;0] lp:Rs.}}, 
+  not (interp {{ordered_bad lp:Rs.}}).
+  }}.
+
+
 
 Elpi Query lp:{{
 	check  (qgen (qheight 4)) {{ (ordered [1;2]).}}.       

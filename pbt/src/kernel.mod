@@ -38,8 +38,9 @@ interp (app [global (indt Prog) | _Args] as Atom) :-
 %   coq.say "args: " Args,
     coq.env.indt Prog _ _ _ _Type _Kn Clauses,
 	memb D Clauses,
-	%  coq.say "selected: " D,
+%	  coq.say "selected: " D,
 	backchain D Atom.
+
 
 % differentiating between dep and non-dep products  -AM 
 backchain {{lp:G -> lp:D}} A :-
