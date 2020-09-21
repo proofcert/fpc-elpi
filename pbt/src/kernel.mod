@@ -52,7 +52,7 @@ backchain (prod _ _Ty (x\ D x)) A :-
 %	   coq.say "backchain : " (D X),
 	  backchain (D X_) A.
 
-backchain A A :- !, coq.say "proven: " A.
+backchain A A :- !. % coq.say "proven: " A.
 
 
 %%%%%%%%%%%
