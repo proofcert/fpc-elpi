@@ -13,8 +13,8 @@ eq_expert (qgen (qsize In In)).
 and_expert (qgen (qheight H)) (qgen (qheight H)) (qgen (qheight H)).
 and_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
 
-or_expert (qgen (qheight H)) (qgen (qheight H)) Ch.
-or_expert (qgen (qsize In Out)) (qgen (qsize In Out)) Ch.
+or_expert (qgen (qheight H)) (qgen (qheight H)) _Ch.
+or_expert (qgen (qsize In Out)) (qgen (qsize In Out)) _Ch.
 
 prod_expert (qgen (qheight H)) (qgen (qheight H')) (qgen (qheight H')) :-
 	H > 0,

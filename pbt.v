@@ -49,8 +49,8 @@ Elpi Accumulate lp:{{
   %% build_clauses: given a Coq context, creates copy clauses associating
   %% the eigenvariables to fresh logic variables
   type build_clauses goal-ctx -> list prop -> prop.
-  build_clauses [decl Var _Name _Ty] [(copy Var X :- !)].
-  build_clauses [decl Var Name Ty | Ds] [(copy Var X :- !)| Cs] :-
+  build_clauses [decl Var _Name _Ty] [(copy Var X_ :- !)].
+  build_clauses [decl Var _Name _Ty | Ds] [(copy Var X_ :- !)| Cs] :-
     build_clauses Ds Cs.
   %% env_type: given a Coq context and an eigenvariable, returns the
   %% type of that eigenvariable
@@ -63,7 +63,7 @@ Elpi Accumulate lp:{{
   env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
     env_clauses L Cs.
 
-  solve [trm Prog] [goal Ctx Ev Ty Who] OutGoals :-
+  solve [trm Prog] [goal Ctx _Ev Ty _Who] _OutGoals :-
     build_clauses Ctx Cs,
     env_clauses Ctx Progs,
     Progs => copy Prog ProgType,

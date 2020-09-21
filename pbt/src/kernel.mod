@@ -33,7 +33,7 @@ interp {{lp:G1 \/ lp:G2}} :-
 interp {{lp:G = lp:G}}.
 
 
-interp (app [global (indt Prog) | Args] as Atom) :-
+interp (app [global (indt Prog) | _Args] as Atom) :-
 %   coq.say "prog: " Prog,
 %   coq.say "args: " Args,
     coq.env.indt Prog _ _ _ _Type _Kn Clauses,
@@ -50,7 +50,7 @@ backchain {{lp:G -> lp:D}} A :-
 backchain (prod _ _Ty (x\ D x)) A :-
 %	  !,
 %	   coq.say "backchain : " (D X),
-	  backchain (D X) A.
+	  backchain (D X_) A.
 
 backchain A A :- !, coq.say "proven: " A.
 
@@ -61,11 +61,9 @@ backchain A A :- !, coq.say "proven: " A.
 
 % check Cert Type :- coq.say "check" Cert Type, fail.
 
-check Cert (bc A A).
-check Cert (go (sort _)) :-
-	tt_expert Cert.
-check Cert (go {{nat}}) :-
-	tt_expert Cert.
+check _Cert (bc A A).
+check _Cert (go (sort _)).
+check _Cert (go {{nat}}).
 check Cert (go {{True}}) :-
 	tt_expert Cert.
 
@@ -84,7 +82,7 @@ check Cert (go {{lp:G1 \/ lp:G2}}) :-
 
 check Cert (bc (prod _ Ty1 Ty2) Goal) :-
   prod_expert Cert Cert1 Cert2,
-  check Cert1 (bc (Ty2 X) Goal),
+  check Cert1 (bc (Ty2 X_) Goal),
   check Cert2 (go Ty1).
 
 check Cert (go (app [global (indt Prog) | _Args ] as Atom)) :-
