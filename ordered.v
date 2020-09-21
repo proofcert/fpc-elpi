@@ -7,6 +7,11 @@ Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
 (* this does not compile*)
 (* Elpi Accumulate File "pbt/src/test-lst.mod". *)
+
+Elpi Query lp:{{
+  interp {{ 0 <= 5}}.
+  }}.
+
 Elpi Accumulate lp:{{
   solve [int N] [goal Ctx Ev Ty _] [] :-
     check (qgen (qheight N)) [] Ty,
