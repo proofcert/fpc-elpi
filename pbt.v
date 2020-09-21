@@ -42,6 +42,11 @@ Inductive is_natlist : list nat -> Prop :=
 nl: is_natlist []
 | nlcons: forall l: list nat, forall n:nat, is_natlist l ->  is_nat n -> is_natlist (cons n l).
 
+Inductive insert (x:nat) : list nat -> list nat -> Prop :=
+i_n : is_nat x -> insert x [] [x]
+| i_s : forall y: nat, forall ys: list nat, x <= y -> insert x (y :: ys) (x :: y :: ys)
+| i_c : forall y: nat, forall ys: list nat, forall rs: list nat, x > y -> insert x ys rs -> insert x (y :: ys) (x :: rs).
+
 Elpi Tactic pbt.
 Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
@@ -57,36 +62,68 @@ Elpi Accumulate lp:{{
   type env_type goal-ctx -> term -> term -> prop.
   env_type [decl Var _ Ty|_] Var Ty.
   env_type [decl _ _ _|L] Var Ty :- env_type L Var Ty.
-
+  %% env_clauses: given a Coq context creates copy clauses associating
+  %% an eigenvariable to its type
   type env_clauses goal-ctx -> list prop -> prop.
   env_clauses [decl Var _ Ty] [(copy Var Ty :- !)].
   env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
     env_clauses L Cs.
 
-  solve [trm Prog] [goal Ctx _Ev Ty _Who] _OutGoals :-
+  solve [trm Spec, trm Prog, int N, trm Monitor] [goal Ctx _Ev Ty _Who] _OutGoals :-
     build_clauses Ctx Cs,
     env_clauses Ctx Progs,
-    Progs => copy Prog ProgType,
-    coq.say ProgType,
-    Cs => copy ProgType ProgGoal,
-    coq.say ProgGoal,
-    check (qgen (qheight 9)) (go ProgGoal),
-    coq.say "Program: " ProgGoal,
-    Cs => copy Ty PropGoal,
-    coq.say "Property: " PropGoal,
-    not (interp PropGoal).
-    % coq.say PropGoal.
+    (Progs => ( copy Spec SpecType,
+    copy Prog ProgType)),
+    (Cs => (copy SpecType SpecGoal,
+    copy ProgType ProgGoal,
+    copy Ty PropGoal)),
+    coq.say "Spec:" SpecGoal,
+    coq.say "Prog:" ProgGoal,
+    coq.say "Prop:" PropGoal,
+    % coq.say "0",
+    check (qgen (qheight N)) (go SpecGoal),
+    % coq.say "a" SpecGoal,
+    interp ProgGoal,
+    % coq.say "b",
+    (Cs => copy Monitor Result),
+    coq.say Result, 
+    not (interp PropGoal),
+    coq.say "Cex:" PropGoal,
+    coq.say "Explain:" Cs.
 }}.
 Elpi Typecheck.
 (* Elpi Query lp:{{not (interp {{rev [] []}})}}. *)
-Elpi Trace.
-Elpi Bound Steps 20.
-Elpi Query lp:{{
-   check (qgen (qheight 5)) (go {{is_natlist lp:X /\ ordered lp:X}}),coq.say X,fail.
-}}. 
+(* Elpi Trace. *)
+Elpi Bound Steps 100000.
 
+Goal forall x r: list nat,
+is_natlist x ->
+ordered_bad x -> insert 0 x r ->
+ordered_bad r.
 
-Goal forall x y: list nat, is_natlist x -> is_natlist y -> rev x y -> rev y x.
 intros.
-elpi pbt (H /\ H0 /\ H1).
+elpi pbt (H /\ H0) (H1) 15 (r0). Abort.
+
+Goal forall x x' y: list nat,
+is_natlist x -> is_natlist y -> is_natlist x' ->
+append [0] x x' -> rev x y -> rev y x'.
+intros.
+elpi pbt (H /\ H0 /\ H1 /\ H3) (H2) 10. Abort.
+
+
+Elpi Query lp:{{
+  check (qgen (qheight 20)) (go {{ordered_bad [0;1;0]}}),
+  interp {{insert lp:X [0;1;0] lp:Rs}},
+  coq.say "List:" Rs,
+  not (interp {{ordered_bad lp:Rs}}).
+  }}. 
+
+Elpi Query lp:{{
+  check (qgen (qheight 30)) (go {{is_natlist lp:Xs /\ ordered_bad lp:Xs.}}),
+  coq.say "List:" Xs,
+  interp {{insert 0 lp:Xs lp:Rs.}},
+  coq.say "Got:" Rs,
+  not (interp {{ordered_bad lp:Rs.}}).
+  }}. 
+
 
