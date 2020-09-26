@@ -89,26 +89,26 @@ Elpi Accumulate lp:{{
     coq.say Result, 
     not (interp PropGoal),
     coq.say "Cex:" PropGoal,
-    coq.say "Explain:" Cs.
+    coq.say "Explain:" Result.
 }}.
 Elpi Typecheck.
 (* Elpi Query lp:{{not (interp {{rev [] []}})}}. *)
 (* Elpi Trace. *)
-Elpi Bound Steps 100000.
+(* Elpi Bound Steps 100000. *)
 
-Goal forall x r: list nat,
-is_natlist x ->
-ordered_bad x -> insert 0 x r ->
+Goal forall x r : list nat, forall n: nat,
+is_natlist x -> is_nat n ->
+ordered_bad x -> insert n x r ->
 ordered_bad r.
 
 intros.
-elpi pbt (H /\ H0) (H1) 15 (r0). Abort.
+elpi pbt (H /\ H0 /\ H1) (H2) 15 (r0 /\ n). Abort.
 
 Goal forall x x' y: list nat,
 is_natlist x -> is_natlist y -> is_natlist x' ->
 append [0] x x' -> rev x y -> rev y x'.
 intros.
-elpi pbt (H /\ H0 /\ H1 /\ H3) (H2) 10. Abort.
+elpi pbt (H /\ H0 /\ H1 /\ H3) (H2) 10 (x). Abort.
 
 
 Elpi Query lp:{{
