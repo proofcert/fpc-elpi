@@ -55,11 +55,26 @@ backchain G G.
 % Checker %
 %%%%%%%%%%%
 
-% check Cert Ctx Type Term :- coq.say "check" Cert Ctx Type Term, fail.
+check Cert (bc A1 A2) Term :-
+  coq.term->string A1 S1,
+  coq.term->string A2 S2,
+  coq.term->string Term T1,
+  coq.say "check bc" A1 A2 T1, fail.
+check Cert (go A) Term :-
+  coq.term->string A S,
+  coq.term->string Term T1,
+  coq.say "check go" A T1, fail.
 
-check Cert [A] A (fun _ A (x\x)).
-check _ [] (sort S) Term :-
-  coq.typecheck Term (sort S) _. %% Resort to Coq typechecking: we could do better
+check Cert (bc A A) (fun _ A (x\x)).
+check Cert (go X) Term :-
+  var X,
+  declare_constraint (check Cert (go X) Term) [X],
+  coq.say "Constraint su" X "(aka" {coq.term->string X}")" Term.
+check _ (go (sort S)) Term :-
+  coq.say "Term" Term "Sort" S,
+  coq.typecheck Term (sort S) _.
+%   coq.say "Type" Type,
+%   coq.typecheck Term (sort S) _. %% Resort to Coq typechecking: we could do better
 % check Cert (sort _) :-
 % 	tt_expert Cert.
 % check Cert {{nat}} :-
@@ -70,18 +85,18 @@ check _ [] (sort S) Term :-
 % check Cert {{lp:G = lp:G}} :-
 % 	eq_expert Cert.
 
-check Cert Ctx {{lp:G1 /\ lp:G2}} {{conj lp:T1 lp:T2}}:-
-	and_expert Cert Cert1 Cert2,
-	check Cert1 Ctx G1 T1,
-	check Cert2 Ctx G2 T2.
+% check Cert (go {{lp:G1 /\ lp:G2}}) {{conj lp:T1 lp:T2}}:-
+% 	and_expert Cert Cert1 Cert2,
+% 	check Cert1 (go G1) T1,
+% 	check Cert2 (go G2) T2.
 
-check Cert Ctx {{lp:G1 \/ lp:G2}} Term :-
-	or_expert Cert Cert' Choice,
-	(
-		(Choice = left, Term = {{or_introl lp:T}}, check Cert' Ctx G1 T)
-	;
-		(Choice = right, Term = {{or_intror lp:T}}, check Cert' Ctx G2 T)
-	).
+% check Cert (go {{lp:G1 \/ lp:G2}}) Term :-
+% 	or_expert Cert Cert' Choice,
+% 	(
+% 		(Choice = left, Term = {{or_introl lp:T}}, check Cert' (go G1) T)
+% 	;
+% 		(Choice = right, Term = {{or_intror lp:T}}, check Cert' (go G2) T)
+% 	).
 
 % check Cert (some G) :-
 % 	some_expert Cert Cert' T,
@@ -89,52 +104,37 @@ check Cert Ctx {{lp:G1 \/ lp:G2}} Term :-
 
 % check Cert (nabla G) :-
 % 	pi x\ check Cert (G x).
+check Cert (go (prod _ Ty1 Ty2)) (fun _ Ty1 T) :-
+  coq.say "CIao",
+	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x)) (T x).
 
-check Cert Ctx (prod _ Ty1 Ty2) (fun _ Ty1 T) :-
-	pi x\ check Cert [Ty1 | Ctx] (Ty2 x) (T x).
+check Cert (bc (prod _ Ty1 Ty2) Goal) (fun _ (prod _ Ty1 Ty2) (x\ T (app [x, Tm]))) :-
+  check Cert (bc (Ty2 Tm) Goal) (fun _ (Ty2 Tm) T),
+  coq.say "Sono il backchain su" {coq.term->string Ty1} {coq.term->string (Ty2 Tm)},
+  check Cert (go Ty1) Tm.
+  %% Suggestion from a call: beta T Tm Term ???
 
-check Cert [prod _ Ty1 Ty2] Goal (fun _ (prod _ Ty1 Ty2) (x\ T (app [x, Tm]))) :-
-  check Cert [(Ty2 Tm)] Goal (fun _ (Ty2 Tm) T),
-  check Cert [] Ty1 Tm.
+check Cert (go (global (indt Prog) as Atom)) OutTerm :-
+  coq.env.indt Prog _ _ _ _Type Kn Clauses,
+  unfold_expert Kn Cert Cert' K,
+  %% Use the selected constructor as key to find its
+  %% clause in the zipped list of constructors and clauses.
+  std.lookup {std.zip Kn Clauses} K Clause, 
+  Kons = global (indc K),
+  check Cert' (bc Clause Atom) (fun _ Clause Term),
+  OutTerm = (Term Kons).
 
-check Cert [] Atom OutTerm :-
-    whd Atom [] (global (indt Prog)) Args, %% Coq-Elpi predicate!
+check Cert (go (app [global (indt Prog) | _Args] as  Atom)) OutTerm :-
     coq.env.indt Prog _ _ _ _Type Kn Clauses,
 	unfold_expert Kn Cert Cert' K,
 	%% Use the selected constructor as key to find its
 	%% clause in the zipped list of constructors and clauses.
 	std.lookup {std.zip Kn Clauses} K Clause, 
-	% coq.say "Key" K "for" Atom,
 	Kons = global (indc K),
-	% coq.say "But OutTerm is" OutTerm,
-	check Cert' [Clause] Atom (fun _ Clause Term),
-	% coq.say "Ok" K "with" Term,
+	check Cert' (bc Clause Atom) (fun _ Clause Term),
 	OutTerm = (Term Kons).
 
-%% This would do without lProlog-HOAS substitutions, and uses
-%% instead pure Coq applications. Does not work at the moment
-
-% check Cert [] Atom {{lp:Kons}} :-
-%     whd Atom [] (global (indt Prog)) Args, %% Coq-Elpi predicate!
-%     coq.env.indt Prog _ _ _ _Type Kn Clauses,
-% 	unfold_expert Kn Cert Cert' K,
-% 	std.lookup {std.zip Kn Clauses} K Atom, 
-% 	coq.say "Atomic Key" K "for" Atom,
-% 	Kons = global (indc K).
-
-% check Cert [] Atom {{lp:Term lp:Kons}} :-
-%     whd Atom [] (global (indt Prog)) Args, %% Coq-Elpi predicate!
-%     coq.env.indt Prog _ _ _ _Type Kn Clauses,
-% 	unfold_expert Kn Cert Cert' K,
-% 	%% Use the selected constructor as key to find its
-% 	%% clause in the zipped list of constructors and clauses.
-% 	std.lookup {std.zip Kn Clauses} K Clause, 
-% 	coq.say "Key" K "for" Atom,
-% 	coq.say "Indeed" Term,
-% 	% get-range (prod _ A B) Atom,
-% 	Kons = global (indc K),
-% 	coq.say "Still here, know " Term,
-% 	% (OutTerm = (app [Kons | _] ); OutTerm = Kons),
-% 	check Cert' [Clause] Atom Term,
-% 	coq.say "Ok" K "with" Term.
-
+%% Perform simple reduction in the head
+check Cert (go (app [(fun A B C)| Args])) Term :-
+  coq.mk-app (fun A B C) Args App,
+  check Cert (go App) Term.
