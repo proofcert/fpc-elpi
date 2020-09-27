@@ -2,9 +2,15 @@ From elpi Require Import elpi.
 Require Import Arith List. Import ListNotations.
 Require Import Coq.Lists.List.
 
+
 Elpi Tactic pbt.
 Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
+
+Elpi Query lp:{{
+    coq.locate "le" (indt GR),
+    coq.env.indt GR _ _ _ Type Kn Types.   % get the names of the constructors
+ }}.
 
 Elpi Query lp:{{
   interp {{ 0 <= 5}}.
@@ -30,8 +36,8 @@ Inductive ordered_bad : list nat -> Prop :=
   | ocnb : forall (x y : nat) (l : list nat),
                 ordered_bad l  -> x <= y -> ordered_bad (x:: y :: l).         
 
-Hint  Constructors ordered.
-Hint Constructors list.
+Hint  Constructors ordered : core.
+Hint Constructors list : core .
 
 (*
 Goal ordered [0;0].

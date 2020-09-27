@@ -1,5 +1,7 @@
 (*
 
+- should we dii dep products in check as well?
+---------------------
 - on generation: feeding the right term, the query does work
 
 - lack of indexing: to prove 1 <= 10 we do 21 backchaining
