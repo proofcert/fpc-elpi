@@ -1,4 +1,27 @@
 (*
+
+- should we dii dep products in check as well?
+---------------------
+- on generation: feeding the right term, the query does work
+
+- lack of indexing: to prove 1 <= 10 we do 21 backchaining
+steps, since we always try x <= x first. At worst
+if we have k constructors, when prolog would take n steps
+we take n * k.
+
+==> this seems different from the standard prog thing
+
+prog (le X X) true
+prog (le X (s Y)) (le X Y),
+
+which index on the first argument of prog and would take 11 steps 
+
+==> could we preprocess (viz. build_clauses in pbt.v) the inductive def
+turning parameters into logic variables and then use lprolog
+indexing? 
+
+
+----------------------------
 kernel.mod:
 
 the axiom and pi-left rule assume that Ctx contains at most one formula.
@@ -10,6 +33,9 @@ why has pi-right a clerk and left an expert? Just terminology
 check could be written hypothetically as hyp/conc
 
 But why not have backchain eben in check ? Why we need the context? why pi-right?
+
+[action: move to back-chain based version of check,
+think about better use of dependent types later]
 ----------------------------
 OLD(ish)
 In PPDP19 there is a clear correspondence between the sequent calculus (fig 4) and
