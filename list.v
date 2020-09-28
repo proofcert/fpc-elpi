@@ -90,14 +90,28 @@ intros xs rs Gen H.
 Fail elpi pbt Gen H 10 (true).
 Abort.
 
-(* This property is false and solve doe snot handle it*)
+(* This property is false and solve does not handle it*)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> xs = rs.
 intros xs rs Gen H.
 Fail elpi pbt Gen H 15 (xs).
 Abort.
 
+(* true *)
+Goal forall xs rs, is_natlist xs -> rev xs rs -> rev2 xs rs.
+intros xs rs Gen HR.
+Fail elpi pbt Gen 15.
+Abort.
 
+(* false loops*)
 
+(*
+Goal forall xs ys aps raps rxs rys,
+is_natlist xs -> is_natlist ys -> 
+append xs ys aps -> rev xs rxs -> rev ys rys ->
+rev aps raps -> append rxs rys raps.
+intros.
+elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 50 (xs /\ ys).
+*)
 Goal forall x x' y: list nat,
 is_natlist x -> is_natlist y -> is_natlist x' ->
 append [0] x x' -> rev x y -> rev y x'.

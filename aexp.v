@@ -1,12 +1,12 @@
 (* Adapted from Types.v in volume  of Software foundations:
 inductive defs of static and dynamic semantics of a simple arithmetic language
-(first-order). Parametric definition of progress (could also do deterministm of
-step and preservation) and a couple of mutants (see exercise 2 in types.v)*)
+(first-order). Parametric definition of progress and preservation
+(could also do determinism of
+step) and some mutants (see exercise 2 in types.v)*)
 
 From elpi Require Import elpi.
 Require Import Arith List. Import ListNotations.
- Import Coq.Lists.List.
- Require Import pbt.
+Require Import pbt.
 
 
 Inductive tm : Type :=
@@ -61,8 +61,7 @@ Inductive bvalue : tm -> Prop :=
   | bv_f : bvalue tfalse.
 
 
-  Reserved Notation "t1 '===>' t2" (at level 40).
-
+Reserved Notation "t1 '===>' t2" (at level 40).
 
 Inductive step : tm -> tm -> Prop :=
   | ST_IfTrue : forall t1 t2,
@@ -93,16 +92,21 @@ Inductive step : tm -> tm -> Prop :=
       (tiszero t1) ===> (tiszero t1')
 
 where "t1 '===>' t2" := (step t1 t2).
-
-
-Inductive notstuck (e : tm) (Step : tm -> tm -> Prop) : Prop :=
-  | p1 :   nvalue e  -> notstuck e Step
-  | p2 : bvalue e -> notstuck e Step
-  | ps : forall  e', Step e e' -> notstuck e Step.
   
- 
-Definition progress (e :tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
+
+ (*parametric defs of progress and preservation *) 
+
+ Inductive notstuck (e : tm) (Step : tm -> tm -> Prop) : Prop :=
+ | pn : nvalue e  -> notstuck e Step
+ | pb : bvalue e -> notstuck e Step
+ | ps e' : Step e e' -> notstuck e Step.
+
+
+ Definition progress (e :tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
     forall t, Has_type e t -> notstuck e Step.
+
+Definition preservation (e e':tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
+    forall t, Step e e' -> Has_type e t -> Has_type e' t.
  
 (* trying to use typing directly as a generator: the property holds*)
 Goal forall e, progress e has_type step.
@@ -111,6 +115,51 @@ intros e t Ht.
 Fail elpi pbt (Ht)  24.
 Abort.
 
+(*variation 6*)
+Module M6.
+Inductive has_type : tm -> typ -> Prop :=
+  | T_Tru :
+        has_type ttrue TBool
+  | T_Fls :
+       has_type tfalse TBool
+   | T_Test : forall t1 t2 t3 T,
+       has_type t1 TBool ->
+       has_type t2 T ->
+       has_type t3 T ->
+       has_type (tif  t1 t2 t3) T 
+  | T_Zro :
+       has_type tzero TNat
+  | T_Scc : forall t1,
+        has_type t1 TNat ->
+        has_type (tsucc t1) TNat
+  | T_Prd : forall t1,
+       has_type t1 TNat ->
+       has_type (tpred t1 ) TNat
+  | T_Prd_B6: has_type (tpred tzero) TBool(*bug6*)
+  | T_Iszro : forall t1,
+       has_type t1 TNat ->
+       has_type (tiszero t1) TBool.
+
+
+End M6.
+
+(* pres should fail for M6: M = tpred(tzero) M' = tzero T = tBool
+but it loops
+*)
+Elpi Query lp:{{
+  check (qgen (qheight 10)) (go {{has_type (tpred tzero) TBool}}),
+  true.
+  }}. 
+
+
+
+(*
+Goal forall e e', preservation e e' M6.has_type step.
+unfold preservation.
+intros e e' t Hs Ht.    
+elpi pbt (Hs) (Ht)  20 (e). 
+Abort.
+*)
 (* a typo-like mutation*)
 Module M1.
 
