@@ -68,10 +68,13 @@ check _Cert (go {{nat}}).
 check Cert (go {{True}}) :-
 	tt_expert Cert.
 
+check Cert (go {{lp:A = lp:A}}) :-
+  eq_expert Cert.
+
 check Cert (go {{lp:G1 /\ lp:G2}}):-
-	and_expert Cert Cert1 Cert2,
-	check Cert1 (go G1),
-	check Cert2 (go G2).
+  and_expert Cert Cert1 Cert2,
+  check Cert1 (go G1),
+  check Cert2 (go G2).
 
 check Cert (go {{lp:G1 \/ lp:G2}}) :-
 	or_expert Cert Cert' Choice,
