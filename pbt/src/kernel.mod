@@ -67,6 +67,9 @@ check _Cert (go (sort _)).
 check _Cert (go {{nat}}).
 check Cert (go {{True}}) :-
 	tt_expert Cert.
+% addind eq case	
+check Cert (go {{lp:G = lp:G}}) :-
+	eq_expert Cert.
 
 check Cert (go {{lp:G1 /\ lp:G2}}):-
 	and_expert Cert Cert1 Cert2,
@@ -80,11 +83,18 @@ check Cert (go {{lp:G1 \/ lp:G2}}) :-
 	;
 		(Choice = right, check Cert' (go G2))
 	).
-
-check Cert (bc (prod _ Ty1 Ty2) Goal) :-
+% usual diff dep. vs non-dep
+check Cert (bc {{lp:Ty1 ->  lp:Ty2}} Goal) :-
+!,
   prod_expert Cert Cert1 Cert2,
-  check Cert1 (bc (Ty2 X_) Goal),
+  check Cert1 (bc Ty2  Goal),
   check Cert2 (go Ty1).
+
+check Cert (bc (prod _ _Ty1 (x\ D x)) Goal) :-
+  prod_clerk Cert Cert1,
+  check Cert1 (bc (D X_) Goal).
+
+
 
 check Cert (go (app [global (indt Prog) | _Args ] as Atom)) :-
     coq.env.indt Prog _ _ _ _Type Kn Clauses,
