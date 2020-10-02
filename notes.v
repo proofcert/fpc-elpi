@@ -1,6 +1,14 @@
 (*
 
-- should we dii dep products in check as well?
+Elpi tactic takes the conjecture in it's orifinal form
+and it is disproved, we abort. This makes sense, but
+in reality we are proving a theorem, namely its negation.
+
+-----------------------
+what does Monitor do?
+
+-----------------------------------
+- should we do dep products in check as well?
 ---------------------
 - on generation: feeding the right term, the query does work
 

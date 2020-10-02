@@ -32,9 +32,9 @@ Elpi Accumulate lp:{{
     (Cs => (copy SpecType SpecGoal,
     copy ProgType ProgGoal,
     copy Ty PropGoal)),
-    coq.say "Spec:" SpecGoal,
-    coq.say "Prog:" ProgGoal,
-    coq.say "Prop:" PropGoal,
+    coq.say "Spec:" {coq.term->string SpecGoal},
+    coq.say "Prog:" {coq.term->string ProgGoal},
+    coq.say "Prop:" {coq.term->string PropGoal},
     % coq.say "0",
     check (qgen (qheight N)) (go SpecGoal),
     % coq.say "a" SpecGoal,
@@ -43,11 +43,11 @@ Elpi Accumulate lp:{{
     (Cs => copy Monitor _Result),
     % coq.say "Result:" Result, 
     not (interp PropGoal),
-    coq.say "Cex:" PropGoal,
+    coq.say "Cex:" {coq.term->string PropGoal},
     coq.say "Explain:" true. %was Cs
 }}.
 Elpi Typecheck.
 (* Elpi Query lp:{{not (interp {{rev [] []}})}}. *)
 (* Elpi Trace. *)
-(* Elpi Bound Steps 100000. *)
+Elpi Bound Steps 100000.
 
