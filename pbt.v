@@ -35,16 +35,12 @@ Elpi Accumulate lp:{{
     coq.say "Spec:" {coq.term->string SpecGoal},
     coq.say "Prog:" {coq.term->string ProgGoal},
     coq.say "Prop:" {coq.term->string PropGoal},
-    % coq.say "0",
     check (qgen (qheight N)) (go SpecGoal),
-    % coq.say "a" SpecGoal,
     interp ProgGoal,
-    % coq.say "b",
-    (Cs => copy Monitor _Result),
-    % coq.say "Result:" Result, 
+    (Cs => copy Monitor Result),
+    coq.say "Trying:" {coq.term->string Result}, 
     not (interp PropGoal),
-    coq.say "Cex:" {coq.term->string PropGoal},
-    coq.say "Explain:" true. %was Cs
+    coq.say "Cex:" {coq.term->string PropGoal}.
 }}.
 Elpi Typecheck.
 (* Elpi Query lp:{{not (interp {{rev [] []}})}}. *)

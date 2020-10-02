@@ -112,7 +112,7 @@ Definition preservation (e e':tm) (Has_type : tm -> typ -> Prop) (Step : tm -> t
 Goal forall e, progress e has_type step.
 unfold progress.
 intros e t Ht.    
-Fail elpi pbt (Ht)  24.
+Fail elpi pbt (Ht) (True) 15 (e).
 Abort.
 
 (*variation 6*)
@@ -143,23 +143,11 @@ Inductive has_type : tm -> typ -> Prop :=
 
 End M6.
 
-(* pres should fail for M6: M = tpred(tzero) M' = tzero T = tBool
-but it loops
-*)
-Elpi Query lp:{{
-  check (qgen (qheight 10)) (go {{has_type (tpred tzero) TBool}}),
-  true.
-  }}. 
-
-
-
-(*
 Goal forall e e', preservation e e' M6.has_type step.
 unfold preservation.
-intros e e' t Hs Ht.    
-elpi pbt (Hs) (Ht)  20 (e). 
+intros e e' t Hs Ht.
+elpi pbt (Ht) (Hs) 10 (e). 
 Abort.
-*)
 (* a typo-like mutation*)
 Module M1.
 
@@ -188,9 +176,10 @@ End M1.
 
 (* may have to code progress as an atom*)
 
+Elpi Bound Steps 10000.
 Goal forall e, progress e M1.has_type step.
 unfold progress.
 intros e t Ht.    
-Fail elpi pbt (Ht)  100 (e). (* it should find a cex:  tiszero(ttrue)
+elpi pbt (Ht) (True) 5 (e). (* it finds cex:  tiszero(ttrue)
 T = tnat*)
 Abort.
