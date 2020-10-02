@@ -1,8 +1,5 @@
 sig kernel.
 
-% Helpers
-type   memb     A -> list A -> o.
-
 % Formulas and their terms
 kind   term        type.
 type   tt            term.
