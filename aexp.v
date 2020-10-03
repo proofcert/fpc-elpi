@@ -1,8 +1,7 @@
 (* Adapted from Types.v in volume  of Software foundations:
 inductive defs of static and dynamic semantics of a simple arithmetic language
 (first-order). Parametric definition of progress and preservation
-(could also do determinism of
-step) and some mutants (see exercise 2 in types.v)*)
+ and some mutants (see exercise 2 in types.v)*)
 
 From elpi Require Import elpi.
 Require Import Arith List. Import ListNotations.
@@ -38,12 +37,7 @@ Inductive has_type : tm -> typ -> Prop :=
   | T_Scc : forall t1,
         has_type t1 TNat ->
         has_type (tsucc t1) TNat
-  (*!! test-bug *)
-  (*! 
-  | T_SccBool : forall t,
-           has_type t TBool ->
-           has_type (tsucc t) TBool
- *)
+
   | T_Prd : forall t1,
        has_type t1 TNat ->
        has_type (tpred t1 ) TNat
@@ -107,7 +101,9 @@ where "t1 '===>' t2" := (step t1 t2).
 
 Definition preservation (e e':tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
     forall t, Step e e' -> Has_type e t -> Has_type e' t.
- 
+Definition deterministic {X Y: Type} (R : X -> Y -> Prop) :=
+        forall (x : X) (y1 y2 : Y), R x y1 -> R x y2 -> y1 = y2.
+
 (* trying to use typing directly as a generator: the property holds*)
 Goal forall e, progress e has_type step.
 unfold progress.
@@ -144,24 +140,32 @@ Inductive has_type : tm -> typ -> Prop :=
 End M6.
 
 (* pres should fail for M6: M = tpred(tzero) M' = tzero T = tBool
-but it loops
-*)
-Elpi Query lp:{{
-  check (qgen (qheight 10)) (go {{has_type (tpred tzero) TBool}}),
-  true.
-  }}. 
+[Note: it loops if step is the generator*)
 
 
-
-(*
 Goal forall e e', preservation e e' M6.has_type step.
 unfold preservation.
 intros e e' t Hs Ht.    
-elpi pbt (Hs) (Ht)  20 (e). 
+elpi pbt (Ht) (Hs)  20 (e). 
 Abort.
+
+(* Same cex
+E = tpred(tzero)
+T1 = tnat
+T2 = tbool*)
+Goal deterministic M6.has_type.
+unfold deterministic.
+intros.
+elpi pbt (H /\ H0) (true)  20 (x). 
+
+(*Elpi Query lp:{{
+  check (qgen (qheight 10)) (go {{M6.has_type (tpred tzero) TBool}}).
+  }}. 
+
+
 *)
 (* a typo-like mutation*)
-Module M1.
+Module Mty.
 
 Inductive has_type : tm -> typ -> Prop :=
   | T_Tru :
@@ -184,11 +188,11 @@ Inductive has_type : tm -> typ -> Prop :=
        has_type t1 TBool ->
        has_type (tiszero t1) TNat.
 
-End M1.
+End Mty.
 
-(* may have to code progress as an atom*)
 
-Goal forall e, progress e M1.has_type step.
+
+Goal forall e, progress e Mty.has_type step.
 unfold progress.
 intros e t Ht.    
 Fail elpi pbt (Ht)  100 (e). (* it should find a cex:  tiszero(ttrue)

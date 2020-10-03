@@ -1,9 +1,16 @@
 (*
 
+can we preprocess the constructors of Inductive
+with copy, so that we put them n "clausal" forms, by removing
+the Coq quantifiers? Then we can remove backchaining altoghether.
+
+
+
 Elpi tactic takes the conjecture in it's orifinal form
 and it is disproved, we abort. This makes sense, but
 in reality we are proving a theorem, namely its negation.
 
+If Elpi fails, the trace is kernel is not displayed
 -----------------------
 what does Monitor do?
 
