@@ -11,7 +11,7 @@ memb X (_Y :: L) :- memb X L.
 % Interpreter %
 %%%%%%%%%%%%%%%
 
-% interp X :- coq.say "interp" X, fail.
+% interp X :- coq.say "interp" {coq.term->string X}, fail.
 interp {{True}}.
 % interp {{nat}}. % :- coq.says "axiom nat", true.
 % interp (sort _) . %:- coq.says "axiom sort".
@@ -60,6 +60,7 @@ backchain A A :- !. % coq.say "proven: " A.
 % Checker %
 %%%%%%%%%%%
 
+<<<<<<< HEAD
 % check Cert Type :- coq.say "check" Cert Type, fail.
 check _Cert (go A) :-
   coq.term->string A S,
@@ -75,16 +76,32 @@ check _Cert (go A) :-
 check _Cert (bc A A) :- !.
 % check _Cert (go (sort _)). %% removed since we use impL -am
 % check _Cert (go {{nat}}).
+=======
+check Cert (go Type) :- 
+  coq.term->string Type String,
+  coq.say "check" Cert "go" String, fail.
+check Cert (bc T1 T2) :- 
+  coq.term->string T1 S1,
+  coq.term->string T2 S2,
+  coq.say "check" Cert "bc" S1 S2, fail.
+
+check _Cert (bc A A).
+check _Cert (go (sort _)).
+check _Cert (go {{nat}}).
+>>>>>>> af08bf1c22850de7c75994a39b032daf6970111f
 check Cert (go {{True}}) :-
 	tt_expert Cert.
 % addind eq case	
 check Cert (go {{lp:G = lp:G}}) :-
 	eq_expert Cert.
 
+check Cert (go {{lp:A = lp:A}}) :-
+  eq_expert Cert.
+
 check Cert (go {{lp:G1 /\ lp:G2}}):-
-	and_expert Cert Cert1 Cert2,
-	check Cert1 (go G1),
-	check Cert2 (go G2).
+  and_expert Cert Cert1 Cert2,
+  check Cert1 (go G1),
+  check Cert2 (go G2).
 
 check Cert (go {{lp:G1 \/ lp:G2}}) :-
 	or_expert Cert Cert' Choice,

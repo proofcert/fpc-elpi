@@ -33,7 +33,6 @@ Inductive has_type : tm -> typ -> Prop :=
        has_type (tif  t1 t2 t3) T 
   | T_Zro :
        has_type tzero TNat
-  (*! *)
   | T_Scc : forall t1,
         has_type t1 TNat ->
         has_type (tsucc t1) TNat
@@ -101,6 +100,7 @@ where "t1 '===>' t2" := (step t1 t2).
 
 Definition preservation (e e':tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
     forall t, Step e e' -> Has_type e t -> Has_type e' t.
+
 Definition deterministic {X Y: Type} (R : X -> Y -> Prop) :=
         forall (x : X) (y1 y2 : Y), R x y1 -> R x y2 -> y1 = y2.
 
@@ -108,7 +108,7 @@ Definition deterministic {X Y: Type} (R : X -> Y -> Prop) :=
 Goal forall e, progress e has_type step.
 unfold progress.
 intros e t Ht.    
-Fail elpi pbt (Ht)  24.
+Fail elpi pbt (Ht) (True) 15 (e).
 Abort.
 
 (*variation 6*)
@@ -139,6 +139,7 @@ Inductive has_type : tm -> typ -> Prop :=
 
 End M6.
 
+
 (* pres should fail for M6: M = tpred(tzero) M' = tzero T = tBool
 [Note: it loops if step is the generator*)
 
@@ -149,21 +150,25 @@ intros e e' t Hs Ht.
 elpi pbt (Ht) (Hs)  20 (e). 
 Abort.
 
-(* Same cex
+(* Next should fail with same cex
 E = tpred(tzero)
 T1 = tnat
 T2 = tbool*)
+
+Elpi Bound Steps 10000.
+
 Goal deterministic M6.has_type.
 unfold deterministic.
 intros.
-elpi pbt (H /\ H0) (true)  20 (x). 
-
+Fail elpi pbt (H ) (H0)  20 (x). 
+Abort.
 (*Elpi Query lp:{{
   check (qgen (qheight 10)) (go {{M6.has_type (tpred tzero) TBool}}).
   }}. 
 
 
 *)
+
 (* a typo-like mutation*)
 Module Mty.
 
@@ -192,9 +197,10 @@ End Mty.
 
 
 
+Elpi Bound Steps 10000.
 Goal forall e, progress e Mty.has_type step.
 unfold progress.
 intros e t Ht.    
-Fail elpi pbt (Ht)  100 (e). (* it should find a cex:  tiszero(ttrue)
+elpi pbt (Ht) (True) 5 (e). (* it finds cex:  tiszero(ttrue)
 T = tnat*)
 Abort.

@@ -43,11 +43,11 @@ nl: is_natlist []
 | nlcons: forall l: list nat, forall n:nat, is_natlist l ->  is_nat n -> is_natlist (cons n l).
 
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
-i_n : is_nat x -> insert x [] [x]
+i_n : insert x [] [x]
 | i_s : forall y: nat, forall ys: list nat, x <= y -> insert x (y :: ys) (x :: y :: ys)
 | i_c : forall y: nat, forall ys: list nat, forall rs: list nat, x > y -> insert x ys rs -> insert x (y :: ys) (x :: rs).
 
-Elpi Tactic pbt.
+Elpi Tactic dpbt.
 Elpi Accumulate File "pbt/src/dep-kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
 Elpi Accumulate lp:{{
@@ -88,12 +88,9 @@ Elpi Accumulate lp:{{
     coq.say "Proof Term:" Term.
 }}.
 Elpi Typecheck.
-(* Elpi Query lp:{{not (interp {{rev [] []}})}}. *)
-(* Elpi Trace. *)
-Elpi Bound Steps 1000.
+(* Elpi Trace. 
+Elpi Bound Steps 5000. *)
 Elpi Debug "DEBUG_CHECK".
-
-
 
 Goal forall x r : list nat, forall n: nat,
 (* is_natlist x -> is_nat n -> *)
@@ -101,8 +98,12 @@ ordered_bad x -> insert n x r ->
 ordered_bad r.
 
 intros.
-elpi pbt (H /\ n) (H0) 5 (x).
+elpi dpbt (H) (H0) 5 (x).
 Abort.
+
+Elpi Query lp:{{
+  check (qgen (qheight 5)) (go {{exists n:nat, exists p:is_nat n, True}}) T.
+}}.
 
 Goal forall x x' y: list nat,
 is_natlist x -> is_natlist y -> is_natlist x' ->
