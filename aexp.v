@@ -104,12 +104,142 @@ Definition preservation (e e':tm) (Has_type : tm -> typ -> Prop) (Step : tm -> t
 Definition deterministic {X Y: Type} (R : X -> Y -> Prop) :=
         forall (x : X) (y1 y2 : Y), R x y1 -> R x y2 -> y1 = y2.
 
-(* trying to use typing directly as a generator: the property holds*)
+(* progress holds*)
 Goal forall e, progress e has_type step.
 unfold progress.
 intros e t Ht.    
 Fail elpi pbt (Ht) (True) 15 (e).
 Abort.
+
+
+(*variation 1: add | T_SuccBool : ∀t,
+           ⊢ t ∈ TBool →
+           ⊢ tsucc t ∈ TBool
+*)
+Module M1.
+
+Inductive has_type : tm -> typ -> Prop :=
+  | T_Tru :
+        has_type ttrue TBool
+  | T_Fls :
+       has_type tfalse TBool
+   | T_Test : forall t1 t2 t3 T,
+       has_type t1 TBool ->
+       has_type t2 T ->
+       has_type t3 T ->
+       has_type (tif  t1 t2 t3) T 
+  | T_Zro :
+       has_type tzero TNat
+  | T_Scc : forall t1,
+        has_type t1 TNat ->
+        has_type (tsucc t1) TNat
+
+  | T_Prd : forall t1,
+       has_type t1 TNat ->
+       has_type (tpred t1 ) TNat
+  | T_Iszro : forall t1,
+       has_type t1 TNat ->
+       has_type (tiszero t1) TBool
+
+(* bug 1*)
+   | T_SuccBool : forall t,
+          has_type t TBool ->
+           has_type (tsucc t) TBool.
+
+End M1.
+
+ Elpi Bound Steps 10000.
+
+ (* OK *)
+Goal forall e, progress e M1.has_type step.
+unfold progress.
+intros e t Ht.    
+elpi pbt (Ht) (True) 5 (e). (* it finds cex:  (tsucc ttrue) *)
+Abort.
+
+(* NOT OK *)
+Goal deterministic M1.has_type.
+unfold deterministic.
+intros.
+Fail elpi pbt (H ) (H0)  20 (x). 
+Abort.
+(* property is false: E = tsucc(tzero)
+T1 = tnat
+T2 = tbool*)
+
+(* variation 3: failure of step det *)
+
+Module M3.
+Reserved Notation "t1 '====>' t2" (at level 40).
+
+Inductive step : tm -> tm -> Prop :=
+  | ST_IfTrue : forall t1 t2,
+      (tif ttrue t1 t2) ====> t1
+  | ST_IfFalse : forall t1 t2,
+      (tif tfalse t1 t2) ====> t2
+  | ST_If : forall t1 t1' t2 t3,
+      t1 ====> t1' ->
+      (tif t1 t2 t3) ====> (tif t1' t2 t3)
+  | ST_Succ : forall t1 t1',
+      t1 ====> t1' ->
+      (tsucc t1) ====> (tsucc t1')
+  | ST_PredZero :
+      (tpred tzero) ====> tzero
+  | ST_PredSucc : forall t1,
+      nvalue t1 ->
+      (tpred (tsucc t1)) ====> t1
+  | ST_Pred : forall t1 t1',
+      t1 ====> t1' ->
+      (tpred t1) ====> (tpred t1')
+  | ST_IszeroZero :
+      (tiszero tzero) ====> ttrue
+  | ST_IszeroSucc : forall t1,
+       nvalue t1 ->
+      (tiszero (tsucc t1)) ====> tfalse
+  | ST_Iszero : forall t1 t1',
+      t1 ====> t1' ->
+      (tiszero t1) ====> (tiszero t1')
+ | ST_Funny2 : forall t1 t2 t2' t3,
+           t2 ====> t2' ->
+           (tif t1 t2 t3) ====> (tif t1 t2' t3)
+                   
+where "t1 '====>' t2" := (step t1 t2).
+
+End M3.  
+
+(* (tif tfalse ?e1 ?e0 = tif ttrue ?e0 ?e6) 
+Finds the cex, albeit not fully instantiated: should have a is_exp generetor
+*)
+Goal deterministic M3.step.
+unfold deterministic.
+intros.
+elpi pbt (H ) (H0)  20 (x). 
+Abort.
+
+
+Inductive is_tm : tm  -> Prop :=
+  | I_Tru :        is_tm ttrue 
+  | I_Fls :       is_tm tfalse 
+   | I_Test : forall t1 t2 t3 ,
+       is_tm t1 ->
+       is_tm t2  ->
+       is_tm t3  ->
+       is_tm (tif  t1 t2 t3)  
+  | I_Zro :       is_tm tzero 
+  | I_Scc : forall t1,
+        is_tm t1  ->        is_tm (tsucc t1) 
+  | I_Prd : forall t1,
+       is_tm t1  ->       is_tm (tpred t1 ) 
+  | I_Iszro : forall t1,
+       is_tm t1  ->       is_tm (tiszero t1) .
+
+ Elpi Bound Steps 100000.
+
+Goal forall (e1 e2 e3  : tm), is_tm e1 -> is_tm e2 -> M3.step e1 e2 -> M3.step e1 e3 -> e2 = e3.
+  intros.
+  Fail elpi pbt ( H /\ H0) (H1 /\ H2) 20 (e2).
+(* same problem with variables *)
+
 
 (*variation 6*)
 Module M6.
@@ -197,7 +327,7 @@ End Mty.
 
 
 
-Elpi Bound Steps 10000.
+(* Elpi Bound Steps 10000*)
 Goal forall e, progress e Mty.has_type step.
 unfold progress.
 intros e t Ht.    
