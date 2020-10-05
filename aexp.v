@@ -148,7 +148,6 @@ Inductive has_type : tm -> typ -> Prop :=
 
 End M1.
 
- Elpi Bound Steps 10000.
 
  (* OK *)
 Goal forall e, progress e M1.has_type step.
@@ -157,11 +156,13 @@ intros e t Ht.
 elpi pbt (Ht) (True) 5 (e). (* it finds cex:  (tsucc ttrue) *)
 Abort.
 
-(* NOT OK *)
+(* NOT OK
+ Elpi Bound Steps 10000.
+ *)
 Goal deterministic M1.has_type.
 unfold deterministic.
 intros.
-Fail elpi pbt (H ) (H0)  20 (x). 
+Fail elpi pbt (H ) (H0) 15 (x). 
 Abort.
 (* property is false: E = tsucc(tzero)
 T1 = tnat
@@ -233,12 +234,13 @@ Inductive is_tm : tm  -> Prop :=
   | I_Iszro : forall t1,
        is_tm t1  ->       is_tm (tiszero t1) .
 
- Elpi Bound Steps 100000.
-
+(* Elpi Bound Steps 100000.
+*)
 Goal forall (e1 e2 e3  : tm), is_tm e1 -> is_tm e2 -> M3.step e1 e2 -> M3.step e1 e3 -> e2 = e3.
   intros.
-  Fail elpi pbt ( H /\ H0) (H1 /\ H2) 20 (e2).
-(* same problem with variables *)
+  elpi pbt (H) (H1 /\ H2) 20 (e2).
+(* Works if we only generate terms for e1, not e2 *)
+Abort.
 
 
 (*variation 6*)
@@ -283,14 +285,14 @@ Abort.
 (* Next should fail with same cex
 E = tpred(tzero)
 T1 = tnat
-T2 = tbool*)
+T2 = tbool
+Works, user should set a low bound*)
 
-Elpi Bound Steps 10000.
 
 Goal deterministic M6.has_type.
 unfold deterministic.
 intros.
-Fail elpi pbt (H ) (H0)  20 (x). 
+elpi pbt (H ) (H0) 10 (x). 
 Abort.
 (*Elpi Query lp:{{
   check (qgen (qheight 10)) (go {{M6.has_type (tpred tzero) TBool}}).
