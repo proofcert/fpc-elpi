@@ -63,33 +63,36 @@ Elpi Accumulate lp:{{
   env_clauses [decl Var _ Ty] [(copy Var Ty :- !)].
   env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
     env_clauses L Cs.
-
-  solve [trm Spec, trm Prog, int N, trm Monitor] [goal Ctx _Ev Ty _Who] _OutGoals :-
+  %% remove_trm: removes the coercion trm and returns a list of terms
+  remove_trm [trm A] [A].
+  remove_trm [trm A | R] [A|R'] :- remove_trm R R'.
+  solve [int N, trm Prog | SpecT] [goal Ctx _Ev Ty _Who] _OutGoals :-
+    remove_trm SpecT Spec,
     build_clauses Ctx Cs,
     env_clauses Ctx Progs,
-    (Progs => ( copy Spec SpecType,
+    (Progs => (std.map Spec (x\ y\ copy x y) SpecTypes,
     copy Prog ProgType)),
-    (Cs => (copy SpecType SpecGoal,
+    (Cs => (std.map SpecTypes (x\y\ copy x y) SpecGoals,
+    std.map Spec (x\y\ copy x y) SpecVars,
     copy ProgType ProgGoal,
     copy Ty PropGoal)),
-    coq.say "Spec:" {coq.term->string SpecGoal},
+    coq.say "Specs:" {std.map SpecGoals (t\s\ coq.term->string t s)},
+    coq.say "Spec Vars:" {std.map SpecVars (t\s\ coq.term->string t s)},
     coq.say "Prog:" {coq.term->string ProgGoal},
     coq.say "Prop:" {coq.term->string PropGoal},
-    check (qgen (qheight N)) (go SpecGoal) Term,
-    coq.say "Proof Term:" {coq.term->string Term},
+    std.map SpecGoals (g\t\ check (qgen (qheight N)) (go g) t) SpecVars,
+    coq.say "Proof Term:" {std.map SpecVars (t\s\ coq.term->string t s)},
     coq.say "Interp" {coq.term->string ProgGoal},
     interp ProgGoal,
     coq.say "Got" {coq.term->string ProgGoal},
-    (Cs => copy Monitor Result),
-    coq.say "Monitor" {coq.term->string Result}, 
     not (interp PropGoal),
     coq.say "Cex:" PropGoal,
     coq.say "Explain:" Result,
     coq.say "Proof Term:" Term.
 }}.
 Elpi Typecheck.
-(* Elpi Trace. 
-Elpi Bound Steps 5000. *)
+(* Elpi Trace.  *)
+(* Elpi Bound Steps 5000. *)
 Elpi Debug "DEBUG_CHECK".
 
 Goal forall x r : list nat, forall n: nat,
