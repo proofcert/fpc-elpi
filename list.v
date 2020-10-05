@@ -73,13 +73,11 @@ Abort.
 
 (* generating both nat and natlist*)
 
-
-
 Goal forall x xs rs,
 is_nat x -> is_natlist xs -> ordered_bad xs -> insert x xs rs -> ordered_bad rs.
 
 intros x xs rs GenN GenL  H1 H2.
-elpi pbt (GenN /\ GenL ) (H1 /\ H2) 15 (x /\ rs). 
+elpi pbt (GenN /\ GenL ) (H1 /\ H2) 15 (rs). 
 Abort.
 
 

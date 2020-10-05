@@ -60,17 +60,31 @@ backchain A A :- !. % coq.say "proven: " A.
 % Checker %
 %%%%%%%%%%%
 
+% check Cert Type :- coq.say "check" Cert Type, fail.
+check _Cert (go A) :-
+  coq.term->string A S,
+  coq.say "check go" S, fail.
+
+/*check _Cert (bc A1 A2)  :-
+  coq.term->string A1 S1,
+  coq.term->string A2 S2,
+  coq.say "check bc" S1 S2, fail.
+*/  
+% end trace
+
+check _Cert (bc A A) :- !.
+% check _Cert (go (sort _)). %% removed since we use impL -am
+% check _Cert (go {{nat}}).
+
 check Cert (go Type) :- 
   coq.term->string Type String,
   coq.say "check" Cert "go" String, fail.
-check Cert (bc T1 T2) :- 
-  coq.term->string T1 S1,
-  coq.term->string T2 S2,
-  coq.say "check" Cert "bc" S1 S2, fail.
+% check Cert (bc T1 T2) :- 
+%   coq.term->string T1 S1,
+%   coq.term->string T2 S2,
+%   coq.say "check" Cert "bc" S1 S2, fail.
 
 check _Cert (bc A A).
-check _Cert (go (sort _)).
-check _Cert (go {{nat}}).
 check Cert (go {{True}}) :-
 	tt_expert Cert.
 % addind eq case	
