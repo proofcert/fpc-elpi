@@ -46,22 +46,22 @@ backchain G G.
 % Checker %
 %%%%%%%%%%%
 
-% check Cert (bc A1 A2) Term :-
+% check Cert (bc A1 A2 Terms) :-
 %   coq.term->string A1 S1,
 %   coq.term->string A2 S2,
-%   coq.term->string Term T1,
+%   std.map Terms (x\y\ coq.term->string x y) T1,
 %   coq.say "check bc" S1 S2 T1, fail.
-% check Cert (go A) Term :-
+% check Cert (go A Term ):-
 %   coq.term->string A S,
 %   coq.term->string Term T1,
-%   coq.say "check go" A T1, fail.
+%   coq.say "check go" A Term, fail.
 
-check Cert (bc A A) (fun _ A (x\x)).
-check Cert (go X) Term :-
+check Cert (bc A A []).
+check Cert (go X Term ):-
   var X,
-  declare_constraint (check Cert (go X) Term) [X],
+  declare_constraint (check Cert (go X Term)) [X],
   coq.say "Constraint on" X "(aka" {coq.term->string X}")" Term.
-check _ (go (sort S)) Term :-
+check _ (go (sort S) Term ):-
 %  coq.say "Term" Term "Sort" S,
   coq.typecheck Term (sort S) _. %% Resort to Coq typechecking: we could do better
 % check Cert {{nat}} :-
@@ -69,7 +69,7 @@ check _ (go (sort S)) Term :-
 % check Cert {{True}} :-
 % 	tt_expert Cert.
 
-check Cert (go {{lp:G = lp:G}}) {{eq_refl}}:-
+check Cert (go {{lp:G = lp:G}} {{eq_refl}}):-
 	eq_expert Cert.
 
 % check Cert (go {{lp:G1 /\ lp:G2}}) {{conj lp:T1 lp:T2}}:-
@@ -91,36 +91,36 @@ check Cert (go {{lp:G = lp:G}}) {{eq_refl}}:-
 
 % check Cert (nabla G) :-
 % 	pi x\ check Cert (G x).
-check Cert (go (prod _ Ty1 Ty2)) (fun _ Ty1 T) :-
-	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x)) (T x).
+check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
+	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).
 
-check Cert (bc (prod _ Ty1 Ty2) Goal) (fun _ (prod _ Ty1 Ty2) (x\ T (app [x, Tm]))) :-
-  check Cert (bc (Ty2 Tm) Goal) (fun _ (Ty2 Tm) T),
+% check Cert (bc (prod _ Ty1 Ty2) Goal) (fun _ (prod _ Ty1 Ty2) (x\ T (app [x, Tm]))) :-
+check Cert (bc (prod _ Ty1 Ty2) Goal [Tm|ArgsList]) :-
+  check Cert (bc (Ty2 Tm) Goal ArgsList),
 %  coq.say "backchain on" {coq.term->string Ty1} {coq.term->string (Ty2 Tm)},
-  check Cert (go Ty1) Tm.
-  %% Suggestion from a call: beta T Tm Term ???
+  check Cert (go Ty1 Tm).
 
-check Cert (go (global (indt Prog) as Atom)) OutTerm :-
+check Cert (go (global (indt Prog) as Atom) Term) :-
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
+  Kons = global (indc K),
   unfold_expert Kn Cert Cert' K,
   %% Use the selected constructor as key to find its
   %% clause in the zipped list of constructors and clauses.
   std.lookup {std.zip Kn Clauses} K Clause, 
-  Kons = global (indc K),
-  check Cert' (bc Clause Atom) (fun _ Clause Term),
-  OutTerm = (Term Kons).
+  check Cert' (bc Clause Atom ListArgs),
+  Term = app [Kons | ListArgs].
 
-check Cert (go (app [global (indt Prog) | _Args] as  Atom)) OutTerm :-
-    coq.env.indt Prog _ _ _ _Type Kn Clauses,
+check Cert (go (app [global (indt Prog) | _Args] as  Atom) Term) :-
+  coq.env.indt Prog _ _ _ _Type Kn Clauses,
+	Kons = global (indc K),
 	unfold_expert Kn Cert Cert' K,
 	%% Use the selected constructor as key to find its
 	%% clause in the zipped list of constructors and clauses.
 	std.lookup {std.zip Kn Clauses} K Clause, 
-	Kons = global (indc K),
-	check Cert' (bc Clause Atom) (fun _ Clause Term),
-	OutTerm = (Term Kons).
+	check Cert' (bc Clause Atom ListArgs),
+  Term = (app [Kons|ListArgs]).
 
 %% Perform simple reduction in the head
-check Cert (go (app [(fun A B C)| Args])) Term :-
+check Cert (go (app [(fun A B C)| Args]) Term) :-
   coq.mk-app (fun A B C) Args App,
-  check Cert (go App) Term.
+  check Cert (go App Term).

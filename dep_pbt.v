@@ -47,7 +47,7 @@ i_n : insert x [] [x]
 | i_s : forall y: nat, forall ys: list nat, x <= y -> insert x (y :: ys) (x :: y :: ys)
 | i_c : forall y: nat, forall ys: list nat, forall rs: list nat, x > y -> insert x ys rs -> insert x (y :: ys) (x :: rs).
 
-Elpi Tactic dpbt.
+Elpi Tactic dep_pbt.
 Elpi Accumulate File "pbt/src/dep-kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
 Elpi Accumulate lp:{{
@@ -80,19 +80,16 @@ Elpi Accumulate lp:{{
     coq.say "Spec Vars:" {std.map SpecVars (t\s\ coq.term->string t s)},
     coq.say "Prog:" {coq.term->string ProgGoal},
     coq.say "Prop:" {coq.term->string PropGoal},
-    std.map SpecGoals (g\t\ check (qgen (qheight N)) (go g) t) SpecVars,
+    std.map SpecGoals (g\t\ check (qgen (qheight N)) (go g t)) SpecVars,
     coq.say "Proof Term:" {std.map SpecVars (t\s\ coq.term->string t s)},
     coq.say "Interp" {coq.term->string ProgGoal},
     interp ProgGoal,
     coq.say "Got" {coq.term->string ProgGoal},
     not (interp PropGoal),
-    coq.say "Cex:" PropGoal,
-    coq.say "Explain:" Result,
-    coq.say "Proof Term:" Term.
+    coq.say "Cex:" PropGoal.
 }}.
 Elpi Typecheck.
 (* Elpi Trace.  *)
-(* Elpi Bound Steps 5000. *)
 Elpi Debug "DEBUG_CHECK".
 
 Goal forall x r : list nat, forall n: nat,

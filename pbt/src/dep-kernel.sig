@@ -36,6 +36,6 @@ type   unfold_expert   list constructor -> cert -> cert -> constructor -> o.
 
 % Checker
 kind   goal type.
-type   go   term -> goal.
-type   bc   term -> term -> goal.
-type   check   cert -> goal -> term -> o.
+type   go   term -> term -> goal.
+type   bc   term -> term -> list term -> goal.
+type   check   cert -> goal -> o.
