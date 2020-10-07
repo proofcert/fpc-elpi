@@ -100,23 +100,22 @@ Fail elpi pbt Gen HR 15.
 Abort.
 
 (* false but it fails to find cex*)
-Elpi Bound Steps 1000000.
+Elpi Bound Steps 10000.
 
 Goal forall xs ys aps raps rxs rys,
 is_natlist xs -> is_natlist ys -> 
 append xs ys aps -> rev xs rxs -> rev ys rys ->
 rev aps raps -> append rxs rys raps.
 intros.
-Fail elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 50 (xs /\ ys).
-
+Fail elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 3 (xs /\ ys).
+Abort.
 Goal forall x x' y: list nat,
-is_natlist x -> is_natlist y -> is_natlist x' ->
+is_natlist x -> is_natlist x' ->
 append [0] x x' -> rev x y -> rev y x'.
 
 intros.
-
-Fail
-elpi pbt (H /\ H0 /\ H1 /\ H3) (H2) 10. Abort.
+Fail elpi pbt (H /\ H0) (H1 /\ H2) 5 (x).
+Abort.
 
 (*
 Elpi Query lp:{{
