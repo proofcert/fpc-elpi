@@ -7,6 +7,9 @@ module kernel.
 memb X (X :: _L).
 memb X (_Y :: L) :- memb X L.
 
+get_head (prod _ _ T) Head :- get_head (T X_) Head.
+get_head (app L) (app L).
+
 %%%%%%%%%%%%%%%
 % Interpreter %
 %%%%%%%%%%%%%%%
@@ -16,11 +19,11 @@ interp {{True}}.
 % interp {{nat}}. % :- coq.says "axiom nat", true.
 % interp (sort _) . %:- coq.says "axiom sort".
 
-interp {{lp:G1 /\ lp:G2}} :-
+interp {{lp:G1 /\ lp:G2}} :- !, % cut to avoid unfolding /\
 	interp G1,
 	interp G2.
 
-interp {{lp:G1 \/ lp:G2}} :-
+interp {{lp:G1 \/ lp:G2}} :- !, % cut to avoid unfolding \/
 	interp G1;
 	interp G2.
 
@@ -38,6 +41,7 @@ interp (app [global (indt Prog) | _Args] as Atom) :-
 %   coq.say "args: " Args,
     coq.env.indt Prog _ _ _ _Type _Kn Clauses,
 	memb D Clauses,
+	get_head D Atom,
 %	  coq.say "selected: " D,
 	backchain D Atom.
 
