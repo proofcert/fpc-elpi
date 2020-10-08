@@ -133,25 +133,13 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  End M1.
  
- (* Adapted from Types.v in volume  of So *)
+ (* Adapted from Types.v in volume  of SF *)
   (* OK *)
  Goal forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
  elpi pbt (Ht) (True) 5 (e). (* it finds cex:  (tsucc ttrue) *)
  Abort.
- 
- (* NOT OK
-  Elpi Bound Steps 10000.
-  *)
- Goal deterministic M1.has_type.
- unfold deterministic.
- intros.
- Fail elpi pbt (H /\ H0) (True) 5 (y1). 
- Abort.
- (* property is false: E = tsucc(tzero)
- T1 = tnat
- T2 = tbool*)
  
  (* variation 3: failure of step det *)
  
