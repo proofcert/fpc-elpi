@@ -42,3 +42,4 @@ kind   goal type.
 type   go   term -> goal.
 type   bc   term -> term -> goal.
 type   check   cert -> goal -> o.
+type get_head term -> term -> o.

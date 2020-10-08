@@ -90,7 +90,7 @@ Abort.
 (* This property is false *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> xs = rs.
 intros xs rs Gen H.
-elpi pbt (Gen) (H) 15 (xs).
+elpi pbt (Gen) (H) 10 (xs).
 Abort.
 
 (* true *)
@@ -109,9 +109,9 @@ elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 10 (xs /\ ys).
 Abort.
 
 Goal forall x x' y: list nat,
-is_natlist x -> is_natlist x' ->
+is_natlist x -> 
 append [0] x x' -> rev x y -> rev y x'.
 
 intros.
-Fail elpi pbt (H /\ H0) (H1 /\ H2) 5 (x).
+elpi pbt (H) (H0 /\ H1) 5 (x).
 Abort.
