@@ -24,13 +24,13 @@ anl : forall xs, append [] xs xs
 Inductive rev : list nat -> list nat -> Prop :=
 r1nl : rev [] []
 | r1c : forall (x: nat) (l ts rs : list nat),
-   rev l ts -> append ts [x] rs -> rev (x  :: l) rs.
+   append ts [x] rs -> rev l ts -> rev (x  :: l) rs.
 
 (* iterative*)
 Inductive revA : list nat -> list nat -> list nat -> Prop :=
 rnl : forall acc, revA [] acc acc
-| rc : forall (x: nat) (l acc rs : list nat),
-   revA l (x :: acc) rs  -> revA (x  :: l) (x :: acc) rs.
+| rc : forall (x : nat) (l acc rs : list nat),
+   revA l (x :: acc) rs  -> revA (x  :: l) acc rs.
 
 Inductive rev2 : list nat -> list nat -> Prop :=
 r: forall xs ys, revA xs [] ys -> rev2 xs ys.
@@ -81,34 +81,33 @@ elpi pbt (GenN /\ GenL ) (H1 /\ H2) 15 (rs).
 Abort.
 
 
-(* This property is true*)
+(* This property is true *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> rev rs xs.
 intros xs rs Gen H.
-Fail elpi pbt Gen H 10.
+Fail elpi pbt (Gen) (H) 10 (xs).
 Abort.
 
-(* This property is false and still solve does not handle it*)
+(* This property is false *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> xs = rs.
 intros xs rs Gen H.
-Fail elpi pbt Gen H 15 (xs).
+elpi pbt (Gen) (H) 15 (xs).
 Abort.
 
 (* true *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> rev2 xs rs.
 intros xs rs Gen HR.
-Fail elpi pbt Gen HR 15.
+Fail elpi pbt (Gen) (HR) 15 (xs).
 Abort.
 
-(* false but it fails to find cex*)
-Elpi Bound Steps 10000.
-
+(* false *)
 Goal forall xs ys aps raps rxs rys,
 is_natlist xs -> is_natlist ys -> 
 append xs ys aps -> rev xs rxs -> rev ys rys ->
 rev aps raps -> append rxs rys raps.
 intros.
-Fail elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 3 (xs /\ ys).
+elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 10 (xs /\ ys).
 Abort.
+
 Goal forall x x' y: list nat,
 is_natlist x -> is_natlist x' ->
 append [0] x x' -> rev x y -> rev y x'.
@@ -116,22 +115,3 @@ append [0] x x' -> rev x y -> rev y x'.
 intros.
 Fail elpi pbt (H /\ H0) (H1 /\ H2) 5 (x).
 Abort.
-
-(*
-Elpi Query lp:{{
-  check (qgen (qheight 20)) (go {{ordered_bad [0;1;0]}}),
-  interp {{insert lp:X [0;1;0] lp:Rs}},
-  coq.say "List:" Rs,
-  not (interp {{ordered_bad lp:Rs}}).
-  }}. 
-
-Elpi Query lp:{{
-  check (qgen (qheight 30)) (go {{is_natlist lp:Xs /\ ordered_bad lp:Xs.}}),
-  coq.say "List:" Xs,
-  interp {{insert 0 lp:Xs lp:Rs.}},
-  coq.say "Got:" Rs,
-  not (interp {{ordered_bad lp:Rs.}}).
-  }}. 
-
-
-*)
