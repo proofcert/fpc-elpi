@@ -6,13 +6,13 @@ module kernel.
 % Interpreter %
 %%%%%%%%%%%%%%%
 
-interp X :- 
-  coq.term->string X T,
-  coq.say "interp" T, fail.
-backchain A B :- 
-  coq.term->string A T1,
-  coq.term->string B T2,
-  coq.say "backchain" T1 T2, fail.
+% interp X :- 
+%   coq.term->string X T,
+%   coq.say "interp" X, fail.
+% backchain A B :- 
+%   coq.term->string A T1,
+%   coq.term->string B T2,
+%   coq.say "backchain" A B, fail.
 
 interp {{True}}.
 interp (sort _) . %:- coq.says "axiom sort".
@@ -107,8 +107,17 @@ check Cert (go (global (indt Prog) as Atom) Term) :-
   %% Use the selected constructor as key to find its
   %% clause in the zipped list of constructors and clauses.
   std.lookup {std.zip Kn Clauses} K Clause, 
-  check Cert' (bc Clause Atom ListArgs),
-  Term = app [Kons | ListArgs].
+  check Cert' (bc Clause Atom [L|ListArgs]),
+  Term = app [Kons | [L|ListArgs]].
+
+check Cert (go (global (indt Prog) as Atom) Kons) :-
+  coq.env.indt Prog _ _ _ _Type Kn Clauses,
+  unfold_expert Kn Cert Cert' K,
+  %% Use the selected constructor as key to find its
+  %% clause in the zipped list of constructors and clauses.
+  std.lookup {std.zip Kn Clauses} K Clause, 
+  check Cert' (bc Clause Atom []),
+  Kons = global (indc K).
 
 check Cert (go (app [global (indt Prog) | _Args] as  Atom) Term) :-
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
@@ -117,8 +126,17 @@ check Cert (go (app [global (indt Prog) | _Args] as  Atom) Term) :-
 	%% Use the selected constructor as key to find its
 	%% clause in the zipped list of constructors and clauses.
 	std.lookup {std.zip Kn Clauses} K Clause, 
-	check Cert' (bc Clause Atom ListArgs),
-  Term = (app [Kons|ListArgs]).
+	check Cert' (bc Clause Atom [L|ListArgs]),
+  Term = (app [Kons,L|ListArgs]).
+
+check Cert (go (app [global (indt Prog) | _Args] as  Atom) Kons) :-
+  coq.env.indt Prog _ _ _ _Type Kn Clauses,
+	Kons = global (indc K),
+	unfold_expert Kn Cert Cert' K,
+	%% Use the selected constructor as key to find its
+	%% clause in the zipped list of constructors and clauses.
+	std.lookup {std.zip Kn Clauses} K Clause, 
+	check Cert' (bc Clause Atom []).
 
 %% Perform simple reduction in the head
 check Cert (go (app [(fun A B C)| Args]) Term) :-
