@@ -7,6 +7,7 @@ type   qheight   int -> qbound.
 type   qsize     int -> int -> qbound.
 type   qgen      qbound -> cert.
 
+/*
 % An integer strict size (e.g., 4) becomes a range 4 .. 0, whose
 % subtraction denotes exactly the size of a subterm to be generated.
 type   qidsize    int -> qbound.
@@ -17,3 +18,4 @@ type   qrgsize    int -> int -> qbound.
 type   qidheight    int -> qbound.
 type   qidheight'   int -> int -> qbound.
 type   qrgheight    int -> int -> qbound.
+*/

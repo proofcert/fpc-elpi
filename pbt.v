@@ -5,6 +5,8 @@ Require Import Coq.Lists.List.
 Elpi Tactic pbt.
 Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
+Elpi Accumulate File "pbt/src/fpc-pair.mod".
+
 Elpi Accumulate lp:{{
   %% build_clauses: given a Coq context, creates copy clauses associating
   %% the eigenvariables to fresh logic variables
