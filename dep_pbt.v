@@ -29,16 +29,17 @@ Elpi Accumulate lp:{{
     std.map Spec (x\y\ copy x y) SpecVars,
     copy ProgType ProgGoal,
     copy Ty PropGoal)),
-    coq.say "Specs:" {std.map SpecGoals (t\s\ coq.term->string t s)},
-    coq.say "Spec Vars:" {std.map SpecVars (t\s\ coq.term->string t s)},
-    coq.say "Prog:" {coq.term->string ProgGoal},
-    coq.say "Prop:" {coq.term->string PropGoal},
+%    coq.say "Specs:" {std.map SpecGoals (t\s\ coq.term->string t s)},
+%    coq.say "Spec Vars:" {std.map SpecVars (t\s\ coq.term->string t s)},
+%    coq.say "Prog:" {coq.term->string ProgGoal},
+%    coq.say "Prop:" {coq.term->string PropGoal},
     std.map SpecGoals (g\t\ coq.say "calling" g t, check (qgen (qheight N)) (go g t)) SpecVars,
     coq.say "Proof Term:" {std.map SpecVars (t\s\ coq.term->string t s)},
-    coq.say "Interp" {coq.term->string ProgGoal},
+    % coq.say "Interp" {coq.term->string ProgGoal},
     interp ProgGoal,
-    coq.say "Got" {coq.term->string ProgGoal},
+    % coq.say "Run" {coq.term->string PropGoal},
     not (interp PropGoal),
-    coq.say "Cex:" PropGoal.
+    coq.say "Got" {coq.term->string ProgGoal},
+    coq.say "Cex:" {coq.term->string PropGoal}.
 }}.
 Elpi Typecheck.

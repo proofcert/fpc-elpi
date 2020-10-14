@@ -2,6 +2,9 @@ module kernel.
 
 %% Experimental kernel with dependent types and proof terms
 
+get_head (prod _ _ T) Head :- get_head (T X_) Head.
+get_head (app L) (app L).
+
 %%%%%%%%%%%%%%%
 % Interpreter %
 %%%%%%%%%%%%%%%
@@ -18,10 +21,12 @@ interp {{True}}.
 interp (sort _) . %:- coq.says "axiom sort".
 
 interp {{lp:G1 /\ lp:G2}} :-
+  !,
 	interp G1,
 	interp G2.
 
 interp {{lp:G1 \/ lp:G2}} :-
+  !,
 	interp G1;
 	interp G2.
 
@@ -33,9 +38,8 @@ interp {{lp:G1 \/ lp:G2}} :-
 
 interp {{lp:G = lp:G}}.
 
-interp (app [global (indt Prog) | Args] as Atom) :-
-  coq.env.indt Prog _ _ _ _Type _Kn Clauses,
-  std.mem Clauses D,
+  get_head D Atom,
+  % coq.say "Select " {coq.term->string (global (indc K))},
   backchain D Atom.
 
 backchain (prod _ Ty (x\P)) G :- backchain P G, interp Ty.
@@ -56,7 +60,7 @@ backchain G G.
 %   coq.term->string Term T1,
 %   coq.say "check go" A Term, fail.
 
-check Cert (bc A A []).
+check _Cert (bc A A []).
 check Cert (go X Term ):-
   var X,
   declare_constraint (check Cert (go X Term)) [X],
@@ -100,6 +104,15 @@ check Cert (bc (prod _ Ty1 Ty2) Goal [Tm|ArgsList]) :-
 %  coq.say "backchain on" {coq.term->string Ty1} {coq.term->string (Ty2 Tm)},
   check Cert (go Ty1 Tm).
 
+check Cert (go (global (indt Prog) as Atom) Kons) :-
+  coq.env.indt Prog _ _ _ _Type Kn Clauses,
+  Kons = global (indc K),
+  unfold_expert Kn Cert Cert' K,
+  %% Use the selected constructor as key to find its
+  %% clause in the zipped list of constructors and clauses.
+  std.lookup {std.zip Kn Clauses} K Clause, 
+  check Cert' (bc Clause Atom []).
+
 check Cert (go (global (indt Prog) as Atom) Term) :-
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
   Kons = global (indc K),
@@ -110,14 +123,14 @@ check Cert (go (global (indt Prog) as Atom) Term) :-
   check Cert' (bc Clause Atom [L|ListArgs]),
   Term = app [Kons | [L|ListArgs]].
 
-check Cert (go (global (indt Prog) as Atom) Kons) :-
+check Cert (go (app [global (indt Prog) | _Args] as  Atom) Kons) :-
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
-  unfold_expert Kn Cert Cert' K,
-  %% Use the selected constructor as key to find its
-  %% clause in the zipped list of constructors and clauses.
-  std.lookup {std.zip Kn Clauses} K Clause, 
-  check Cert' (bc Clause Atom []),
-  Kons = global (indc K).
+	Kons = global (indc K),
+	unfold_expert Kn Cert Cert' K,
+	%% Use the selected constructor as key to find its
+	%% clause in the zipped list of constructors and clauses.
+	std.lookup {std.zip Kn Clauses} K Clause, 
+	check Cert' (bc Clause Atom []).
 
 check Cert (go (app [global (indt Prog) | _Args] as  Atom) Term) :-
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
@@ -128,15 +141,6 @@ check Cert (go (app [global (indt Prog) | _Args] as  Atom) Term) :-
 	std.lookup {std.zip Kn Clauses} K Clause, 
 	check Cert' (bc Clause Atom [L|ListArgs]),
   Term = (app [Kons,L|ListArgs]).
-
-check Cert (go (app [global (indt Prog) | _Args] as  Atom) Kons) :-
-  coq.env.indt Prog _ _ _ _Type Kn Clauses,
-	Kons = global (indc K),
-	unfold_expert Kn Cert Cert' K,
-	%% Use the selected constructor as key to find its
-	%% clause in the zipped list of constructors and clauses.
-	std.lookup {std.zip Kn Clauses} K Clause, 
-	check Cert' (bc Clause Atom []).
 
 %% Perform simple reduction in the head
 check Cert (go (app [(fun A B C)| Args]) Term) :-
