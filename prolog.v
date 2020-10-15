@@ -1,3 +1,5 @@
+(*"prolog"-like tactic modulo FPC for height, size and pairing thereof  -- am*)
+
 From elpi Require Import elpi.
 Require Import Arith List. Import ListNotations.
 Require Import Coq.Lists.List.
@@ -7,37 +9,37 @@ Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
 Elpi Accumulate File "pbt/src/fpc-pair.mod".
 
-Elpi Accumulate lp:{{
-  %% build_clauses: given a Coq context, creates copy clauses associating
-  %% the eigenvariables to fresh logic variables
-  type build_clauses goal-ctx -> list prop -> prop.
-  build_clauses [decl Var _Name _Ty] [(copy Var X_ :- !)].
-  build_clauses [decl Var _Name _Ty | Ds] [(copy Var X_ :- !)| Cs] :-
-    build_clauses Ds Cs.
-  %% env_type: given a Coq context and an eigenvariable, returns the
-  %% type of that eigenvariable
-  type env_type goal-ctx -> term -> term -> prop.
-  env_type [decl Var _ Ty|_] Var Ty.
-  env_type [decl _ _ _|L] Var Ty :- env_type L Var Ty.
-  %% env_clauses: given a Coq context creates copy clauses associating
-  %% an eigenvariable to its type
-  type env_clauses goal-ctx -> list prop -> prop.
-  env_clauses [decl Var _ Ty] [(copy Var Ty :- !)].
-  env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
-    env_clauses L Cs.
 
-  solve [trm Spec, int N] [goal Ctx _Ev _Ty _Who] _OutGoals :-
-    build_clauses Ctx Cs,
-    env_clauses Ctx Progs,
-    (Progs => ( copy Spec SpecType)),
-    (Cs => (copy SpecType SpecGoal)),
-    coq.say "Goal:" {coq.term->string SpecGoal},
-    check (qgen (qheight N)) (go SpecGoal).
+Elpi Accumulate lp:{{
+  solve [str "height" , int N]  [goal _Ctx _Ev Goal _W] _OutGoals :-
+    coq.say "Goal:" {coq.term->string Goal},
+    check (qgen (qheight N)) (go Goal).
+
+  solve [str "size", int N, int M] [goal _Ctx _Ev Goal _W] _OutGoals :-
+    coq.say "Goal:" {coq.term->string Goal},
+    check (qgen (qsize N M )) (go Goal).
   
-    
-}}.
+  solve [str "pair", int H, int S1, int S2] [goal _Ctx _Ev Goal _W] _OutGoals :-
+    coq.say "Goal:" {coq.term->string Goal},
+    check (pair (qgen (qheight N)) (qgen (qsize S1 S2 ))) (go Goal).
+
+  }}. 
 Elpi Typecheck.
-Elpi Bound Steps 10000.
+
+Elpi Tactic dprolog.
+Elpi Accumulate File "pbt/src/dep-kernel.mod".
+Elpi Accumulate File "pbt/src/fpc-qbound.mod".
+Elpi Accumulate File "pbt/src/fpc-pair.mod".
+
+Elpi Accumulate lp:{{
+  solve [int N] [goal _Ctx Ev Goal _Who] _OutGoals :-
+    coq.say "Goal:" {coq.term->string Goal},
+    check (qgen (qheight N)) (go Goal Term),
+    Ev = Term.
+  }}.
+Elpi Typecheck.
+
+Elpi Bound Steps 100000.
 
 
  Inductive ordered : list nat -> Prop :=
@@ -47,4 +49,9 @@ onl : ordered []
      ordered (y :: l) -> x <= y -> ordered (x :: y :: l).
 
  Goal ordered [0;1;2;6].
-   Fail elpi prolog 10.
+   elpi prolog height 40.
+   Restart.
+   Fail elpi prolog size 100 N .
+   elpi dprolog 60.
+   Qed.
+
