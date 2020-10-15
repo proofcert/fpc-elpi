@@ -39,7 +39,6 @@ Elpi Accumulate lp:{{
     interp ProgGoal,
     % coq.say "Run" {coq.term->string PropGoal},
     not (interp PropGoal),
-    coq.say "Got" {coq.term->string ProgGoal},
-    coq.say "Cex:" {coq.term->string PropGoal}.
+    coq.say "Got" {coq.term->string ProgGoal}.
 }}.
 Elpi Typecheck.

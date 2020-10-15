@@ -35,7 +35,8 @@ Elpi Accumulate lp:{{
   solve [int N] [goal _Ctx Ev Goal _Who] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qheight N)) (go Goal Term),
-    Ev = Term.
+    Ev = Term,
+    coq.say "Proof:" {coq.term->string Ev}.
   }}.
 Elpi Typecheck.
 
@@ -51,7 +52,7 @@ onl : ordered []
  Goal ordered [0;1;2;6].
    elpi prolog height 40.
    Restart.
-   Fail elpi prolog size 100 N .
+   Fail elpi prolog size 100 0 . (*why?*)
    elpi dprolog 60.
    Qed.
 

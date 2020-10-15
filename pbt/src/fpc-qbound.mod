@@ -3,7 +3,7 @@ module fpc-qbound.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Simple term height and size bounds %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+	
 tt_expert (qgen (qheight _)).
 tt_expert (qgen (qsize In In)).
 
@@ -19,12 +19,16 @@ or_expert (qgen (qsize In Out)) (qgen (qsize In Out)) _Ch.
 prod_expert (qgen (qheight H)) (qgen (qheight H')) (qgen (qheight H')) :-
 	H > 0,
 	H' is H - 1.
-prod_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
+prod_expert (qgen (qsize In Out)) (qgen (qsize In' Mid)) (qgen (qsize Mid Out)) :-
+	In > 0,
+	In' is In - 1.
 
 prod_clerk (qgen (qheight H)) (qgen (qheight H')) :- 
 	H > 0,
 	H' is H - 1.
-prod_clerk (qgen (qsize In Out)) (qgen (qsize In Out)).
+prod_clerk (qgen (qsize In Out)) (qgen (qsize In' Out)) :-
+	In > 0,
+	In' is In - 1.
 
 unfold_expert Kn (qgen (qheight H)) (qgen (qheight H')) K :-
 	std.mem Kn K,

@@ -12,10 +12,10 @@ in reality we are proving a theorem, namely its negation.
 
 If Elpi fails, the trace is kernel is not displayed
 -----------------------
-what does Monitor do?
+
 
 -----------------------------------
-- should we do dep products in check as well?
+- should we do dep products in check as well? [done]
 ---------------------
 - on generation: feeding the right term, the query does work
 
