@@ -1,0 +1,30 @@
+;; RefTeX parse info file
+;; File: /home/dale/git/fpc-elpi/ijcar2020/paper.tex
+;; User: dale (Dale Miller)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi nil)
+
+(bibview-cache ("tassi19itp" . "Enrico Tassi 2019, {Deriving Proved Equality Tests Coq, in: 10th Intern. Conf. Inter., 141:29:1") ("cauderlier16phd" . "Cauderlier 2016, {Obj. Orient. Mech. Inter. betw., {Conservatoire National Des Arts et M{\\'e}tiers, Paris}") ("heath15pxtp" . "Quentin Heath & Dale Miller 2015, fram. proof cert. finite state, in: Proceedings Fourth Workshop Proof, 11") ("chihani17jar" . "Zakaria Chihani etal. 2017, semantic framework proof evidence, jar 59:287") ("liang09tcs" . "Chuck Liang & Dale Miller 2009, Focus. Polar. Line.  Intu., Theoretical Computer Science 410:4747") ("coq-elpi20web" . "Enrico Tassi 2020, Coq plugin embedding {ELPI}"))
+
+(master-dir . "/home/dale/git/fpc-elpi/ijcar2020/")
+
+(label-numbers)
+
+(bof "/home/dale/git/fpc-elpi/ijcar2020/paper.tex")
+
+(toc "toc" "    1 Introduction" "/home/dale/git/fpc-elpi/ijcar2020/paper.tex" nil 2 "1" "\\section{Introduction}" 5372)
+
+(toc "toc" "    2 Related work" "/home/dale/git/fpc-elpi/ijcar2020/paper.tex" nil 2 "2" "\\section{Related work}" 5476)
+
+(bib "/home/dale/repo/parsifal/papers/references/master.bib")
+
+(eof "/home/dale/git/fpc-elpi/ijcar2020/paper.tex")
+))
+

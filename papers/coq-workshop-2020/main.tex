@@ -1,0 +1,234 @@
+\documentclass[a4paper]{easychair}
+\usepackage{xspace}
+\usepackage{fullpage}
+
+\newcommand{\lP}{$\lambda$Prolog\xspace}
+\newcommand{\LKF}{\hbox{\sl LKF}\xspace}
+\newcommand{\LJF}{\hbox{\sl LJF}\xspace}
+\newcommand{\fpccoq}{FPC-Coq\xspace}
+
+\title{\fpccoq: Using ELPI to elaborate external proof evidence into Coq proofs}
+\author{Roberto Blanco\inst{1}\and Matteo Manighetti\inst{2}\and Dale Miller\inst{2}}
+\institute{Inria Paris\and Inria Saclay}
+% RB: I wonder whether/when my change of affiliation will be relevant.
+\authorrunning{Blanco, Miller, and Manighetti}
+\titlerunning{\fpccoq: Using ELPI in Coq}
+
+\begin{document}
+\maketitle
+\begin{abstract}\noindent
+Logic programming implementations of the \emph{Foundational Proof
+  Certificate} (FPC) framework are capable of checking a wide range of
+proof evidence.  Proof checkers based on logic programming can make
+use of both unification and backtracking search to allow varying
+degrees of proof reconstruction to take place during proof checking.
+Such proof checkers are also able to elaborate proofs lacking full
+details into proofs containing much more detail.  We outline here a
+proof-of-concept system in which the Coq-Elpi plugin, which embeds an
+implementation of \lP into Coq, is used to check proof certificates
+supplied by external (to Coq) provers and to elaborate them into the
+fully detailed proof terms that can be checked by the Coq kernel.
+\end{abstract}
+
+The trusted base of Coq is its kernel, which is a type-checking
+program that certifies that a dependently typed $\lambda$-term has a
+given type.  If type checking succeeds, we accept that the formula
+corresponding to that type is, in fact, a theorem of intuitionistic
+logic.  The rest of the Coq system, especially its tactic language, is
+designed to help a human user build proofs-cum-$\lambda$-terms that
+can be checked by the kernel.  Of course, there are many theorem
+provers for intuitionistic logic for which a completed proof is not
+the kind of detailed $\lambda$-term required by the Coq kernel but is,
+instead, a trace of some key aspects of a proof: some proof details
+might not be captured in such a trace.  For example:
+\begin{enumerate}
+
+\item Substitution instances of quantifiers might not be recorded in a
+  proof since such instances can, in principle, be reconstructed using
+  unification.
+
+\item Detailed typing information might not need to be stored within a
+  proof certificate since types can often be reconstructed during
+  proof checking.
+
+\item Some simplifications steps might be applied within a proof
+  without recording which rewrites were used.  A simple 
+  non-deterministic proof-search engine might be expected to
+  reconstruct an equivalent simplification.
+\end{enumerate}
+%RB: Not intuitionistic, but SAT/SMT certificates also are like this.
+
+The Foundational Proof Certificate (FPC) framework \cite{chihani17jar}
+has been designed for formally defining a rich collection of proof
+certificates that do not necessarily contain full details.  Proof
+checkers for FPC certificates can be written using simple logic
+programs: the standard implementation mechanisms of unification and
+backtracking search can then be used to reconstruct missing proof
+details \cite{miller17fac}.  Such proof checking kernels can also be
+used to elaborate such certificates into fully detailed proofs
+\cite{blanco17phd,blanco17cade}.
+
+We built the \fpccoq system to demonstrate the feasibility of using
+logic programming to check proof certificates produced by external
+provers and to elaborate such certificates into proofs with sufficient
+details that they can be given directly to Coq's kernel to
+check.  Note that one does not need to trust the external prover nor
+the \fpccoq tool-chain: one only needs to trust the Coq kernel.
+
+Because of the need to represent and compute with quantificational
+formulas and dependently-typed $\lambda$-terms, we chose \lP
+\cite{miller12proghol} as our implementation language since it has a
+direct and elegant treatment of binding in data structures.  The ELPI
+implementation \cite{dunchev15lpar} of \lP has been embedded recently
+into the Coq-Elpi plugin \cite{coq-elpi20web}, and we have used this
+plugin to implement a system that checks proof certificates in the FPC
+framework and elaborates them into proof terms that can be submitted
+to the Coq kernel.
+
+The \fpccoq system can be seen as part of the larger effort to use \lP
+within a type theory setting \cite{coen19mscs}, in general, and within
+Coq \cite{tassi19itp}, in particular. In doing so, the first step is to
+define how to use Coq terms as proof evidence for a formula, i.e.,
+to program a type checker in the FPC framework. Initially, the
+presentation of connectives as inductive types in Coq is translated to
+the usual connectives of intuitionistic first-order logic, the only ones
+known to the FPC checker.
+
+The current version of \fpccoq only works for proving theorems in
+first-order intuitionistic logic.  Given that the \lP proof checker,
+based on \LJF (a focused version of intuitionistic sequent calculus),
+can also serve as a proof checker for \LKF (its classical
+counterpart), \fpccoq can be used to prove double-negation
+translations of a formula for which there is a proof certificate in
+classical logic \cite{chihani17jar}.  Extending the FPC framework to
+involve inductive and coinductive reasoning has also been considered
+\cite{heath15pxtp,heath19jar}, and a future version of \fpccoq could
+well include proof certificates that are output from inductive theorem
+provers as well as model checkers.
+
+Given its origins in the theory of focused sequent calculus, our first
+FPC proof checker only implements a minimalistic sequent calculus in a
+purely declarative fashion.  We have also developed a second approach
+to building a proof checker based on dependent types in the style of
+\cite{lengrand10lmcs}.  This second approach allows for a much more
+concise implementation, where there is no translation needed from Coq
+formulas to intuitionistic formulas since the kernel directly operates
+with dependent types. The usual definitions of proof certificates
+remain directly usable also in this context.
+
+In particular, when the user loads the \lP code for an FPC definition
+named, say \texttt{fpc}, into the system, that FPC definition is made
+available as a Coq-Elpi tactic that takes a proof certificate, say
+\texttt{cert}, as an argument.  Inside Coq's proof mode, that tactic
+can be invoked by \texttt{elpi fpc cert}.
+
+The code for both of these implementations is available at
+\url{https://github.com/proofcert/fpc-elpi}, along with some simple
+examples to illustrate the steps taken to elaborate and check proof
+certificates.  We have not yet explored the cost of performing proof
+checking in this setting: it is likely to vary greatly among different
+certificate formats.
+
+Although \fpccoq currently targets the construction of proofs for the
+Coq kernel, it should be straightforward to use the same setup
+described here to build Dedukti proofs as well \cite{assaf16types}.
+Our development could also provide the facilities for cleanly and
+easily building Coq tactics that are written in \lP and are controlled
+by (partial) proof certificates.
+
+%\bibliography{../../references/master}
+\bibliographystyle{plain}
+\begin{thebibliography}{10}
+
+\bibitem{assaf16types}
+Ali Assaf, Guillaume Burel, Raphal Cauderlier, David Delahaye, Gilles Dowek,
+  Catherine Dubois, Fr{\'e}d{\'e}ric Gilbert, Pierre Halmagrand, Olivier
+  Hermant, and Ronan Saillard.
+\newblock Expressing theories in the $\lambda$${\Pi}$-calculus modulo theory
+  and in the {Dedukti} system.
+\newblock In {\em TYPES: Types for Proofs and Programs}, Novi Sad, Serbia,
+  2016.
+
+\bibitem{blanco17phd}
+Roberto Blanco.
+\newblock {\em Applications for Foundational Proof Certificates in theorem
+  proving}.
+\newblock PhD thesis, Universit{\'e} Paris-Saclay, December 2017.
+
+\bibitem{blanco17cade}
+Roberto Blanco, Zakaria Chihani, and Dale Miller.
+\newblock Translating between implicit and explicit versions of proof.
+\newblock In Leonardo de~Moura, editor, {\em Automated Deduction - {CADE} 26 -
+  26th International Conference on Automated Deduction, Gothenburg, Sweden,
+  August 6-11, 2017, Proceedings}, volume 10395 of {\em Lecture Notes in
+  Computer Science}, pages 255--273. Springer, 2017.
+
+\bibitem{chihani17jar}
+Zakaria Chihani, Dale Miller, and Fabien Renaud.
+\newblock A semantic framework for proof evidence.
+\newblock {\em J. of Automated Reasoning}, 59(3):287--330, 2017.
+
+\bibitem{dunchev15lpar}
+Cvetan Dunchev, Ferruccio Guidi, Claudio~Sacerdoti Coen, and Enrico Tassi.
+\newblock {ELPI:} fast, embeddable, $\lambda${Prolog} interpreter.
+\newblock In M. Davis, A. Fehnker, A. McIver, and A. Voronkov, editors, 
+{\em Logic for Programming, Artificial Intelligence, and
+  Reasoning, LPAR-20}, LNCS 9450, pages 460--468. Springer, 2015.
+
+\bibitem{coen19mscs}
+Ferruccio Guidi, Claudio~Sacerdoti Coen, and Enrico Tassi.
+\newblock Implementing type theory in higher order constraint logic
+  programming.
+\newblock {\em Mathematical Structures in Computer Science}, 29(8):1125--1150,
+  2019.
+
+\bibitem{heath15pxtp}
+Quentin Heath and Dale Miller.
+\newblock A framework for proof certificates in finite state exploration.
+\newblock In Cezary Kaliszyk and Andrei Paskevich, editors, {\em Proceedings of
+  the Fourth Workshop on Proof eXchange for Theorem Proving}, number 186 in
+  Electronic Proceedings in Theoretical Computer Science, pages 11--26. Open
+  Publishing Association, August 2015.
+
+\bibitem{heath19jar}
+Quentin Heath and Dale Miller.
+\newblock A proof theory for model checking.
+\newblock {\em J. of Automated Reasoning}, 63(4):857--885, 2019.
+
+\bibitem{lengrand10lmcs}
+{St\'ephane} Lengrand, Roy Dyckhoff, and James McKinna.
+\newblock A focused sequent calculus framework for proof search in pure type
+  systems.
+\newblock {\em Logical Methods in Computer Science}, 7(1), 2011.
+
+\bibitem{miller17fac}
+Dale Miller.
+\newblock Proof checking and logic programming.
+\newblock {\em Formal Aspects of Computing}, 29(3):383--399, 2017.
+
+\bibitem{miller12proghol}
+Dale Miller and Gopalan Nadathur.
+\newblock {\em Programming with Higher-Order Logic}.
+\newblock Cambridge Univ. Press, 2012.
+
+\bibitem{tassi19itp}
+Enrico Tassi.
+\newblock {Deriving Proved Equality Tests in Coq-Elpi: Stronger Induction
+  Principles for Containers in Coq}.
+\newblock In John Harrison, John O'Leary, and Andrew Tolmach, editors, {\em
+  10th International Conference on Interactive Theorem Proving (ITP 2019)},
+  volume 141 of {\em Leibniz International Proceedings in Informatics
+  (LIPIcs)}, pages 29:1--29:18, Dagstuhl, Germany, 2019. Schloss
+  Dagstuhl--Leibniz-Zentrum fuer Informatik.
+
+\bibitem{coq-elpi20web}
+Enrico Tassi.
+\newblock Coq plugin embedding {ELPI}.
+\newblock \url{https://github.com/LPCIC/coq-elpi}, 2020.
+
+\end{thebibliography}
+
+
+\end{document}
+
+%%  LocalWords:  ELPI Coq's minimalistic Dedukti Elpi fpc elpi

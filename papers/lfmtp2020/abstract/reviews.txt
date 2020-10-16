@@ -1,0 +1,107 @@
+LFMTP 2020 <lfmtp2020@easychair.org>
+Mon, Jun 1, 6:23 PM (21 hours ago)
+
+Dear author,
+
+it is my pleasure to inform you that your talk proposal for LFMTP has
+been accepted. Please, read carefully the reviews for your abstract
+(or full paper), since they may contain precious suggestions to
+improve the text of the abstract or to shape your talk. 
+
+We now invite you to re-submit a second version of the abstract that
+takes into account the suggestions, in case we will be able to
+informally publish the abstracts on the website. A reasonable deadline
+for re-submission is Sunday, 7th of June. 
+
+We are now looking forward to listen to your talk soon.
+
+Cheers,
+Claudio Sacerdoti Coen
+(on behalf of the PC)
+
+SUBMISSION: 6
+TITLE: Linking a lambda Prolog proof checker to the Coq kernel: An extended abstract
+
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 6
+TITLE: Linking a lambda Prolog proof checker to the Coq kernel: An extended abstract
+AUTHORS: Roberto Blanco, Matteo Manighetti and Dale Miller
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+
+From what I understand (the paper is not very clear), this paper
+presents a framework for allowing in the proof assistant Coq the use
+of "external" automated provers returning FPC certificates which are
+in turn converted into Coq proof terms using some FPC checker. This is
+achieved by using Elpi, a lambda-Prolog interpreter embedded in
+Coq. Currently, it seems that only provers written in Elpi itself can
+be used (hence the double quotes around "external").
+
+I find the topic interesting. It should lead to interesting questions
+and discussions. For instance, would it be possible to use truly
+external provers like SAT or SMT solvers, or provers like Vampire, E,
+etc.? Would this scale up? Could this be applied to not just Coq terms
+of type Prop but any term, perhaps using [7].
+
+So I am in favor of acceptance. However, the paper is not very clear
+and I invite authors to improve it. First, it would be nice that the
+first lines explain what you did and how (an abstract in the abstract)
+before giving more context. Second, the paper is actually one page
+only when you remove the title and the references, and a great part of
+this is dedicated to the context (FPC) rather than the contribution
+itself. By compacting the bibliography (easy) and slightly shortening
+the presentation of FPC (easy as well), the authors will be able to
+give much more details on how things are actually working. This would
+be much more attractive.
+
+Remarks:
+
+- "The Coq kernel, on the other hand, works with exactly one form of
+  proof structure and that proof system is fully detailed. In
+  particular, the Coq kernel performs type-checking on a dependently
+  typed λ -term."
+
+Note however that Coq has a system of metavariables representing holes
+in a proof.
+
+----------------------- REVIEW 2 ---------------------
+SUBMISSION: 6
+TITLE: Linking a lambda Prolog proof checker to the Coq kernel: An extended abstract
+AUTHORS: Roberto Blanco, Matteo Manighetti and Dale Miller
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+This abstract outlines the design of the FPC-Coq system, a tool which
+provides a link between a logic programming implementation of an FPC
+proof checker and the Coq kernel.  This is very interesting both for
+users and developers of the Coq proof system. Therefore, I propose to
+accept this abstract for presentation at LFMTP.  The abstract is clear
+and well-written.
+
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 6
+TITLE: Linking a lambda Prolog proof checker to the Coq kernel: An extended abstract
+AUTHORS: Roberto Blanco, Matteo Manighetti and Dale Miller
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+
+Building on the the Foundational Proof Certificate (FPC) framework,
+this abstract describes the implementation of a system that integrates
+a logic programming proof checker into the kernel of Coq. Such system
+allows to import/check proof certificates produced by  external
+(intuitionistic logic) provers. The imported proof objects do not need
+to be fully detailed. Instead, during proof reconstruction, the
+checker completes all the missing details (needed to be type checked
+by Coq's kernel). 
+
+The proposed framework may contribute to deal with the lack of robust
+mechanisms for proof search in Coq. Moreover, it may allow the
+integration of automatic theorem provers in Coq projects. The topic is
+certainly of interesest for the workshop and I recommend the
+presentation of this paper. 
+

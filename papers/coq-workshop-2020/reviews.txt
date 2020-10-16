@@ -1,0 +1,146 @@
+Coq2020 <coq2020@easychair.org>
+Mon, May 25, 7:05 PM (4 days ago)
+	
+Dear Dale,
+
+We are pleased to inform you that your submission to the Coq workshop
+has been accepted. 
+
+We expect the final version of the abstract by June 18th. Please take
+carefully into account the comments of reviewers that you will find
+below. In particular, in light of the reviews, please add examples,
+clarify what is the stage of development of the presented work, and do
+a comparison with other external provers.
+
+As you may be already aware, the 2020 edition of the Coq workshop will
+be held online. The final schedule and length of talks for the
+IJCAR-FSCD workshops is yet to be determined. Please let us know of
+any constraints relative to the day or hour of your presentation.
+
+Best regards,
+
+The Coq Workshop 2020 organizers.
+
+SUBMISSION: 6
+TITLE: FPC-Coq: Using ELPI to elaborate external proof evidence into Coq proofs
+
+
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 6
+TITLE: FPC-Coq: Using ELPI to elaborate external proof evidence into Coq proofs
+AUTHORS: Roberto Blanco, Matteo Manighetti and Dale Miller
+
+----------- Overall evaluation -----------
+SCORE: 1 (weak accept)
+----- TEXT:
+This paper outlines how the Elpi plugin, which embeds the
+Lambda-Prolog language in Coq, was used to implement a checker for
+first-order logic proof certificates as defined in the so-called FPC
+framework. The proof certificates considered in the resulting system,
+dubbed FPC-Coq, may be incomplete, i.e., omit certain information that
+can be inferred by performing standard proof steps such as finding
+substitution instances of quantifiers and backtracking. FPC-Coq takes
+certificates as input and produces fully elaborated Coq terms by
+performing the standard proof steps in Lambda-Prolog. 
+
+The use of Lambda-Prolog and Elpi for creating Coq proof terms from
+incomplete standalone (first-order) proof certificates appears
+appropriate and novel. Since Coq terms do not (yet) have a good
+version-independent representation, it seems like a very good idea to
+provide the possibility to store proofs as minimalistic FPC
+certificates, and to allow importing FPC certificates created
+elsewhere. It would have been interesting to know typical sizes of
+nontrivial FPC certificates as compared to proof terms, since terms
+can often be inconveniently large. Moreover, the Coq community can
+definitely benefit from demonstrations of applications of logic
+programming using Lambda-Prolog in Coq, which is seemingly quite
+different from traditional Coq plugin development using OCaml. 
+
+The main weak point of the paper is the lack of an example of the
+checker/elaborator applied to some concrete first-order logic
+certificate. This omission cannot be blamed on lack of space, since
+almost two-thirds of the second page is taken up by references, which
+in my opinion do not provide much value to readers. I expected either
+a detailed textually described example, or a diagram showing the main
+properties of some concrete certificate and its corresponding proof
+term. As things are now, the paper is highly abstract and
+non-specific, which may deter potential readers and members of the Coq
+community. 
+
+In summary, I recommend accepting the paper to be presented at the
+workshop, but I strongly encourage the authors to improve the
+presentation and decrease the waste of space on references by
+replacing most of them with an example. 
+
+Specific comments:
+
+p.1: What is the computational cost to elaborate large certificates to
+Coq terms? E.g., is it typically linear or quadratic in the
+certificate size/depth? This is an important consideration when using
+Coq-FPC. 
+p.1: Why is "foundational proof certificate" both written capitalized
+and in small case? Please use one capitalization consistently. 
+p.1: "the first step is how to define how to consume Coq terms as
+proof evidence" - is "consume" really the right word here? Based on
+the context, I thought the point was to "produce" terms? 
+p.1: "only works on" -> "only works for"
+----------- Reviewer's confidence -----------
+SCORE: 3 ((medium))
+
+
+----------------------- REVIEW 2 ---------------------
+SUBMISSION: 6
+TITLE: FPC-Coq: Using ELPI to elaborate external proof evidence into Coq proofs
+AUTHORS: Roberto Blanco, Matteo Manighetti and Dale Miller
+
+----------- Overall evaluation -----------
+SCORE: 0 (borderline paper)
+----- TEXT:
+I am sympathetic to the concept of using lambda-prolog as a universal
+proof-checking language, but the weakness of this paper is the lack of
+a convincing demonstration example.  The examples in the github repo
+(* Example lemmas *) in coq_fpc.v and coq_fpc_dep.v are all tiny
+little tautologies.  If there is a purpose to an
+external-proof-witness-integrator such as coq-elpi, then one needs
+better motivation than that. 
+
+Also, it would be useful to compare to something like SMTCoq, as a
+different example of integrating external proofs into Coq.  Would
+coq-elpi have been useful in building something like SMTCoq?  What's
+the relation of coq-elpi to something like CVC4's proof-witness
+language? 
+----------- Reviewer's confidence -----------
+SCORE: 3 ((medium))
+
+
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 6
+TITLE: FPC-Coq: Using ELPI to elaborate external proof evidence into Coq proofs
+AUTHORS: Roberto Blanco, Matteo Manighetti and Dale Miller
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+The Foundational Proof Certificate (FSP) [4] is a framework to
+formally describe proof reconstruction from proof certificates and
+computation, where certificates can range from just "trivial using
+such decision procedure" (full automation) to "here is the full proof
+derivation" (no automation), passing through arbitrary intermediate
+lightened representations requiring some amount of (finite)
+computation to recover the full proof (e.g dropping redundant
+arguments).
+
+This talk is about accessing the FSP from Coq using Coq-Elpi (Coq-Elpi
+is a meta-language for extending Coq with commands written in the ELPI
+variant of lambda-prolog).
+
+I'm quite in favor of this talk, as both Coq-Elpi and FSP are worth
+being advertized, even if what the implementation in the github
+directory mentioned in the abstract seems limited at the current
+stage.
+
+Incidentally, the talk would benefit of a stronger highlight on what
+is implemented or is planned to be implemented.
+----------- Reviewer's confidence -----------
+SCORE: 4 ((high))
+

@@ -1,0 +1,139 @@
+\newcommand{\ie}{i.e.}
+\newcommand{\etc}{etc}
+\newcommand{\eg}{e.g.}
+\newcommand{\lP}{$\lambda$Prolog\xspace}
+
+\newcommand{\LKF}{\hbox{\sl LKF}\xspace}
+\newcommand{\LJF}{\hbox{\sl LJF}\xspace}
+
+\newcommand{\fpccoq}{FPC-Coq\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Listings
+
+\colorlet{lprolog}{blue!70!black}
+\colorlet{abellatop}{blue!70!green}
+\colorlet{abellatac}{orange!30!black}
+\colorlet{abellabad}{red!80!yellow}
+\definecolor{bleu}{HTML}{000DB3}
+
+\lstdefinelanguage{lprolog}{%
+  alsoletter={-},
+  classoffset=0,%
+  morekeywords={sig,module,type,kind,pi,sigma,end},%
+  keywordstyle=\color{lprolog},%
+  classoffset=0,%
+  otherkeywords={:-,\\,=,=>,<=,\&},%
+  sensitive=true,%
+  morestring=[bd]",%
+  morecomment=[l]\%,%
+  morecomment=[n]{/*}{*/},%
+}
+
+\lstdefinelanguage{abella}[]{lprolog}{%
+  alsoletter={-},
+  classoffset=1,%
+  morekeywords={Close,CoDefine,Define,Kind,Query,Quit,Specification,
+    Set,Split,Theorem,Type,Undo,by,as,prop,true,false,forall,exists,nabla},%
+  keywordstyle=\color{abellatop},%
+  classoffset=2,%
+  morekeywords={abbrev,apply,backchain,case,coinduction,cut,
+    induction,inst,intros,monotone,on,permute,rename,left,right,witness,
+    search,split,to,unabbrev,unfold,assert,with},%
+  keywordstyle=\color{abellatac},%
+  classoffset=3,%
+  morekeywords={undo,abort,skip,clear},%
+  keywordstyle=\color{abellabad}\underbar,%
+  classoffset=0,%
+}
+
+\lstset{%
+%  basicstyle=\smaller\ttfamily,%
+  basicstyle=\ttfamily,%
+  breakatwhitespace=true,breaklines=true,%
+  language=abella,%
+  commentstyle=\itshape,%
+  xleftmargin=5pt,
+  rangeprefix=/*\ ,
+  rangesuffix=\ */,
+  includerangemarker=false,
+}
+
+\newcommand*{\SavedLstInline}{}
+\LetLtxMacro\SavedLstInline\lstinline
+\DeclareRobustCommand*{\lstinline}{%
+  \ifmmode
+    \let\SavedBGroup\bgroup
+    \def\bgroup{%
+      \let\bgroup\SavedBGroup
+      \hbox\bgroup
+    }%
+  \fi
+  \SavedLstInline
+}
+\DeclareRobustCommand\lstip[1][]{%
+  \lstinline[language=lprolog,basicstyle=\ttfamily,keepspaces=true,#1]}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\lstset{language=lprolog}
+
+\newcommand{\blue}[1]{{\color[rgb]{0,0,1} #1}}
+\newcommand{\tup}[1]{\langle #1\rangle}
+\newcommand{\tupp}[2]{\blue{\langle #1,}#2{\blue{\rangle}}}
+
+
+
+\newcommand{\lra}{\mathrel{\vdash}}
+\newcommand{\seq}[2]{#1\lra #2}
+
+%%%%%%%%%%%%%%%% LJF
+\newcommand{\truen}{t^-}
+\newcommand{\truep}{t^+}
+\newcommand{\falsen}{f^-}
+\newcommand{\falsep}{f^+}
+\newcommand{\wedgep}{\wedge^{\!+}}
+\newcommand{\wedgen}{\wedge^{\!-}}
+\newcommand{\veep}{\vee^{\!+}}
+\newcommand{\veen}{\vee^{\!-}}
+
+\newcommand{\Nscr}{{\cal N}}
+\newcommand{\Rscr}{{\cal R}}                                   % Used for an ambiguous rhs
+%\newcommand{\Rscr}{\Delta_1\Downarrow\Delta_2}                % Used for an ambiguous rhs
+\newcommand{\jUnf    }[4]{#1\mathbin\Uparrow#2\vdash#3\mathbin\Uparrow #4} % unfocused sequent
+\newcommand{\jUnfG   }[2]{\jUnf{\Gamma}{#1}{#2}{{}}}           % unf sequ with \Gamma
+\newcommand{\jUnfamb }[3]{#1\mathbin\Uparrow#2\vdash#3 \Rscr}  % unfocused sequent
+\newcommand{\jUnfGamb}[1]{\Gamma\mathbin\Uparrow#1\vdash \Rscr}% unf sequ with \Gamma
+\newcommand{\jLf     }[3]{#1\Downarrow#2\vdash#3}              % left focused sequent
+\newcommand{\jLfG    }[1]{\jLf{\Gamma}{#1}{E}}                 % left foc seq with \Gamma 
+\newcommand{\jRf     }[2]{#1\vdash #2\Downarrow}               % right focused sequent
+\newcommand{\jRfG    }[1]{\jRf{\Gamma}{#1}}                    % right foc seq with \Gamma
+%%%%%%%%%%%%%%%% 
+
+
+%%%%%%%%%%%%%%%% 
+\newcommand{\bxi}[1]{\blue{\Xi_{#1}}}
+\newcommand{\bXi}[1]{\blue{\Xi_{#1} :\null}}
+
+\newcommand{\andClerk}[3]{{\wedge_c}(#1,#2,#3)}
+\newcommand{\falseClerk}[2]{f_c(#1,#2)}
+\newcommand{\orClerk}[2]{{\vee_c}(#1,#2)}
+\newcommand{\allClerk}[2]{\forall_c(#1,#2)}
+\newcommand{\arrClerk}[2]{\to_c(#1,#2)}
+\newcommand{\storeClerk}[3]{\hbox{\sl store}_c(#1,#2,#3)}
+
+\newcommand{\trueExpert }[1]{{\true_e}(#1)}
+\newcommand{\andExpert}[3]{{\wedge_e}(#1,#2,#3)}
+\newcommand{\andExpertLJF}[6]{{\wedge_e}(#1,#2,#3,#4,#5,#6)}
+\newcommand{\orExpert  }[3]{{\vee_e}(#1,#2,#3)}
+\newcommand{\someExpert}[3]{\exists_e(#1,#2,#3)}
+\newcommand{\initExpert}[2]{\hbox{\sl init}_e(#1,#2)}
+\newcommand{\cutExpert}[4]{\hbox{\sl cut}_e(#1,#2,#3,#4)}
+\newcommand{\decideExpert}[3]{\hbox{\sl decide}_e(#1,#2,#3)}
+\newcommand{\releaseExpert}[2]{\hbox{\sl release}_e(#1,#2)}
+%%%%%%%%%%%%%%%%
+
+\DeclareRobustCommand\lsti[1][]{\lstinline[basicstyle=\ttfamily,keepspaces=true,#1]}
+

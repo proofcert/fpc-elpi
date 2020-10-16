@@ -1,0 +1,70 @@
+>>  ----------------------- REVIEW 1 ---------------------
+
+>>  ... My understanding is that they have a Coq tactic that takes
+>>  a proof goal, exports to to an external mini-prover, which generates
+>>  an FPC certificate. Then the FPC certificate is imported back to Coq
+>>  via a deep embedding, and Coq uses a reflection theorem to turn it
+>>  into an ordinary proof. But I am only guessing: this is not made
+>>  clear.
+
+A more accurate outline is: an external proof certificate is checked
+via lambda Prolog (ELPI running within Coq).  If that check is
+successful, lambda Prolog will build a proof structure that the Coq
+kernel should be able to check (only the Coq kernel needs to be
+trusted).  Part of the novelty here is the use of FPCs and logic
+programming, which makes defining external proof structures, checking
+such proofs, and generating Coq proofs all part of the same, modular
+process.  Another novelty here is that Coq proofs are built entirely
+within the ELPI plugin without using, say, Ltac or reflection.
+
+>>  The example, a proof of "(A -> B) -> A -> B", is singularly
+>>  unimpressive. Can the tool do something more complex? How long does it
+>>  take?
+
+Since this is an ongoing project, there are now more examples in the
+GitHub repository.  Many other kinds of FPCs are described in 
+papers [5,9,11].
+
+>>  I don't understand what is in the repository. The READMEs don't
+>>  provide any guidance.
+
+The repository has been reorganized to make it much more clear.
+
+>>  ----------------------- REVIEW 2 ---------------------
+
+>>  - The presented example (example 1) that uses the system is
+>>    trivial. It leaves me wondering how easy it is to apply the system
+>>    to realistic examples. 
+
+There are more examples in the GitHub repository.
+
+>>  * I am uncertain of the accuracy of the second sentence in the related
+>>    work section. It states that this version of FPC-Coq only works for
+>>    proving theorems in first order intuitionistic logic. Then continues
+>>    to state that FPC-Coq can be used to prove the double negation of a
+>>    formula for which there is a classical proof. Double negating a
+>>    formula and finding an intuitionistic proof is only true for
+>>    propositional logic and not first-order logic. First order negative
+>>    translations are more involved (e.g. also double negating the body
+>>    of each forall quantifier).
+
+We meant to say "double negation translation" and not "the double
+negation."  As this reviewer points out, many more negations need to
+be inserted into first-order formulas for this scheme to work.  The
+use of such double-negation translations in this focused setting has
+been studied more carefully in reference [11] and in the technical
+report https://hal.inria.fr/hal-01354298 (by Chihani, Ilik, Miller).
+
+>>  - Section 2.1, could you please provide a short explanation why there
+>>    are 101 introduction rules (and not 100)? 
+
+Since there are 100 formulas on the left and one on the right, there
+are possibly 101 places to use an introduction rule.
+
+>>  - Section 2.2: it may be helpful to explicitly state that decide and
+>>    store are examples of experts and not necessarily part of every
+>>    system. 
+
+We can be more clear about this: Decide and store are part of the
+focusing mechanism and, hence, part of every FPC.  They are not,
+however, part of the usual presentation of the sequent calculus.
