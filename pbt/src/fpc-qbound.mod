@@ -16,6 +16,10 @@ and_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
 or_expert (qgen (qheight H)) (qgen (qheight H)) _Ch.
 or_expert (qgen (qsize In Out)) (qgen (qsize In Out)) _Ch.
 
+prod_expert (qgen (qheight H)) (qgen (qheight H)) (qgen (qheight H)).
+prod_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
+
+/* removed the bound decrease --am
 prod_expert (qgen (qheight H)) (qgen (qheight H')) (qgen (qheight H')) :-
 	H > 0,
 	H' is H - 1.
@@ -29,6 +33,10 @@ prod_clerk (qgen (qheight H)) (qgen (qheight H')) :-
 prod_clerk (qgen (qsize In Out)) (qgen (qsize In' Out)) :-
 	In > 0,
 	In' is In - 1.
+
+*/
+prod_clerk (qgen (qheight H)) (qgen (qheight H)).
+prod_clerk (qgen (qsize In Out)) (qgen (qsize In Out)).
 
 unfold_expert Kn (qgen (qheight H)) (qgen (qheight H')) K :-
 	std.mem Kn K,

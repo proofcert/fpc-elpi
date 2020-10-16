@@ -18,10 +18,14 @@ Elpi Accumulate lp:{{
   solve [str "size", int N, int M] [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qsize N M )) (go Goal).
+
+  solve [str "sizeN", int N] [goal _Ctx _Ev Goal _W] _OutGoals :-
+    coq.say "Goal:" {coq.term->string Goal},
+    check (qgen (qsize N M_ )) (go Goal).  
   
   solve [str "pair", int H, int S1, int S2] [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
-    check (pair (qgen (qheight N)) (qgen (qsize S1 S2 ))) (go Goal).
+    check (pair (qgen (qheight H)) (qgen (qsize S1 S2 ))) (go Goal).
 
   }}. 
 Elpi Typecheck.
@@ -50,9 +54,10 @@ onl : ordered []
      ordered (y :: l) -> x <= y -> ordered (x :: y :: l).
 
  Goal ordered [0;1;2;6].
-   elpi prolog height 40.
+   elpi prolog height 10.
    Restart.
-   Fail elpi prolog size 100 0 . (*why?*)
-   elpi dprolog 60.
+   Fail elpi prolog sizeN 20.
+   Fail elpi prolog size 20 0 . (*why?*)
+   elpi dprolog 20.
    Qed.
 
