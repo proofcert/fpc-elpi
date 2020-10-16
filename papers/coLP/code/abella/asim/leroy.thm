@@ -1,0 +1,84 @@
+% proof of existence of a term which diverges and coevalutes to a
+% single "value" from Leroy page 20.  Hard to search because coeval
+% has mode + + and need instantiate existentials in 3 clause of coeval
+
+Kind    tm, ty, const, id, env, num    type.
+
+Type    z    num.
+Type    s    num -> num.
+
+Type    zero, one    const.
+Type    con          const -> tm.
+Type    app          tm -> tm -> tm.
+Type    fun          (tm -> tm) -> tm.
+Type    i            ty.
+
+% standard CBV
+Define  eval : tm -> tm -> prop by
+    eval (con C) (con C);
+    eval (fun R) (fun R);
+    eval (app M N) V := exists R W,
+        eval M (fun R) /\ eval N W /\ eval (R W) V.
+   
+% usual CBV rules, but coinductively
+CoDefine  coeval : tm -> tm -> prop by
+    coeval (con C) (con C) ;
+    coeval (fun R) (fun R) ;
+    coeval (app M N) V := exists R W,
+        coeval M (fun R) /\ coeval N W /\ coeval (R W) V.
+
+CoDefine  coeval_ev : tm -> tm -> prop by
+    coeval_ev (con C) (con C) ;
+    coeval_ev (fun R) (fun R) ;
+    coeval_ev (app M N) V := exists R W,
+        eval M (fun R) /\ eval N W /\ coeval_ev (R W) V.
+
+% divergence CBV 
+CoDefine  divrg : tm  -> prop by
+    divrg (app M N)    := divrg M ;
+	  divrg (app M X)    := exists V, eval M V /\ divrg X ;
+    divrg (app M X)    := exists F V, eval M (fun F) /\ eval X V /\ divrg (F V).
+
+
+
+Theorem dcjustone: exists M V,  divrg M	/\ coeval M V /\ (forall V1,  coeval M V1 -> V = V1).
+exists (app (fun x\ (con zero))  (app (fun (x1\app x1 x1)) (fun (x1\app x1 x1)))).
+exists (con zero).
+split.
+%diverg M
+ unfold 2.
+  exists ( fun (x\ (con zero))).
+   split.
+   search.
+   coinduction.
+   search.
+%coevan M V
+unfold.
+  exists (x\ con zero).
+  exists (app (fun (x1\app x1 x1)) (fun (x1\app x1 x1))).
+  split.
+	search.
+	coinduction.
+	search.
+	search.
+% uniqueness
+intros.
+case H1.
+case H2.
+case H4.
+search.
+% qed.
+
+% 
+Theorem ev_coev: forall E V, eval E V -> coeval E V.
+induction on 1.
+intros. case H1.
+ search.
+ search.
+ unfold.
+ exists R . exists W. split.
+ backchain IH.
+  backchain IH.
+    backchain IH.
+%qed
+

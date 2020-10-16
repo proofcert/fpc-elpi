@@ -1,0 +1,27 @@
+
+% DM Just wanted to do the (obvious) proofs explicitly.
+
+Kind tm     type.
+Type a,b    tm.  % two constants
+Type fun    (tm -> tm) -> tm.
+Type app    tm -> tm -> tm.
+
+CoDefine coeval: tm -> tm -> prop by
+  coeval a a ;
+  coeval b b ;
+  coeval (fun R) (fun R) ;
+  coeval (app M N) V := 
+    exists R W, coeval M (fun R) /\ coeval N W /\ coeval (R W) V.
+
+Theorem diverges : forall V, coeval (app (fun x\ app x x) (fun x\ app x x)) V.
+  coinduction. intros. unfold. witness (x\ app x x). witness (fun x\ app x x).
+  split. search. search. apply CH with V = V. search.
+
+Theorem not-deterministic : exists E V1 V2, coeval E V1 /\ coeval E V2 /\ (V1 = V2 -> false).
+  witness (app (fun x\ app x x) (fun x\ app x x)). witness a. witness b. split.
+  apply diverges with V = a. search.
+  apply diverges with V = b. search.
+  intros. case H1.
+
+
+

@@ -1,0 +1,109 @@
+%% Encoding of CCS from Abella's library ccs_two_level ported
+%% 1. (p | p) not ~ to p for some p 
+%% 2. there are p,q such that p < q and q < p, but not p ~ q
+
+%% we could use ccs (up to), but with ! instead of mu
+
+Kind    proc, act      type.
+
+Type    a,  b, tau         act .
+Type    bar            act -> act .
+
+Type    null           proc.
+Type    out            act -> proc -> proc.
+Type    plus, par      proc -> proc -> proc.
+Type    mu             (proc -> proc) -> proc.
+
+
+%Type    
+
+Define comp : act -> act -> prop by
+comp A (bar A);
+comp (bar A) A.
+
+Define step :          proc -> act -> proc -> prop by
+step (out A P) A P;
+step (plus P Q) A P1 := step P A P1;
+step (plus P Q) A Q1 := step Q A Q1;
+step (par P Q) A (par P1 Q) := step P A P1;
+step (par P Q) A (par P Q1) := step Q A Q1;
+step (mu P) A Q := step (P (mu P)) A Q;
+step (par P Q) tau (par P1 Q1) :=
+  exists A B, comp A B /\ step P A P1 /\ step Q A Q1.
+
+Define is_act : act -> prop by
+is_act  a ; is_act b ; is_act tau; is_act (bar A) := is_act A.
+
+Define is_proc :          proc  -> prop by
+is_proc null;
+is_proc (out A P) := is_act A;
+is_proc (plus P Q) := is_proc P /\ is_proc  Q;
+is_proc (par P Q) := is_proc P /\ is_proc  Q;
+is_proc (mu P)  := is_proc (P (mu P)) .
+
+
+CoDefine sim : proc -> proc -> prop by
+  sim P Q :=
+    forall A P1,  step P A P1  -> exists Q1,  step Q A Q1  /\ sim P1 Q1.
+
+Theorem sim_refl: forall P, sim P P.
+skip.
+
+CoDefine bisim : proc -> proc -> prop by
+  bisim P Q :=
+    (forall A P1, step P A P1 -> exists Q1, step Q A Q1 /\ bisim P1 Q1) /\
+    (forall A Q1, step Q A Q1 -> exists P1, step P A P1 /\ bisim P1 Q1).
+
+
+%% from Catiuscia's notes
+
+Theorem par_not_bisim: exists P, (bisim (par P P)  P -> false).
+exists (out a null).
+intros. case H1.
+assert  step (par (out a null) (out a null)) tau (par null null).
+apply H2 to H4.
+case H5.
+% qed
+
+
+%% from Wikipedia
+% M=p.\overline{c}.M+p.\overline{t}.M+p.(\overline{c}.M+\overline{t}.M)
+% and M ′ = p . ( c ¯ . M ′ + t ¯ . M ′ ) {\displaystyle
+% M'=p.({\overline {c}}.M'+{\overline {t}}.M')}
+% M'=p.(\overline{c}.M'+\overline{t}.M') simulate each other but are
+% not bisimilar.
+
+
+%% NOTE: there is a direct proof that does not need coinduction in Bedwyr
+Theorem sim_not_bisim: exists P Q, sim P Q /\ sim Q P
+ /\ (bisim P Q -> false).
+ % P = ab + a
+exists (plus (out a (out b null)) (out a null)).
+% Q = ab
+exists (out a (out b null)).
+split.
+% sim P Q
+  unfold.
+   intros.
+   case H1.
+    exists P1. split. search.
+    backchain sim_refl. %lemma up to
+    case H2.
+    exists (out b null). split. search.
+     % sim null (out b null)  % lemma ? Needs case analysis
+       unfold. intros. case H3.
+% sim Q P
+ unfold. intros. case H1.
+  exists (out b null) . split. search.
+   backchain sim_refl.
+% not bisim   
+   intros. case H1.
+   assert ( step (plus (out a (out b null)) (out a null)) a (null)).
+   apply H2 to H4.
+   case H5.
+   case H6.
+ assert ( step ((out b null)) b (null)).
+ apply H8 to H9.
+ case H10.
+
+%qed

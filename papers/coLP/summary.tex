@@ -1,0 +1,512 @@
+% Submissions must not exceed 12 pages ACM style 2-column (including
+% figures, but excluding bibliography). 
+
+%\documentclass[preprint]{sigplanconf}
+\documentclass[sigconf]{acmart}
+
+
+%\settopmatter{printfolios=false,printccs=false,printacmref}
+\settopmatter{printfolios=false,printccs=true,printacmref}
+
+\usepackage{xspace}
+% The following two fonts broke the typesetting of some math environments.
+%\usepackage{txfonts}
+%\usepackage{pifont}
+\usepackage{amssymb,amsmath}
+\usepackage{proof}
+%\usepackage{url,breakurl}
+%\usepackage{booktabs}
+%\usepackage{graphics} % use for the Pitts-Gabbay quantifier
+
+\usepackage{listings}
+\usepackage{letltxmacro}
+\input{../ppdp19/listing-macros}  % Use to get better highlighing of code
+\lstset{language=lprolog}
+\lstset{language=abella}
+
+% \newcommand{\blue}[1]{{\color[rgb]{0,0,1} #1}}
+% \newcommand{\tup}[1]{\langle #1\rangle}
+% \newcommand{\tupp}[2]{\blue{\langle #1,}#2{\blue{\rangle}}}
+
+
+\newcommand{\instan}[1]{\hbox{\sl grnd}~(#1)}
+\newcommand{\Pscr}{{\mathcal P}}
+
+
+\newcommand{\ok}{\checkmark}
+% DM The use of pifont and txfonts broke typesetting for me: equality
+% signs never appearred and some parentheses did not appear either.
+%\newcommand{\noc}{\ding{56}}
+\newcommand{\noc}{\ddag}
+\newcommand{\lP}{$\lambda$Prolog\xspace}
+\newcommand{\nat }{\hbox{\sl nat}\xspace}
+\newcommand{\plus}{\hbox{\sl app}\xspace}
+\newcommand{\lst}{\hbox{\sl lst}\xspace}
+\newcommand{\sort}{\hbox{\sl sort}}
+\newcommand{\rev}{\hbox{\sl rev}}
+\newcommand{\ordered}{\hbox{\sl ordered}}
+
+%\newcommand{\atac}{A2Tac\xspace}
+\newcommand{\atac}{ACheck\xspace}
+%\newcommand{\lra}{\mathrel{\longrightarrow}}
+\newcommand{\lra}{\mathrel{\vdash}}
+\newcommand{\seq}[2]{#1\lra #2}
+
+\newcommand{\true}{tt}
+
+%%%%%%%%%%%%%%%% LJF
+\newcommand{\truen}{t^-}
+\newcommand{\truep}{t^+}
+\newcommand{\falsen}{f^-}
+\newcommand{\falsep}{f^+}
+\newcommand{\wedgep}{\wedge^{\!+}}
+\newcommand{\wedgen}{\wedge^{\!-}}
+\newcommand{\veep}{\vee^{\!+}}
+\newcommand{\veen}{\vee^{\!-}}
+\newcommand{\with}{\&}
+
+\newcommand{\Nscr}{{\cal N}}
+\newcommand{\Rscr}{{\cal R}}                                   % Used for an ambiguous rhs
+%\newcommand{\Rscr}{\Delta_1\Downarrow\Delta_2}                % Used for an ambiguous rhs
+\newcommand{\jUnf    }[4]{#1\mathbin\Uparrow#2\vdash#3\mathbin\Uparrow #4} % unfocused sequent
+\newcommand{\jUnfG   }[2]{\jUnf{\Gamma}{#1}{#2}{{}}}           % unf sequ with \Gamma
+\newcommand{\jUnfamb }[3]{#1\mathbin\Uparrow#2\vdash#3 \Rscr}  % unfocused sequent
+\newcommand{\jUnfGamb}[1]{\Gamma\mathbin\Uparrow#1\vdash \Rscr}% unf sequ with \Gamma
+\newcommand{\jLf     }[3]{#1\Downarrow#2\vdash#3}              % left focused sequent
+\newcommand{\jLfG    }[1]{\jLf{\Gamma}{#1}{E}}                 % left foc seq with \Gamma 
+\newcommand{\jRf     }[2]{#1\vdash #2\Downarrow}               % right focused sequent
+\newcommand{\jRfG    }[1]{\jRf{\Gamma}{#1}}                    % right foc seq with \Gamma
+%%%%%%%%%%%%%%%% 
+\newcommand{\bxi}[1]{\blue{\Xi_{#1}}}
+\newcommand{\bXi}[1]{\blue{\Xi_{#1} :\null}}
+
+\newcommand{\andClerk}[3]{{\wedge_c}(#1,#2,#3)}
+\newcommand{\falseClerk}[2]{f_c(#1,#2)}
+\newcommand{\orClerk}[2]{{\vee_c}(#1,#2)}
+\newcommand{\allClerk}[2]{\forall_c(#1,#2)}
+\newcommand{\storeClerk}[3]{\hbox{\sl store}_c(#1,#2,#3)}
+
+\newcommand{\trueExpert }[1]{{\true_e}(#1)}
+\newcommand{\eqExpert }[1]{{=_e}(#1)}
+\newcommand{\unfoldExpert}[2]{{\hbox{\sl unfold}_e}(#1,#2)}
+\newcommand{\andExpert}[3]{{\wedge_e}(#1,#2,#3)}
+\newcommand{\andExpertLJF}[6]{{\wedge_e}(#1,#2,#3,#4,#5,#6)}
+\newcommand{\orExpert  }[3]{{\vee_e}(#1,#2,#3)}
+\newcommand{\someExpert}[3]{\exists_e(#1,#2,#3)}
+\newcommand{\initExpert}[2]{\hbox{\sl init}_e(#1,#2)}
+\newcommand{\cutExpert}[4]{\hbox{\sl cut}_e(#1,#2,#3,#4)}
+\newcommand{\decideExpert}[3]{\hbox{\sl decide}_e(#1,#2,#3)}
+\newcommand{\releaseExpert}[2]{\hbox{\sl release}_e(#1,#2)}
+%%%%%%%%%%%%%%%%
+
+%
+\newcommand{\step}{\longrightarrow}
+\newcommand{\sstlc}{\textit{STLC}\xspace}
+\newcommand{\vds}{\vdash_\Sigma}
+
+
+\def\bnfas{\mathrel{::=}}
+\def\bnfalt{\mid}
+
+\def\lam{\lambda}
+\def\Lam{\Lambda}
+\def\arrow{\rightarrow}
+\def\oftp{\mathord{:}}
+\def\hastype{\mathrel{:}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Editorials
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\long\def\ednote#1{\footnote{[{\it #1\/}]}\message{ednote!}}
+%\long\def\ednote#1{\begin{quote}[{\it #1\/}]\end{quote}\message{note!}}
+\newenvironment{metanote}{\begin{quote}\message{note!}[\begingroup\it}%
+                         {\endgroup]\end{quote}}
+\long\def\ignore#1{}
+
+\newcommand{\todo}[1]{\begin{metanote}TODO: #1\end{metanote}}
+%
+%\setlength{\textwidth}{13.2cm}
+%\setlength{\textheight}{19.9cm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+%\conferenceinfo{}{}
+%\CopyrightYear{}
+%\copyrightdata{}
+%\title{Property-Based Testing via Proof Reconstruction: Work-in-progress}
+
+%\acmConference[PPDP'2019]{21th International Symposium on Principles and Practice of Declarative Programming}{October 7--9 }{Porto, Portugal}
+
+\title{Notes on coinductive PBT}
+\author{Roberto Blanco}
+\affiliation{\institution{INRIA Paris, France}}
+\email{roberto.blanco@inria.fr}
+\author{Dale Miller}
+\affiliation{\institution{INRIA Saclay \& LIX, \'Ecole Polytechnique, France}}
+\email{dale.miller@inria.fr}
+\author{Alberto Momigliano}
+\affiliation{\institution{DI, Universit\`a degli Studi di Milano, Italy}}
+\email{momigliano@di.unimi.it}
+
+\begin{abstract}
+  The \emph{linear } logic behind Bedwyr (``muFa'', according to
+  Quentin) seems to be the proof-theory of coinductive PBT. Applications are mostly in separating
+  equivalences in process/lambda calculi.
+\end{abstract}
+\maketitle
+
+\section{The proposal}
+\label{sec:p}
+
+
+
+Our starting point is to see whether the FPC approach in the previous
+paper extends to richer set of specifications. Originally, we wanted
+to prove formulas of the form
+%
+\(\exists x [(\tau(x)\land P(x)) \land \neg Q(x)]\)
+%
+whether $P,Q$ were essentially Horn logic programs plus nabla. We
+argued that the logic behind it was basically minimal logic, since we
+only provided certificates for the positive phase, while the
+negative/testing one was just exhaustive search.
+
+Now, we want to PBT specs over \emph{infinite behavior} (more than infinite
+objects). Here's an example: it is well known that in CCS there are processes that are similar to each other but not bisimilar,
+for example \texttt{a.b + a} and \texttt{a.b}:
+
+\begin{lstlisting}
+Theorem sim_not_bisim: exists P Q,
+ sim P Q /\ sim Q P /\ (bisim P Q -> false).
+\end{lstlisting}
+My Abella proof uses reflexivity of similarity in the positive phase,
+but there is also a direct coinductive proof with the following
+simulation:
+\begin{enumerate}
+\item $R_1 = \{\mathtt{(a.b+a, a.b ),(b,b),(0,b),(0,0)}\}$
+  \item $R_2 = \{\mathtt{(a.b,a.b+a),(b,b), (0,0)}\}$ 
+\end{enumerate}
+%
+
+More examples: in \cite{2007-Leroy-Grall}, it is suggested to take the usual rules for CBV in the lambda-calculus with constants, but \emph{coinductively}:
+\begin{lstlisting}
+CoDefine coeval: tm -> tm -> prop by
+ coeval (con C) (con C);
+ coeval (fun R) (fun R);
+ coeval (app M N) V := exists R W, coeval M (fun R) /\ coeval N W /\ coeval (R W) V.
+\end{lstlisting}
+
+Whether this notion of co-evaluation makes sense is debatable, but the
+following holds: it is not deterministic anymore, since a divergent
+term such as $\Omega$ co-evaluates to anything
+\begin{lstlisting}
+Theorem fail_det: exists E V1 V2, coeval E V1
+/\ coeval E V2 /\ (V1 = V2 -> false).
+\end{lstlisting}
+The proof uses coinduction twice with the trivial simulation
+$\Omega,0$, and $\Omega, 1$ say.
+%
+
+Consider now \emph{ground} vs.\ \emph{applicative} similarity in
+PCFL. The latter is finer than the former:
+
+\begin{lstlisting}
+CoDefine sim : tm -> tm -> ty -> prop by
+sim  M1 M2 (arr S S') :=
+ (forall M, {eval M1 (abs M)} -> 
+ exists M' , {eval M2 (abs M')} /\ 
+ (forall x, {of x S} -> sim  (M x) (M' x) S'));  ...
+CoDefine gsim : tm -> tm -> ty -> prop by
+ gsim  M1 M2 (arr S S') :=
+ (forall x, {of x S} -> gsim  (app M1 x) (app M2 x) S');  ...
+Theorem cex_asim_gsim: exists M1 M2 T, gsim M1 M2 T /\ (sim M1 M2 T -> false).
+\end{lstlisting}
+Two such separating terms are: $\lambda x.\ \bot$ and $\bot$, which
+are not applicative similar since $\bot$ does not converge to a
+lambda. The proof uses several lemmas such as transitivity of
+\texttt{asim}, Kleene order being included in similarity, $\bot$ being
+the least element in the similarity order etc.
+
+Our angle: Can PBT find those processes/lambda terms?
+All of this begs for a richer logic:
+\begin{itemize}
+\item   \texttt{(bi)sim} are not Horn clauses
+\item they require some form of coinduction for proof search to succeed (and case analysis for the negative phase)
+\end{itemize}
+
+The combination of those two points rules out falling back on
+coinductive lp as in
+\url{https://www.swi-prolog.org/pldoc/doc/_SWI_/library/coinduction.pl},
+based on \cite{Luke07}. Even $\lambda$Prolog seems out as we need to
+do case analysis on eigenvariables and more crucially we cannot
+simulate nabla with pi for non-Horn specs such as similarity (of
+course we would need tables, but that's doable). We need a logic with
+(co)induction and nabla. Sounds familiar?
+
+\subsection{Shall we use Bedwyr as is?}
+\label{sec:bed}
+
+
+That's the first instinct, since it has automation for search and case analysis, the correct distinction
+between eigenvariables and scoped constants, tabling and even tabling modulo lemmas (up to version 1.3). And in fact,  we
+can investigate co-evaluation immediately, with hand-made height generators:
+\begin{lstlisting}
+ Define coinductive  coeval : tm -> tm -> prop by ...
+ Define wt : num -> env -> tm -> prop by ... % generator
+ ?= wt (s (s (s z))) void M /\ wt z void M1 /\ wt z void M2 /\ coeval M M1 /\ coeval M M2 /\ (M1 = M2 -> false))
+
+ Found a solution:  2195msa
+ M2 = con one
+ M1 = con zero
+ M  = app (fun (x1\ app x1 x1)) (fun (x1\ app x1 x1))
+\end{lstlisting}
+Note that we need generators for \texttt{M1,M2} since standard mode
+analysis guaranteeing groundness of the output variable does not
+immediately apply to coinductive LP.
+
+For the sim/not bisim example, checking \texttt{bisim P Q -> false}
+runs afoul of the limitations of the left proved that does not handle
+universal and implications.  However, as noted in \cite{HeathM15}, the
+logic behind Bedwyr is essentially linear and therefore we can rely on
+negation normal forms and simply push negation inside to define
+\emph{non}-bisimulation, yielding an interesting polarization
+structure:
+
+\begin{lstlisting}
+Define inductive n_bisim : proc -> proc -> prop by
+ n_bisim P Q :=
+ (exists A P1, step P A P1 /\ forall Q1, step Q A Q1 -> n_bisim P1 Q1) \/
+ (exists A Q1, step Q A Q1 /\ forall P1, step P A P1 -> n_bisim Q1 P1).
+
+ ?= N = (s (s z)) /\ is_proc N P /\ is_proc N Q /\ sim P Q /\ sim Q P /\ n_bisim P Q.
+Found a solution: 301ms
+ Q = par (out tau null) (out tau null)
+ P = out tau (out tau null)
+\end{lstlisting}
+
+A similar problem: find a process that is not bisimilar to its \texttt{par}
+
+\begin{lstlisting}
+?=is_proc (s z)) P /\ n_bisim (par P P) P).
+  P = out a null
+\end{lstlisting}
+
+Question:
+\begin{itemize}
+\item What's going on recursion-theoretically? The complement of a
+  r.e.\ coinductive relation must be inductive, but what is its
+  degree? Conversely, the complement of an r.e.\ inductive relation
+  such as evaluation is coinductive, certainly not r.e., so what we
+  would get by negation normal form would be badly incomplete.
+\end{itemize}
+
+To recover the flexibility of different generating strategy, we can
+port the FPC approach of the PPDP paper to Bedwyr. Current attempt is
+doing this \emph{only for generation} and rely on Bedwyr for everything
+else. 
+\begin{lstlisting}
+?= check  (qheight 2) (isProc (p2i P)) /\ (n_bisim (par P P)  P).
+ \end{lstlisting}
+From first experiments this is feasible, so far and allows us to use native tabling and the
+L0/L1 search strategy. It's less efficient that I was expecting: a query like the above works, but
+\begin{lstlisting}
+(check (qheight 4 (and (isProc (p2i P)) (isProc (p2i Q)))
+	/\ sim P Q /\ sim Q P /\ (n_bisim P Q)
+\end{lstlisting}
+takes some 20 secs, because we are building up two processes $P$ and $Q$
+independently. This is different from previous examples in PPDP, where
+generation was performed over judgments such as typing (see
+preservation/progress). A possibility is to generate $P$ and $Q$ together, following
+ideas in \cite{TNIQ}, whereby we fist generate $P$ and then obtain $Q$ by locally mutating the former.
+
+This architecture may be also  less flexible, since we have to
+live with the limitation of the left prover. And we do not have
+certificates for the rest of the query. This may be limiting if we
+need to steer both the satisfaction of the premises and the testing
+phase, which is not purely negative anymore. 
+
+Or we can go all the way two-level and use a kernel for muFa, pretty
+much as in Quentin's code
+\url{http://slimmer.gforge.inria.fr/bedwyr/pcmc/}. It's going to be
+slow, especially if we use it for generation as well and it uses
+standard (co)induction rules via invariants, which is not exactly
+user-friendly. We could add support for tables, but we run the risk of
+re-inventing the wheel (read Bedwyr). However, it is as flexible as we
+program it, in the sense that we can add tabling modulo (sort of
+testing ``up-to'' previously established theorems).
+
+As a refinement of the first approach, the logic of Bedwyr not being
+completely clear, one could take the cex found by Bedwyr and re-run it
+in Quentin's kernel to have an honest-to-goodness proof in $\mu$mall
+(although we need to turn tables into invariants).
+
+ 
+\subsection{HM logic}
+\label{sec:hml}
+In \cite{HeathM15}, certificates for non (bi)similarity in LTS are assertions
+in a fragment of Hennessy-Milner logic that separates two
+processes. This begs the question if it makes sense to formulate such
+a logic for PCFL and simulation. In other terms, show two (lazy) programs not contextually equivalent by generating an HML formula that separates them.
+
+The presentation in \cite{Gordon95}
+where small step semantics is annotated with observations (essentially
+destructors) seems particularly apt and corresponds to ground
+bisimilarity --- it's possible that by changing the dichotomy between
+passive/active types it could be applied to the applicative case as
+well.  See also\cite{LagoR15} for a similar LTS for applicative.
+
+First question: is HML enough or do we have to go to the modal $\nu$-calculus to accommodate infinite computations? Example: \texttt{iterate f x} does not simulate
+\texttt{map f (iterate (f x))}. Let \texttt{f} be the square function. The programs have transitions (using Gordon's LTS):
+\begin{lstlisting}
+iterate f 3 >> 
+  3 :: iterate (f (f 3)) --hd->  3 --3-> stuck 
+  3 :: iterate (f (f 3)) --tl->  iterate (f (f 3)) --?? ->
+
+map f (iterate (f 3)) >>
+  f 3 :: map f (iterate f (f 3)) --hd-> 9 etc
+  f 3 :: map f (iterate f (f 3)) --tl->  map f (iterate f (f 3))
+\end{lstlisting}
+so a formula satisfying the former but not the latter should be something like
+\texttt{(<hd> <3> true)}. In the first case we observe here 3 and  9 in the other. This suggests that we
+can extract a separating \emph{evaluation context} from a HM formula, here essentially \texttt{hd \_}.
+
+Some problems:
+\begin{itemize}
+\item Differently from LTS (and from the equational theory of the lambda
+  calculus), our operational semantics is deterministic in the sense
+  that while we can make different observations on the same term, we
+  cannot make different transitions with the same observation. Hence
+  the modalities seems to collapse and I see box as only useful for saying that no observations can be made. But are they still dual?
+\item If we use Gordon's active/passive approach, we need a satisfaction clause for \texttt{Trans  Red}:
+  $$
+  P \models F
+  \mbox{ if for type of $P$ active, when } P\Downarrow V, V \models F
+  $$
+\item We may have to add fixed points to account for formulae satisfying bisimilar terms such as \texttt{ones} and \texttt{ones'}
+\begin{lstlisting}
+zeros = 0 :: zeros
+ones  = 1 :: ones
+ones' = map (fun x -> x + 1) zeros 
+\end{lstlisting}
+\end{itemize}
+
+Other questions
+\begin{itemize}
+\item HM logic is presented as parameterized by
+the underlying LTS, but can we also vary the motion of bisimulation:
+strong vs weak, up-to? There is some generalization of LTS into synchronization trees that may do that.
+
+\item  What are the relations with
+trace semantics and related notions such as in
+\cite{2007-Leroy-Grall}?
+
+\item In a sense to be made precise could FPC
+induce a related HM logic?
+\end{itemize}
+In the meantime, we can use PBT HM logic to find formul\ae\ that separates
+two non-similar LTS, here the example in Section 5.2 of
+\cite{HeathM15}, where \texttt{hsat} is HM forcing of a modal formula
+by a process:
+\begin{lstlisting}
+?= N = (s (s (s z))) /\ is_hform N F /\ hsat (proc 6) F  /\ (hsat (proc 1) F -> false).
+
+F = hdiam a (hconj (hdiam b tt) (hdiam c tt))
+N = s (s (s z))
+\end{lstlisting}
+Note that we cannot directly use box, as the left prover
+complains. However, we may get around it defining non-forcing.
+
+
+
+
+\subsection{Other  examples}
+
+Because of the immense body of work in model checking (finite) process
+calculi such as CCS, if we want to sell our approach, we may want as
+usual to insist on domains that are hard for weaker frameworks, so
+stick to binders. This means the $\pi$ and $\lambda$ calculi.
+
+From the meta-theory of $\pi$ calculus
+\begin{itemize}
+\item  early and late bisim not preserved by inputs
+\item  ground bisim not a congruence
+\item ground  bisim not preserved by name substitution
+\item model checking with the HML described in \cite{Tiu:2010} . Note that for the
+  encoding of satisfaction to be adequate we need to compute the list
+  of possible free new names beside those occurring in the process and
+  formula. Still `` One can thus calculate the number of new names
+  needed based on the number of bound input modalities in A.'' (ibidem page 21). See also  some of the examples in the Bedwyr example suite \verb+{pi/pi_modal.def}+
+\end{itemize}
+
+
+ More from \cite{2007-Leroy-Grall}:
+\begin{itemize}
+  \item There are raw terms that diverge, but not coevaluate;
+\begin{lstlisting}
+?= wt (s (s (s (s z)))) void M  /\ divrg M /\ (forall V, coeval M V -> false).
+
+Found a solution: + 2011
+ M = app (con zero) (app (fun (x1\ app x1 x1)) (fun (x1\ app x1 x1)))
+\end{lstlisting}
+  \item Let \texttt{costeps} be the kleene closure of the step relation, coinductively. Then the are terms such that
+    \texttt{costeps E V} but not \texttt{coeval E V} --- the reverse of Lemma 36.
+  \item type soundness fails for co-evaluation (the Filinski cex, based on the $Y$ combinator, seems hard, see Section 8.2).
+  \end{itemize}
+
+  More from the lazy lambda-calculus:
+  \begin{itemize}
+  \item The eta  and surjective pairing laws hold for ground similarity but not for applicative.
+  \end{itemize}
+
+  
+  Other PL examples that we could mutate and see what happens:
+\begin{itemize}  
+
+\item Milner-Tofte type preservation result for circular closures~\cite{milner91tcs}
+\item Transitivity of subtyping in recursive types (seen as rational trees over simple types)
+  \cite{kozen_silva_2017}
+\end{itemize}
+
+\subsection{Related work}
+
+Some precursors to coinductive LP \cite{JaffarSV04,CharatonikMNPW98},
+all that much ado about nothing following \cite{Luke07} such as
+\cite{DBLP:journals/cl/Ancona13,MantadelisRM14}. Note: the latter
+seems intertwined with infinite terms rather than infinite behaviors
+and does not have enough abstractions to tackle the examples we care
+about.
+
+Gupta says it can prove two Buchi automata bisimlar if the accepts the
+same infinite strings (probably with some trick to express universal
+quantification). For non equivalence one can show that there's a
+string that the other does not accept, but the status of NAF wrt coLP
+is totally unsettled. Anyhow, the automata example does not work in
+SWI (but it does with the meta-interpreter).
+
+NOTE: the CWB
+\url{https://homepages.inf.ed.ac.uk/perdita/cwb/summary.html} can do a
+bunch of stuff such as ``derive automatically logical formulae which
+distinguish nonequivalent'' processes (of course, it is finite-state
+systems). Perhaps try the new versions \url{http://caal.cs.aau.dk/}
+\cite{CAAL} or \url{https://sourceforge.net/projects/cwb-nc/}. Also
+the usual XSB tabled approach to simulation checking~\cite{symbolic}. Thus, we need to stress the pi calculus angle (binders, infinite state)
+
+TO READ: stuff from Katya Komendantskaya \cite{KomendantskayaL17,BasoldKL19} (probably not that relevant). Stuff about testing equivalences in LTS (Sangiogi Book 1)
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{colp}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+%  LocalWords:  coinductive Blanco INRIA Saclay Ecole Polytechnique
+%  LocalWords:  Universit degli Studi di Milano nabla CBV PCFL asim
+%  LocalWords:  Kleene lp eigenvariables bisim Milner Tofte Katya HML
+%  LocalWords:  Komendantskaya colp muFa PPDP Bedwyr formul LTS hsat
+%  LocalWords:  coevaluate costeps kleene Filinski cex surjective CWB
+%  LocalWords:  XSB bisimulation bisimilarity hd

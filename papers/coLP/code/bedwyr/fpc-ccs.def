@@ -1,0 +1,163 @@
+% and apply FPC to PBT of coinductive specs in  mu-less CCS
+
+#include "fpc.def".
+
+%% start process stuff
+% Prog
+
+Kind    proc, act      type.
+
+% coercions among object and meta process/actions
+Type p2i  proc -> i.
+Type a2i  act -> i.
+Type i2a  i -> act.
+Type i2p  i -> proc.
+
+
+Type    a,  b, tau         act .
+Type    bar            act -> act .
+
+Type    null           proc.
+Type    out            act -> proc -> proc.
+Type    plus, par      proc -> proc -> proc.
+Type    mu             (proc -> proc) -> proc.
+
+
+Type isAct i -> oo.
+Type isProc i -> oo.
+  
+Define prog_proc :  oo -> oo -> prop by
+       prog_proc (isAct (a2i a)) tt;
+       prog_proc (isAct (a2i b)) tt;
+       prog_proc (isAct (a2i (bar (i2a L)))) (isAct L );
+       prog_proc (isProc (p2i null)) tt;
+       prog_proc (isProc (p2i (out A P))) (and (isAct (a2i A)) (isProc (p2i P)));
+       prog_proc (isProc (p2i (par Q P))) (and (isProc (p2i Q)) (isProc (p2i P)));
+       prog_proc (isProc (p2i (plus Q P))) (and (isProc (p2i Q)) (isProc (p2i P))).
+%todo: add mu, but with copyclause
+%% ends process stuff
+
+
+%% now, back to Bedwyr -level stuff
+
+Define comp : act -> act -> prop by
+comp A (bar A);
+comp (bar A) A.
+
+Define step :          proc -> act -> proc -> prop by
+step (out A P) A P;
+step (plus P _) A P1 := step P A P1;
+step (plus _ Q) A Q1 := step Q A Q1;
+step (par P Q) A (par P1 Q) := step P A P1;
+step (par P Q) A (par P Q1) := step Q A Q1;
+step (mu P) A Q := step (P (mu P)) A Q;
+step (par P Q) tau (par P1 Q1) :=
+  exists A B, comp A B /\ step P A P1 /\ step Q A Q1.
+
+Define coinductive sim : proc -> proc -> prop by
+  sim P Q :=
+	forall A P1,  step P A P1  -> exists Q1,  step Q A Q1  /\ sim P1 Q1.
+
+Define inductive n_sim : proc -> proc -> prop by
+  n_sim P Q :=
+	exists A P1,  step P A P1  /\ forall Q1, step Q A Q1 -> n_sim P1 Q1.
+
+Define coinductive bisim : proc -> proc -> prop by
+  bisim P Q :=
+    (forall A P1, step P A P1 -> exists Q1, step Q A Q1 /\ bisim P1 Q1) /\
+    (forall A Q1, step Q A Q1 -> exists P1, step P A P1 /\ bisim P1 Q1).
+
+Define inductive n_bisim : proc -> proc -> prop by
+  n_bisim P Q :=
+	(exists A P1, step P A P1 /\ forall Q1, step Q A Q1 -> n_bisim P1 Q1) \/
+	(exists A Q1, step Q A Q1 /\ forall P1, step P A P1 -> n_bisim Q1 P1).
+
+
+% The query
+%   p_not_par (qheight (s (s z))) P.
+%   p_not_par (qsize   (s (s (s z))) z) P.
+Define p_not_par : cert -> proc -> prop by
+       p_not_par Gen P :=
+	check Gen (isProc (p2i P)) prog_proc /\ (n_bisim (par P P)  P).
+
+Define sim_not_bisim : cert -> proc -> proc -> prop by
+       sim_not_bisim Gen P Q :=
+	(check Gen (and (isProc (p2i P)) (isProc (p2i Q))) prog_proc
+	/\ sim P Q /\ sim Q P /\ (n_bisim P Q)).
+
+% very slow
+Define sim_not_bisimB : proc -> proc -> prop by
+       sim_not_bisimB P Q :=
+	exists H, member H ((s z) :: s (s z) ::  s (s (s z)) ::  s (s (s (s z))) ::  s( s (s (s (s z)))) ::  s (s( s (s (s (s z))))) :: nil) /\
+	(check (qheight H) (and (isProc (p2i P)) (isProc (p2i Q))) prog_proc
+	/\ sim P Q /\ sim Q P /\ (n_bisim P Q)).
+
+
+
+%   sim_not_bisim (qheight (s (s (s (s z))))) P Q. % 27669ms
+%   sim_not_bisim ( c (qheight (s (s (s (s z))))) (qsize (s (s (s (s (s (s (s (s z)))))))) (s z)))  P Q. % 27669ms
+%   sim_not_bisim (qsize (s (s (s (s (s (s (s (s z)))))))) (s z)) P Q. %nope
+
+% this should be fine tuned so not to pass the same bound to both generators
+
+Define lteq : nt -> nt -> prop by
+       lteq z _ ;
+       lteq (s N) (s M) := lteq N M.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DM Trying some examples about trace and trace equivalence.
+% Added this code just to get familiar with the setup.  Nothing deep.
+% These can be removed at some point.  See harness file for test cases. 
+
+Kind trace   type.
+Type emp     trace.
+Type tr      act -> trace -> trace.
+
+Define trace : proc -> trace -> prop by
+       trace _ emp ;
+       trace P (tr A Trace) := step P A Q /\ trace Q Trace.
+
+Define trace_equiv : proc -> proc -> prop by
+       trace_equiv P Q := (forall Trace, trace P Trace -> trace Q Trace) /\
+                          (forall Trace, trace Q Trace -> trace P Trace).
+
+Define n_trace_equiv : proc -> proc -> prop by
+       n_trace_equiv P Q := (exists Trace, trace P Trace /\ (trace Q Trace -> false)) \/
+                            (exists Trace, trace Q Trace /\ (trace P Trace -> false)).
+
+Define trace_eq_not_sim : cert -> proc -> proc -> prop by
+       trace_eq_not_sim Gen P Q :=
+	(check Gen (and (isProc (p2i P)) (isProc (p2i Q))) prog_proc) /\
+	trace_equiv P Q /\ n_sim P Q.
+
+Define trace_eq_not_bisim : cert -> proc -> proc -> prop by
+       trace_eq_not_bisim Gen P Q :=
+	(check Gen (and (isProc (p2i P)) (isProc (p2i Q))) prog_proc) /\
+	trace_equiv P Q /\ n_bisim P Q.
+
+Define trace_eq_not_equal : cert -> proc -> proc -> prop by
+       trace_eq_not_equal Gen P Q :=
+	(check Gen (and (isProc (p2i P)) (isProc (p2i Q))) prog_proc) /\
+	trace_equiv P Q /\ (P = Q -> false).
+
+% /*
+% % kernel, now defined parametrically in fpc
+% Define   check :    cert -> oo -> prop by
+
+% check Cert tt         := ttE Cert;
+% check Cert (eq T T)   := eqE Cert;
+% check Cert (and G1 G2):=
+%    andE Cert Cert1 Cert2 /\ 
+%    check Cert1 G1 /\  check Cert2 G2;
+% check Cert (or G1 G2) :=
+%   exists LR Cert', orE Cert Cert' LR /\  
+%    ((LR = left /\   check Cert' G1) \/
+%    (LR = right /\  check Cert' G2));
+  
+% check Cert (some G):= 
+%     exists CertQ T, someE Cert Cert1 T /\ 
+%     check Cert1 (G T);
+% check Cert A :=
+% 	exists G Cert', unfoldE Cert Cert' /\  
+%       prog A G /\  check Cert' G.
+% */

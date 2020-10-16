@@ -1,0 +1,360 @@
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\documentclass[a4paper]{easychair}
+\usepackage{url,xcolor}
+\usepackage{proof}
+\usepackage{listings}
+\usepackage{letltxmacro}
+
+\newcommand{\instan}[1]{\hbox{\sl grnd}~(#1)}
+\newcommand{\Pscr}{{\mathcal P}}
+
+
+\newcommand{\ok}{\checkmark}
+% DM The use of pifont and txfonts broke typesetting for me: equality
+% signs never appearred and some parentheses did not appear either.
+%\newcommand{\noc}{\ding{56}}
+\newcommand{\noc}{\ddag}
+\newcommand{\lP}{$\lambda$Prolog\xspace}
+\newcommand{\nat }{\hbox{\sl nat}\xspace}
+\newcommand{\plus}{\hbox{\sl app}\xspace}
+\newcommand{\lst}{\hbox{\sl lst}\xspace}
+\newcommand{\sort}{\hbox{\sl sort}}
+\newcommand{\rev}{\hbox{\sl rev}}
+\newcommand{\ordered}{\hbox{\sl ordered}}
+
+%\newcommand{\atac}{A2Tac\xspace}
+\newcommand{\atac}{ACheck\xspace}
+%\newcommand{\lra}{\mathrel{\longrightarrow}}
+\newcommand{\lra}{\mathrel{\vdash}}
+\newcommand{\seq}[2]{#1\lra #2}
+
+\newcommand{\true}{tt}
+
+%%%%%%%%%%%%%%%% LJF
+\newcommand{\truen}{t^-}
+\newcommand{\truep}{t^+}
+\newcommand{\falsen}{f^-}
+\newcommand{\falsep}{f^+}
+\newcommand{\wedgep}{\wedge^{\!+}}
+\newcommand{\wedgen}{\wedge^{\!-}}
+\newcommand{\veep}{\vee^{\!+}}
+\newcommand{\veen}{\vee^{\!-}}
+\newcommand{\with}{\&}
+
+\newcommand{\Nscr}{{\cal N}}
+\newcommand{\Rscr}{{\cal R}}                                   % Used for an ambiguous rhs
+%\newcommand{\Rscr}{\Delta_1\Downarrow\Delta_2}                % Used for an ambiguous rhs
+\newcommand{\jUnf    }[4]{#1\mathbin\Uparrow#2\vdash#3\mathbin\Uparrow #4} % unfocused sequent
+\newcommand{\jUnfG   }[2]{\jUnf{\Gamma}{#1}{#2}{{}}}           % unf sequ with \Gamma
+\newcommand{\jUnfamb }[3]{#1\mathbin\Uparrow#2\vdash#3 \Rscr}  % unfocused sequent
+\newcommand{\jUnfGamb}[1]{\Gamma\mathbin\Uparrow#1\vdash \Rscr}% unf sequ with \Gamma
+\newcommand{\jLf     }[3]{#1\Downarrow#2\vdash#3}              % left focused sequent
+\newcommand{\jLfG    }[1]{\jLf{\Gamma}{#1}{E}}                 % left foc seq with \Gamma 
+\newcommand{\jRf     }[2]{#1\vdash #2\Downarrow}               % right focused sequent
+\newcommand{\jRfG    }[1]{\jRf{\Gamma}{#1}}                    % right foc seq with \Gamma
+%%%%%%%%%%%%%%%% 
+\newcommand{\bxi}[1]{\blue{\Xi_{#1}}}
+\newcommand{\bXi}[1]{\blue{\Xi_{#1} :\null}}
+
+\newcommand{\andClerk}[3]{{\wedge_c}(#1,#2,#3)}
+\newcommand{\falseClerk}[2]{f_c(#1,#2)}
+\newcommand{\orClerk}[2]{{\vee_c}(#1,#2)}
+\newcommand{\allClerk}[2]{\forall_c(#1,#2)}
+\newcommand{\storeClerk}[3]{\hbox{\sl store}_c(#1,#2,#3)}
+
+\newcommand{\trueExpert }[1]{{\true_e}(#1)}
+\newcommand{\eqExpert }[1]{{=_e}(#1)}
+\newcommand{\unfoldExpert}[2]{{\hbox{\sl unfold}_e}(#1,#2)}
+\newcommand{\andExpert}[3]{{\wedge_e}(#1,#2,#3)}
+\newcommand{\andExpertLJF}[6]{{\wedge_e}(#1,#2,#3,#4,#5,#6)}
+\newcommand{\orExpert  }[3]{{\vee_e}(#1,#2,#3)}
+\newcommand{\someExpert}[3]{\exists_e(#1,#2,#3)}
+\newcommand{\initExpert}[2]{\hbox{\sl init}_e(#1,#2)}
+\newcommand{\cutExpert}[4]{\hbox{\sl cut}_e(#1,#2,#3,#4)}
+\newcommand{\decideExpert}[3]{\hbox{\sl decide}_e(#1,#2,#3)}
+\newcommand{\releaseExpert}[2]{\hbox{\sl release}_e(#1,#2)}
+%%%%%%%%%%%%%%%%
+
+%
+\newcommand{\step}{\longrightarrow}
+\newcommand{\sstlc}{\textit{STLC}\xspace}
+\newcommand{\vds}{\vdash_\Sigma}
+
+
+\def\bnfas{\mathrel{::=}}
+\def\bnfalt{\mid}
+
+\def\lam{\lambda}
+\def\Lam{\Lambda}
+\def\arrow{\rightarrow}
+\def\oftp{\mathord{:}}
+\def\hastype{\mathrel{:}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Editorials
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\long\def\ednote#1{\footnote{[{\it #1\/}]}\message{ednote!}}
+%\long\def\ednote#1{\begin{quote}[{\it #1\/}]\end{quote}\message{note!}}
+\newenvironment{metanote}{\begin{quote}\message{note!}[\begingroup\it}%
+                         {\endgroup]\end{quote}}
+\long\def\ignore#1{}
+
+\newcommand{\todo}[1]{\begin{metanote}TODO: #1\end{metanote}}
+%
+%\setlength{\textwidth}{13.2cm}
+%\setlength{\textheight}{19.9cm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\input{types20/listing-macros}  % Use to get better highlighing of code
+\lstset{language=lprolog}
+\lstset{language=abella}
+\title{On the Proof Theory of Property-Based Testing of Coinductive Specifications, or:\\
+ PBT to Infinity and beyond}
+\authorrunning{Blanco, Miller and Momigliano}
+\titlerunning{PBT to Infinity and
+   beyond}
+\author{Roberto Blanco\inst{1} \and Dale Miller\inst{2} \and Alberto Momigliano\inst{3}}
+
+\institute{
+  INRIA Paris, France
+  \and
+  INRIA Saclay \& LIX, \'Ecole Polytechnique, France\\
+\and
+DI, Universit\`a degli Studi di Milano, Italy
+}
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+\label{sec:intro}
+
+\begin{center}
+  [For the moment taken from the TYPES abstract, to be revised]
+\end{center}
+
+Reasoning about infinite computations via coinduction and corecursion
+has an ever increasing relevance in formal methods and, in particular,
+in the semantics of programming languages, starting
+from~\cite{milner91tcs}; see also~\cite{2007-Leroy-Grall} for a
+compelling example --- and, of course, coinduction underlies (the
+meta-theory of) process calculi. This was acknowledged by researchers
+in proof assistants, who promptly provided support for coinduction and
+corecursion from the early 90's on, see~\cite{Paulson97,Gim95types}
+for the beginning of the story concerning the most popular frameworks.
+
+It also became apparent that tools that search for
+refutations/counter-examples of conjectures prior to attempting a
+formal proof are invaluable: this is particularly true in PL theory,
+where proofs tend to be shallow but may have hundreds of cases.  One
+such approach is \emph{property-based testing} (PBT), which employs
+automatic test data generation to try and refute executable
+specifications.  Pioneered by \emph{QuickCheck} for functional
+programming~\cite{claessen00icfp}, it has now spread to most major
+proof assistants~\cite{BlanchetteBN11,QChick}.
+
+% DM I revised the following paragraph.  Did I get the sense right?
+
+In general, PBT does not extend well to coinductive specifications
+(an exception being Isabelle's \emph{Nitpick},
+% \url{https://isabelle.in.tum.de/dist/doc/nitpick.pdf}
+which is, however, a counter-model generator).  A particular
+challenge, for example, for \emph{QuickChick} is extending it to work
+with Coq's notion of coinductive via \emph{guarded} recursion (which
+is generally seen to be an unsatisfactory approach to coinduction). We
+are not aware of applications of PBT to other form of coinduction, such as \emph{co-patterns}~\cite{AbelPTS13}.
+
+While PBT originated in the functional programming community, we have
+given in a previous paper (\cite{Blanco0M19}) a reconstruction of some
+of its features (operational semantics, different flavors of
+generation, shrinking) in purely proof-theoretic terms employing the
+framework of \emph{Foundational Proof Certificates}~\cite{chihani17jar}: the
+latter, in its full generality, defines a range of proof structures
+used in various theorem provers such as resolution refutations,
+Herbrand disjuncts, tableaux, etc.
+%
+In the context of PBT, the proof theory setup is much simpler.
+
+\begin{center}
+  [etc\dots]
+\end{center}
+
+
+The contributions of this paper are
+\begin{itemize}
+\item Tighten the link of our previous reconstruction of PBT to the
+  proof-theoretic approach of model checking in~\cite{heath19jar} by casting it in the setting of $\mu$MALL
+\item Extend PBT beyond the Horn-nabla fragment to Harrop spec, first using only case analysis, then also co-induction
+\item Experiment with a multi-level architecture, where FPC only takes
+  care of generation and testing  is delegated to a system such as Bedwyr
+\item Hopefully provide some examples (CCS, $\pi$ calculus (?), co-evaluation)
+\item
+  \begin{center}
+[others \dots]    
+  \end{center}
+
+\end{itemize}
+
+\section{The story so far}
+\label{sec:tecap}
+
+\begin{center}
+  [Here we recap what we did in PPDP, in the uniform proof style, see fig~\ref{fig:augmented}: the connection with linear logic comes in the next section]
+\end{center}
+
+Consider an attempt to find counter-examples to a conjecture of the
+form \(\forall x [(\tau(x)\wedge P(x)) \supset Q(x)]\) where $\tau$ is
+a typing predicate and $P$ and $Q$ are two other predicates defined
+using Horn clause specifications.
+%
+By negating this conjecture, we attempt to find a (focused) proof of 
+\(\exists x [(\tau(x)\land P(x)) \land \neg Q(x)]\).
+%
+In the focused proof setting, the \emph{positive phase} (where
+test cases are generated) is represented by \(\exists x\) and
+\((\tau(x)\land P(x))\). 
+%
+That phase is followed by the \emph{negative phase} (where conjectured
+counter-examples are tested) and is represented by \(\neg Q(x)\).
+%
+%% turns out to be a search for a proof of \(\exists x [(\tau(x)\land
+%%   P(x)) \land \neg Q(x)]\) in a focused sequent calculus for
+%% (basically) Horn logic, and pre-condition phase, while proving $Q$ can
+%% be relegated to deterministic logic programming-like computation (the
+%% \emph{negative} phase), interpreting ``$\neg$'' as
+%% Negation-as-failure..
+%
+%
+
+\begin{figure}
+\newcommand{\XXi}{{\color{blue}{\Xi}}}
+\[
+\infer{\XXi\vdash G_1\wedge G_2}
+      {\XXi_1\vdash G_1\qquad \XXi_2\vdash G_2\qquad \andExpert{\XXi}{\XXi_1}{\XXi_2}}
+\qquad
+\infer{\XXi\vdash \true}
+      {\trueExpert{\XXi}}
+\]
+\vskip -6pt
+\[
+\infer{\XXi\vdash G_1\vee G_2}
+      {\XXi'\vdash G_i\qquad \orExpert{\XXi}{\XXi'}{i}}
+\qquad
+\infer{\XXi\vdash \exists x. G}
+      {\XXi'\vdash G[t/x]\qquad \someExpert{\XXi}{\XXi'}{t}}
+\]
+\vskip -6pt
+\[
+\infer{\XXi\vdash t = t}
+      {\eqExpert{\XXi}}
+\qquad
+\infer{\XXi\vdash A}
+      {\XXi'\vdash G \quad (A~\hbox{\tt :-}~G)\in\instan\Pscr
+                     \quad \unfoldExpert{\XXi}{\XXi'}}
+\]
+\caption{A proof system augmented with proof certificates and
+  additional ``expert'' premises.}
+\label{fig:augmented}
+\end{figure}
+
+
+\section{Linear logic as the proof theory of model checking}
+\label{sec:ll}
+
+
+
+A natural choice is linear logic cousin $\mu\mathrm{MALL}$~\cite{Baelde12}, which is associated to  the \emph{Bedwyr} model-checker. %  In fact, the latter
+% has already been used for related aims~\cite{HeathM15}.
+
+\subsection{Horn programs as fixed points}
+\label{ssec:lpfixed}
+
+\begin{center}
+  [Here we introduce fixed points, and re-state the rules in fig~\ref{fig:augmented} with only unfolding rules. We may also want to introduce our first coinductive examples, probably \texttt{coeval} (it's Horn). 
+  ]
+\end{center}
+
+\subsection{Onwards to linear logic}
+\label{ssec:ll}
+
+\begin{center}
+  [
+  \begin{itemize}
+  \item Here we introduce polarization, focusing. I assume we will be
+    using only $\mu$F rather than all muMALL; and if so, perhaps we
+    can simplify the syntax of the focusing judgment
+  \item Not sure we want to put clercks and experts everywhere, if they play a part only during generation and that should stay in the Horn+nabla fragment
+  \item Now we can introduce non Horn examples such as simulation and points out that the left unfolding rules do case analysis.
+\end{itemize}
+  ]
+\end{center}
+
+\subsection{Full system}
+\label{ssec:fullmumall}
+
+\begin{center}
+  [Here we add the rules for (co)induction, init (and cut?). In the end we take the muFlogic from the JAR paper and the ``completeness'' results thereof]
+\end{center}
+
+\section{Implementation and case studies}
+\label{sec:case}
+
+\begin{center}
+  [Here we discuss the ``architecture'', namely using the lightweight FPC for generators and Bedwyr for testing]
+\end{center}  
+\subsection{Examples}
+\label{ssec:exs}
+
+\begin{center}
+  [Which esamples? The ones which work]
+\end{center}
+
+\subsection{Refinements}
+\label{ssec:refs}
+
+\begin{center}
+  [Anything else to make this interesting: integration with
+  proof-outlines, pre-computation of terms 'a la Tarau, full
+  ``post-mortem'' FPC, that is also for the testing phase, to
+  elaborate further the results, for examples for explanations etc., wild ideas about generating infinite terms with observation functions as in \emph{Hipster} \cite{EinarsdottirJP18}]
+\end{center}
+
+\section{Related work}
+\label{sec:rel}
+
+\begin{center}
+  [to much details, just for my own sake, only a small portion will make it in the paper]
+\end{center}
+  While coinductive logic programming,
+see~\cite{Luke07} and~\cite{BasoldKL19} for a much more principled and
+in depth treatment, may at first seem to fit the bill, the need to
+model infinite \emph{behavior} rather than infinite objects, that is (ir)rational terms on the
+domain of discourse, has lead us to adopt a much stronger logic (and
+associated proof theory) with explicit rules for induction and
+coinduction.
+\input{long-related}
+\section{Conclusion}
+\label{sec:conc}
+
+
+
+\bibliographystyle{abbrv}
+\bibliography{colp,../ppdp19/l}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+%  LocalWords:  Coinductive QuickCheck utf inputenc fontenc Herbrand
+%  LocalWords:  corecursion coinductive corecursive QuickChick CBV ir
+%  LocalWords:  disjuncts PCFL LTS Harrop PBT Coq's coinductively CCS
+%  LocalWords:  intuitionistic FPCs Bedwyr Bedwyr's nabla

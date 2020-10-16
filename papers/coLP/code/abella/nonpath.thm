@@ -1,0 +1,58 @@
+%% 22 April 2020
+%%
+%% Simple example reasoning about paths and nonpaths.  -Dale
+
+Kind graph                  type.
+Kind node                   type.
+
+Type g1,g2                  graph.
+
+Type a,b,c,d,e,f,g          node.
+
+Define adj : graph -> node -> node -> prop by
+  adj g1 a b
+; adj g1 a c
+; adj g1 b d
+; adj g1 e f
+; adj g2 a b
+; adj g2 b a.
+
+% Graph g1 is acyclic while graph g2 contains a cycle.
+
+Define path : graph -> node -> node -> prop by
+  path G X Y := X = Y \/ (exists Z, adj G X Z /\ path G Z Y).
+
+CoDefine nonpath  : graph -> node -> node -> prop by
+  nonpath G X Y := (X = Y -> false) /\ (forall Z, adj G X Z -> nonpath G Z Y).
+
+Theorem example1 : path g1 a d.
+  unfold. right. witness b. split. search.
+  unfold. right. witness d. split. search.
+  search.
+
+Theorem example2 : nonpath g1 d a.
+  unfold. intros. case H1.
+  intros. case H1.
+
+Theorem example3 : nonpath g1 a e.
+  unfold. intros. case H1. intros. case H1.
+  unfold. intros. case H2. intros. case H2.
+  unfold. intros. case H3. intros. case H3.
+  unfold. intros. case H2. intros. case H2.
+
+% Coinduction is needed with graph g2 given the cycle.
+
+Theorem example4 : nonpath g2 a e.
+  coinduction. unfold.
+    intros. case H1. intros. case H1.
+    unfold. intros. case H2.
+    intros. case H2. search.
+
+Theorem example5 : path g1 a e -> false.
+  intros. case H1. case H2.
+  case H3. case H4. case H5. case H6. case H7.
+  case H8. case H9. case H4. case H5. case H6.
+
+Theorem example6 : path g2 a e -> false.
+ induction on 1. intros. case H1. case H2. case H3. case H4.
+    case H5. case H6. apply IH to H7.

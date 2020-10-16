@@ -1,0 +1,30 @@
+% Run the following at the command line:
+% bedwyr -t -I harness-fpc-ccs.thm
+
+#include "fpc-ccs.def".
+
+% 2ms
+#assert  p_not_par (qheight (s (s z))) P.
+#assert  p_not_par (qsize   (s (s (s z))) z) P.
+
+% slow:  28128ms H = 4, if higher, slower
+
+#assert  sim_not_bisim (qheight (s (s (s (s z))))) P Q.
+% s = 14, do not run, too slow 2916721ms (50 mins)
+% #assert  sim_not_bisim (qsize (s (s (s (s (s (s (s (s (s (s (s (s (s (s z)))))))))))))) z) P Q.
+% ------- 
+
+#assert      trace (out a (plus (out b null) (out tau null))) Trace.
+#assert      trace_equiv (plus (out a (out b null)) (out a (out tau null))) (out a (plus (out b null) (out tau null))).
+#assert      sim (plus (out a (out b null)) (out a (out tau null))) (out a (plus (out b null) (out tau null))).
+#assert_not  sim (out a (plus (out b null) (out tau null))) (plus (out a (out b null)) (out a (out tau null))).
+#assert_not  n_trace_equiv (out a (out b null)) (out a (out b null)).
+#assert      n_trace_equiv (out b (out a null)) (out a (out b null)).
+% with fpc
+#assert      trace_eq_not_equal (qheight (s (s z))) P Q.
+%#assert      trace_eq_not_equal (qheight (s (s z))) P Q.
+
+% The next two are slow
+
+#assert_not  trace_eq_not_sim (qsize (s (s (s (s (s (s (s (s z)))))))) z) P Q.
+#assert_not  trace_eq_not_sim (qheight (s (s (s (s (s z)))))) P Q.

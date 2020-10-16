@@ -1,0 +1,144 @@
+%% 22 April 2020
+%%
+%% Some examples of theorems and proofs involving purely positive and
+%% purely negative definitions of the same relations.
+
+%% The theorems and proof can probably be improved.  -Dale
+
+Kind nat    type.
+Type z      nat.
+Type s      nat -> nat.
+
+Define nat : nat -> prop by
+ nat z ;
+ nat (s X) := nat X.
+
+Define even : nat -> prop by
+ even z ;
+ even (s (s X)) := even X.
+
+Define odd : nat -> prop by
+ odd (s z) ;
+ odd (s (s X)) := odd X.
+
+Theorem odd-implies-even : forall X, odd X -> even (s X).
+induction on 1. intros. case H1.
+  search.
+  apply IH to H2. unfold. search.
+
+Theorem even-implies-odd : forall X, even X -> odd (s X).
+induction on 1. intros. case H1.
+  search.
+  apply IH to H2. unfold. search.
+
+Theorem odd-implies-odd2 : forall X, odd X -> odd (s (s X)).
+induction on 1. intros. case H1.
+  search.
+  apply IH to H2. unfold. search.
+
+CoDefine noteven : nat -> prop by
+  noteven X := (X = z -> false) /\ forall Y, X = (s (s Y)) -> noteven Y.
+
+CoDefine notodd : nat -> prop by
+  notodd X := (X = (s z) -> false) /\ forall Y, X = (s (s Y)) -> notodd Y.
+
+Theorem example1 : noteven (s (s (s (s (s z))))).
+  unfold. intros eq. case eq. intros eq. case eq.
+  unfold. intros eq. case eq. intros eq. case eq.
+  unfold. intros eq. case eq. intros eq. case eq.
+
+Theorem odd-implies-noteven : forall X, odd X -> noteven X.
+  induction on 1. intros pivot. case pivot.
+  unfold. intros eq. case eq.
+          intros eq. case eq.
+  res: apply IH to H1.
+  unfold. intros. case H2.
+          intros. case H2. search.
+
+Theorem even-implies-noteven : forall X, even X -> noteven (s X).
+coinduction. intros. unfold.
+  intros. case H2.
+  intros. case H2. case H1. apply CH to H3. search.
+
+Theorem odd-implies-notodd1 : forall X, odd X -> notodd (s X).
+coinduction. intros. unfold.
+  intros. case H2. case H1.
+  intros. case H2. case H1. unfold. intros. case H3.
+    intros. case H3.
+  apply CH to H3. search.
+
+Theorem notodd-implies-notodd2 : forall X, notodd X -> notodd (s (s X)).
+  coinduction. intros. unfold.
+    intros. case H2.
+    intros. case H2. search.
+
+Theorem noteven-implies-noteven2 : forall X, noteven X -> noteven (s (s X)).
+  coinduction. intros. unfold.
+    intros. case H2.
+    intros. case H2. search.
+
+Theorem even1-implies-noteven : forall X, even (s X) -> noteven X.
+  coinduction. intros. unfold.
+    intros. case H2. case H1.
+    intros. case H2. case H1. apply CH to H3. search.
+
+Theorem even-implies-notodd : forall X, even X -> notodd X.
+induction on 1. intros. case H1.
+  unfold. intros. case H2.
+  intros. case H2. apply IH to H2. apply notodd-implies-notodd2 to H3. search.
+
+Theorem multi-imps : 
+  (forall X, nat X -> noteven X     -> odd X)    /\
+  (forall X, nat X -> noteven (s X) -> even X)   /\
+  (forall X, nat X -> odd (s X)     -> notodd X) /\
+  (forall X, nat X -> notodd X      -> even X)   /\
+  (forall X, nat X -> notodd (s X)  -> odd X).
+induction on 1 1 1 1 1. split.
+  intros. case H1. case H2. apply H3 to _.
+     apply IH1 to H3 H2.
+     apply even-implies-odd to H4. search.
+  intros. case H1. search. case H2. apply H5 to _ with Y = X1. 
+          apply IH to H3 H6. apply odd-implies-even to H7. search.
+  intros. case H1. unfold. intros. case H3.
+          intros. case H3. case H2. apply odd-implies-even to H4.
+          apply odd-implies-notodd1 to H4. search.
+  intros. case H1. search. apply IH4 to H3 H2.
+          apply odd-implies-even to H4. search.
+  intros. case H1. case H2. apply H3 to _.
+          case H2.  apply H5 to _ with Y = X1.
+	  apply IH3 to H3 H6.  apply even-implies-odd to H7. search.
+
+Split multi-imps as noteven-implies-odd, noteven1-implies-even,
+      odd1-implies-notodd, notodd-implies-even, notodd1-implies-odd.
+
+Theorem notodd2-implies-notodd : forall X, nat X -> notodd (s (s X)) -> notodd X.
+  intros. assert nat (s X).  apply notodd1-implies-odd to H3 H2.
+  apply odd1-implies-notodd to H1 H4. search.
+
+Theorem noteven-implies-notodd : forall X, nat X -> noteven X -> notodd (s X).
+  intros. apply noteven-implies-odd to H1 H2.
+  apply odd-implies-notodd1 to H3. search.
+
+Theorem example2 : noteven (s (s (s (s (s z))))).
+  backchain noteven-implies-noteven2.
+
+
+Theorem even-excluded-middle : forall N, nat N -> even N -> noteven N -> false.
+  induction on 1. intros. case H1.
+    case H3. apply H4 to _. assert nat (s X).
+    apply even1-implies-noteven to H2. apply noteven1-implies-even to H4 H3.
+    apply IH to H4 H7 H6.
+
+Theorem odd-excluded-middle : forall N, nat N -> odd N -> notodd N -> false.
+  induction on 1. intros. case H1.
+    case H2. assert nat (s X).
+    apply odd1-implies-notodd to H4 H2. apply notodd1-implies-odd to H4 H3.
+    apply IH to H4 H7 H6.
+
+Theorem even1-implies-odd : forall N, nat N -> even (s N) -> odd N.
+  intros. assert nat (s N).  apply even1-implies-noteven to H2.
+          apply noteven-implies-odd to H1 H4. search.
+
+Theorem odd1-implies-even : forall N, nat N -> odd (s N) -> even N.
+  intros. assert nat (s N).  apply odd1-implies-notodd to H1 H2.
+          apply notodd-implies-even to H1 H4. search.

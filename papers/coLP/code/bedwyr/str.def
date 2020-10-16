@@ -1,0 +1,14 @@
+Kind stream, num type.
+
+Type z num.
+Type s num -> num.
+Type cons  num -> stream -> stream.
+
+
+Define inductive is_num : num -> prop by
+       is_num z;
+       is_num (s N) := is_num N.
+
+Define coinductive is_str : stream -> prop by
+       is_str (cons N S) := is_num N /\ is_str S.
+

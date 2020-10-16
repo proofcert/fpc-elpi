@@ -1,0 +1,11 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{The story so far}{}% 2
+\BOOKMARK [1][-]{section.3}{Linear logic as the proof theory of model checking}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Horn programs as fixed points}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Onwards to linear logic}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Full system}{section.3}% 6
+\BOOKMARK [1][-]{section.4}{Implementation and case studies}{}% 7
+\BOOKMARK [2][-]{subsection.4.1}{Examples}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.2}{Refinements}{section.4}% 9
+\BOOKMARK [1][-]{section.5}{Related work}{}% 10
+\BOOKMARK [1][-]{section.6}{Conclusion}{}% 11

@@ -1,0 +1,95 @@
+
+\paragraph{Haskell}
+
+QuickCheck can partially deal with infinite objects, provided that the properties themselves are computable. Lazy evaluation is no magic bullets: stream equality loops, but we can use the \emph{take} lemma to observe finite portions.
+
+\paragraph{coLP}
+
+Gupta and his students have been advocating (very, very incrementally)
+for extending LP first only coinduction, then allowing both least and
+greatest semantics~\cite{Luke07}. The approach is semantically based:
+you start with the greatest complete Herbrand model, containing finite
+and infinite (both rational and irrational) ground terms. Then they
+modify the operational semantics dropping the occur check and relying
+on cycle (same atom) and loop detection (same atom modulo
+unification). They show soundness of the procedure wrt the greatest
+complete Herbrand model. Completeness seems hopeless for
+recursion-theoretic reasons as shown in~\cite{AnconaD15}.
+
+\paragraph{Katya}
+This has been much improved by Komendantskaya and friends (see~\cite{BasoldKL19}) \dots
+
+Rather than relying on infinite terms via rational unification, they
+introduce in the language of the logic a fixed point constructor
+(which is then restricted to occur guarded, so as to be normalizing)
+and its equational theory. While this may make sense for programming,
+it seems problematic for a logical framework. Do we still have
+adequacy of the encodings and canonical forms? Do \texttt{fix z.~cons
+  0 z} and \texttt{fix z.~cons 0 (cons 0 z)} denote the same infinite
+term or now the encodings refers to equivalence classes (perhaps wrt
+bi-similarity) ? It would be hard to give a Curry-Howard reading of
+this, since fixed points terms do not have a type classifying them and
+the later modality does not have a proof term. Still, it could be
+straighten up following~\cite{abelVezzosi:aplas14}. However, the
+approach seems limited to guarded coinduction and may suffer from the
+very problems raised by Ancona et al., namely  that a greatest fixed point semantics plus infinite (although) guarded terms gives unwanted results. For example, I think that  this is
+still provable: \texttt{last (fix ones.~cons 1 ones) 2}. Finally, it's hard to implement in our setup, since we have to change the unification algorithm to take into account unfolding of fixed points (it's equi-recursive, in Peirce's terminology).
+
+\paragraph{Terms Generation}
+
+There's been considerable work on generation (mostly random) of
+lambda-terms, with an emphasis on uniform
+distributions~\cite{BendkowskiGT17}. Tarau generalizes it to arbitrary
+first-order signatures~\cite{Tarau18} extending Remy's algorithm for
+generating random binary trees \dots
+
+\paragraph{Coaxioms}
+
+In a lengthy list of papers such as ~\cite{AnconaDZ17, Dagnino19},
+Ancona at al.\ argue against the use of gfixpoints as the semantics of
+Aczel's style inference system. Starting from the desire to improve on
+Leroy's coinductive operational semantics given its shortcomings, as
+well as those of co-logic programming, they try to carve out undesired
+results: take for example the logic program for last element of a list
+and an infinite list of ones \texttt{Os = [1|Os]}. Then by a circular
+proof you can prove \texttt{last Os 2}. We would argue that (1) we do
+not care about infinite objects (2) in a guarded sense, the definition
+of \texttt{last} is \emph{not productive} and it is rejected by Coq
+(as a \textbf{Fixpoint} (but that proof holds with a
+\textbf{Coinductive}) and by Agda's copatterns. They instead use
+coaxioms (and then corules) to rule out those derivations. Those are
+standard rules, but with a different interpretation: an atom is
+provable if it has an infinite (even irrational ) proof, but whose
+nodes have all a finite proof from the coaxioms only. Semantically
+this corresponds to a fixed point that lies somewhere between least
+and greatest. In the \texttt{last} example, the coaxiom would state
+\texttt{last [X|XS] X}, which should force the element to be in the
+list and rule out the offending derivation.  To me this notion of a
+proof does not seem effective (how do I check the coaxiom condition
+finitely?) and the coaxioms do not seem to have a declarative reading,
+or, less charitably, that reading makes no sense. Still, they may have
+more details in later papers. Essentially, it's an answer to a problem
+I do not much care for.
+
+\paragraph{Abella's current setup}
+
+I think we all agree that infinite terms are an hassle, better to stay
+clear from. Still, Abella's approach makes me worry: first, there is
+no formal connection between the guarded version implemented and the
+fixed point rules of the meta-logic, in particular compared to the strict correspondence exhibited by Beluga's script language
+\emph{Harpoon}.  This can be fixed, I assume. While we cannot have a
+``paradox'' such as the \texttt{last} example just because we have no
+way to construct such a term, there are others mentioned by Ancona
+(graph reachability) that are raised by finite terms. Moreover,
+examples in the library such as \texttt{colist.thm} are bizarre,
+since we prove properties of objects that we cannot construct. So, we fail to prove that
+stream equality entails free equality,  but we cannot exhibit two streams that
+refute the property.
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "outline"
+%%% End:
+
+%  LocalWords:  Tarau Remy's Coaxioms Ancona gfixpoints Aczel's coLP
+%  LocalWords:  coinductive Fixpoint Agda's coaxioms corules coaxiom
+%  LocalWords:  Herbrand Katya Komendantskaya QuickCheck

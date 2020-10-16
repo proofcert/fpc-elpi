@@ -1,0 +1,329 @@
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\documentclass[a4paper]{easychair}
+\usepackage{url,xcolor}
+\usepackage[xcolor]{changebar}
+\usepackage{listings}
+\usepackage{letltxmacro}
+\input{listing-macros}  % Use to get better highlighing of code
+\lstset{language=lprolog}
+\lstset{language=abella}
+
+\title{Notes on PBT and CCS}
+\authorrunning{Momigliano}
+\titlerunning{Notes on PBT and CCS}
+\author{Alberto Momigliano}
+
+\institute{
+DI, Universit\`a degli Studi di Milano, Italy
+}
+\begin{document}
+
+\maketitle
+
+
+While PBT originated in the functional programming community, we have
+given in a previous paper (\cite{Blanco0M19}) a reconstruction of some
+of its features (operational semantics, different flavors of
+generation, shrinking) in purely proof-theoretic terms employing the
+framework of \emph{Foundational Proof Certificates}~\cite{chihani17jar}.
+%
+In the context of PBT, the FPC setup is quite simple.
+Consider an attempt to find counter-examples to a conjecture of the
+form \(\forall x [(\tau(x)\wedge P(x)) \supset Q(x)]\) where $\tau$ is
+a typing predicate and $P$ and $Q$ are two other predicates defined
+using Horn clause specifications.
+%
+By negating this conjecture, we attempt to find a (focused\footnote{
+For Horn specs, focusing is immaterial, but when we do proof search over logic with fixed points, it helps to structure the search itself. Still, the rules are heavy-handed and we can just work with base sequents for the time being}) proof of 
+\(\exists x [(\tau(x)\land P(x)) \land \neg Q(x)]\).
+%
+In the focused proof setting, the \emph{positive phase} (where
+test cases are generated) is represented by \(\exists x\) and
+\((\tau(x)\land P(x))\). 
+%
+That phase is followed by the \emph{negative phase} (where conjectured
+counter-examples are tested) and is represented by \(\neg Q(x)\).
+%
+%% turns out to be a search for a proof of \(\exists x [(\tau(x)\land
+%%   P(x)) \land \neg Q(x)]\) in a focused sequent calculus for
+%% (basically) Horn logic, and pre-condition phase, while proving $Q$ can
+%% be relegated to deterministic logic programming-like computation (the
+%% \emph{negative} phase), interpreting ``$\neg$'' as
+%% Negation-as-failure..
+%
+
+As explained in~\cite{Blanco0M19}, the standard PBT setup needs little
+more than Horn logic. % specifications.
+%
+However, when addressing infinite computations, we need richer
+specifications.  While coinductive logic programming,
+see~\cite{Luke07} may at first seem to fit the bill, the need to model
+infinite \emph{behavior} rather than infinite objects\footnote{I find
+  the combination of Logic Programming and infinite terms difficult to handle (but I need to read~\cite{BasoldKL19}), so I suggest to restrict to finite objects that have meaningful infinite behaviors}, that is any infinite
+terms on the domain of discourse, has lead us to adopt a much stronger
+logic (and associated proof theory) with explicit rules for induction
+and coinduction.
+
+A natural choice for such a logic is the fixed point logic $\cal
+G$~\cite{Gacek2012} and its linear logic cousin $\mu\mathrm{MALL}$~\cite{Baelde12}, which are associated to the \emph{Abella} proof
+assistant (\url{http://abella-prover.org}) and the \emph{Bedwyr} model-checker (\url{http://slimmer.gforge.inria.fr/bedwyr/}).  In fact, the latter
+has already been used for related aims~\cite{HeathM15}.
+
+In our current setup, we attempt to find counter-examples, using
+Bedwyr to execute both the generation of test cases  and the testing phase.
+%
+Such an implementation of PBT has the advantages of allowing us to
+piggyback on Bedwyr's facilities for efficient proof 
+search via tabling for (co)inductive predicates.
+
+%and supports reasoning over lambda-tree syntax via the $\nabla$ quantifier. 
+
+
+To make things more concrete, consider CCS. While analogous goals
+using, for example, the \emph{Concurrency Workbench}, it is a
+remarkable feature of the proof-theoretic account that is easy to
+generalizes PBT from a system without bindings (say, CCS) to a system
+with bindings (say, the $\pi$-calculus).
+%
+
+%
+Now, for the syntax of CCS:
+%\begin{changebar}
+  
+
+  Wrt a standard presentation, we use \texttt{null} for $0$,
+  \texttt{plus} for binary sums, \texttt{par} for parallel
+  composition, \texttt{out} for the prefix process. We do not account
+  for relabeling or restriction (but it's easy with an operator
+  \texttt{nu : (act -> proc) -> proc}). Recursion (aka process
+  definitions) could be easily accounted for with a constant \texttt{mu
+    : (proc -> proc ) -> proc}, but this has some issues when defining
+  a generator for it, so we postpone it. Basically, the generator
+  clause would be \verb|is_proc (s N) (mu P) := is_proc N (P (mu P))|
+  and this is out of the HO pattern unification fragment that Bedwyr
+  handles. We can fix that, making the substitution explicit, but I
+  just have not done it yet.
+%  \end{changebar}
+
+
+\begin{lstlisting}
+Kind    proc, act,num  type.
+Type    a,  b, tau     act .
+Type    bar            act -> act .
+Type    null           proc.
+Type    out            act -> proc -> proc.
+Type    plus, par      proc -> proc -> proc.
+\end{lstlisting}
+
+  The transition system:
+  \begin{changebar}
+    Co-names are obtained via \texttt{bar} and the \texttt{comp}
+    predicates mediates among them. \texttt{step} is just the
+    translation of the operational semantics rules of the above
+    fragment of CCS (no value-passing, restriction, and recursion).
+  \end{changebar}
+\begin{lstlisting}
+Define comp : act -> act -> prop by
+comp A (bar A);
+comp (bar A) A.
+
+Define step : proc -> act -> proc -> prop by
+step (out A P) A P;
+step (plus P _) A P1 := step P A P1;
+step (plus _ Q) A Q1 := step Q A Q1;
+step (par P Q) A (par P1 Q) := step P A P1;
+step (par P Q) A (par P Q1) := step Q A Q1;
+step (par P Q) tau (par P1 Q1) :=
+  exists A B, comp A B /\ step P A P1 /\ step Q A Q1.
+\end{lstlisting}
+
+  Now for \emph{strong} (bi)similarity (coinductive) and its negation,
+  which we obtain by pushing negation inside. This is informally
+  justified by the fact that Bedwyr's proof theory can be seen as
+  multiplicative additive linear logic with fixed points, where
+  negation normal forms exist in the same sense of classical logic\footnote{Th story is a bit more complicated since to handle open queries, we also need disunification, but again this is relevant only wrt the current implementation of Bedwyr.}:
+\begin{lstlisting}
+Define coinductive sim : proc -> proc -> prop by
+sim P Q :=
+	forall A P1,  step P A P1  -> exists Q1,  step Q A Q1  /\ sim P1 Q1.
+
+Define coinductive bisim : proc -> proc -> prop by
+bisim P Q :=
+    (forall A P1, step P A P1 -> exists Q1, step Q A Q1 /\ bisim P1 Q1) /\
+    (forall A Q1, step Q A Q1 -> exists P1, step P A P1 /\ bisim P1 Q1).
+
+Define inductive n_bisim : proc -> proc -> prop by
+  n_bisim P Q :=
+	(exists A P1, step P A P1 /\ forall Q1, step Q A Q1 -> n_bisim P1 Q1) \/
+	(exists A Q1, step Q A Q1 /\ forall P1, step P A P1 -> n_bisim Q1 P1).
+\end{lstlisting}
+
+Generators: these are here hard-wired exhaustive depth-bounded
+ones, but using the FPC architecture of~\cite{Blanco0M19}, we can mix
+and match different strategies (even random ones); for the sake of
+these notes, these generators will do.
+\begin{lstlisting}
+% indices for gens
+Type z num.
+Type s num -> num.
+
+Define is_act : num -> act -> prop by
+is_act  _ a ; is_act _ b ; is_act _ tau;
+is_act (s N) (bar A) := is_act N A. 
+
+Define is_proc :          num -> proc  -> prop by
+is_proc _ null;
+is_proc (s N) (out A P) := is_act N A /\ is_proc N P;
+is_proc (s N) (plus P Q) := is_proc N P /\ is_proc N Q;
+is_proc (s N) (par P Q) := is_proc N P /\ is_proc N Q.
+\end{lstlisting}
+
+Now, we can use directly Bedwyr, for example asking it to find two
+terms that are similar but not bisimilar:
+\begin{lstlisting}
+?= N = (s (s z)) /\ is_proc N P /\ is_proc N Q /\ sim P Q /\ sim Q P /\ n_bisim P Q.
+ % Q = par (out tau null) (out tau null),  that is t.0 | t.0
+ % P = out tau (out tau null), that is t.t.0
+\end{lstlisting}
+
+The generation of a process is just logic programming search, while
+testing their similarity is coinductive and it is implemented in
+Bedwyr with tables, which basically encode the required
+simulation. There is a meta-theoretic result that translates a tabled
+logic programming derivation into one in a meta-logic such as $\cal G$
+with explicit induction and coinduction rules.  Bedwyr carries out a
+standard uniform proof of a goal such as \verb|P -> Q|, with one
+exception: once \texttt{P} is assumed, we carry out a case analysis on
+it by searching for a proof of it and apply the stream of computed
+answer substitutions from \texttt{P} to the search of a proof of
+\texttt{Q}. This case analysis has some technical limitations to make
+it sound, which explains why we need to explicitly encode the negation
+of bisimulation rather then simply call \verb|bisim P Q -> false|.
+
+\begin{changebar}
+  Another query: is there a process that is not bisimilar to the
+  parallel composition with itself? In other terms, is this true:
+  $\forall P, bisim\ P ( P | P)$? Yes, namely \texttt{a.0}.
+\end{changebar}
+
+
+\begin{lstlisting}
+ ? N = (s z) /\ is_proc N P /\ n_bisim (par P P) P.
+%  P = out a null
+\end{lstlisting}
+
+For a final example, consider \emph{trace} equivalence:
+\begin{lstlisting}
+Kind trace   type.
+Type emp     trace.
+Type tr      act -> trace -> trace.
+
+Define trace : proc -> trace -> prop by
+       trace _ emp ;
+       trace P (tr A Trace) := step P A Q /\ trace Q Trace.
+
+Define trace_equiv : proc -> proc -> prop by
+       trace_equiv P Q := (forall Trace, trace P Trace -> trace Q Trace) /\
+                          (forall Trace, trace Q Trace -> trace P Trace).
+\end{lstlisting}
+It's possible to separate trace equivalence and bi-similarity:
+\begin{changebar}
+\begin{lstlisting}
+Define trace_eq_not_bisim : proc -> proc -> prop by
+ trace_eq_not_bisim P Q :=
+  N =  (s (s z)) /\ N1 =  (s (s (s z))) /\ is_proc N P /\ is_proc N1 Q
+	 /\  trace_equiv P Q /\ n_bisim P Q.
+% Q = plus (out a null) (out a (out a null))
+% P = out a (out a null)
+\end{lstlisting}
+but this takes some 10 minutes, probably because we are building up two processes $P$ and $Q$
+independently.
+\end{changebar}
+This is different from previous examples
+in~\cite{Blanco0M19}, where generation was performed over judgments
+such as typing (see preservation/progress). A possibility is to
+generate $P$ and $Q$ together, following ideas in \cite{TNIQ}, whereby
+we first generate $P$ and then obtain $Q$ by locally mutating the
+former under some strong constraints. This is where
+\emph{constrain-and-generate} could play a role somehow.
+\begin{changebar}
+  Note however that while \texttt{trace} has mode \texttt{+,-}, it is
+  non-deterministic. Moreover, a predicate such as \texttt{trace\_equiv}
+  has to be called with mode \texttt{+,+}, by the operational
+  semantics of Bedwyr
+\end{changebar}
+Another avenue to investigate would be to \emph{pre-compute}
+partitions of processes, possibly removing isomorphic ones (maybe
+under the equational theory of process equivalence -- certainly
+\texttt{P + Q} and \texttt{Q + P} ``are'' the same process). Then at
+run time we do the testing bit. Papers by Tarau here may be relevant.
+
+\begin{center}
+  \begin{huge}
+  \textbf{WARNING}
+  \end{huge}
+\end{center}
+
+The previous examples DO NOT use coinduction, but follows only by case
+analysis, that is would hold even if (bi)similarity is just \emph{a}
+fixed point, not the greatest.
+
+To find an example where we do use that, we move to the lambda-calculus:
+ consider the usual rules for CBV
+evaluation in the $\lambda$-calculus with constants, but define it
+\emph{coinductively}, following see~\cite{2007-Leroy-Grall}:
+\begin{lstlisting}
+Type    zero, one    const.
+Type    con          const -> tm.
+Type    app          tm -> tm -> tm.
+Type    fun          (tm -> tm) -> tm.
+
+Define coinductive coeval: tm -> tm -> prop by
+ coeval (con C) (con C);
+ coeval (fun R) (fun R);
+ coeval (app M N) V := 
+   exists R W, coeval M (fun R) /\ coeval N W /\ coeval (R W) V.
+% generators
+Define wt : num -> env -> tm -> prop by
+    wt _ _ (con zero) ;
+    wt _ _ (con one) ;
+    wt _ E (A)              := mem E A ;
+    wt (s N) E (app X Y)    := wt N E X /\ wt N E Y ;
+    wt (s N) E (fun F)      := nabla x, wt N (bind x E) (F (x)).
+
+\end{lstlisting}
+Is evaluation still deterministic?  And if not, can we find terms
+\lstinline{M}, \lstinline{M1}, and \lstinline{M2} such that
+\mbox{\lstinline{coeval M M1 /\\ coeval E M2 /\\ (M1 = M2 -> false)}}?
+\begin{lstlisting}
+ ?= wt (s (s (s z))) void M /\ wt z void M1 /\ wt z void M2 /\ coeval M M1 /\ coeval M M2 /\ (M1 = M2 -> false))
+
+ Found a solution:  2195msa
+ M2 = con one
+ M1 = con zero
+ M  = app (fun (x1\ app x1 x1)) (fun (x1\ app x1 x1))
+\end{lstlisting}
+
+Note that we need generators for \texttt{M1,M2}, since a coinductive
+definition of evaluation requires mode \texttt{+,+}, and I do not
+see how co-routining would help. The inductive version has mode
+\texttt{+,-}, so we need to generate only \texttt{M}; in fact, we can
+use \texttt{coeval M M1} \emph{directly} as a generator.
+
+
+\bibliographystyle{abbrv} \bibliography{../colp,../../ppdp19/l}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+%  LocalWords:  Coinductive QuickCheck utf inputenc fontenc Herbrand
+%  LocalWords:  corecursion coinductive corecursive QuickChick CBV ir
+%  LocalWords:  disjuncts PCFL LTS Harrop PBT Coq's coinductively CCS
+%  LocalWords:  intuitionistic FPCs Bedwyr Bedwyr's proc finitary
+%  LocalWords:  bisimulation bisim Tarau sequents disunification
+%  LocalWords:  routining

@@ -1,0 +1,152 @@
+%% Encoding of CCS without recursion, adapted from Abella's library
+%%   ccs_two_level ported for manual PBT
+
+% for mu, use copy at generation, otherwise we're off Llambda
+
+%% NONE OF THIS EXAMPLES REALLY USE COINDUCTION, JUST ANY FIXED POINT WILL DO
+%% In fact it works without tables!
+
+Kind    proc, act,num      type.
+
+% indices
+Type z num.
+Type s num -> num.
+
+Type    a,  b, tau         act .
+Type    bar            act -> act .
+
+Type    null           proc.
+Type    out            act -> proc -> proc.
+Type    plus, par      proc -> proc -> proc.
+% in step, not in is_proc
+Type    mu             (proc -> proc) -> proc.
+
+Define comp : act -> act -> prop by
+comp A (bar A);
+comp (bar A) A.
+
+Define step :          proc -> act -> proc -> prop by
+step (out A P) A P;
+step (plus P _) A P1 := step P A P1;
+step (plus _ Q) A Q1 := step Q A Q1;
+step (par P Q) A (par P1 Q) := step P A P1;
+step (par P Q) A (par P Q1) := step Q A Q1;
+step (mu P) A Q := step (P (mu P)) A Q; % OK, but no mu generation
+step (par P Q) tau (par P1 Q1) :=
+  exists A B, comp A B /\ step P A P1 /\ step Q A Q1.
+
+Define is_act : num -> act -> prop by
+is_act  _ a ; is_act _ b ; is_act _ tau;
+is_act (s N) (bar A) := is_act N A. 
+
+Define is_proc :          num -> proc  -> prop by
+is_proc _ null;
+is_proc (s N) (out A P) := is_act N A /\ is_proc N P;
+is_proc (s N) (plus P Q) := is_proc N P /\ is_proc N Q;
+is_proc (s N) (par P Q) := is_proc N P /\ is_proc N Q.
+%is_proc (s N) (mu P)  := is_proc N (P (mu P)) . 
+%% This is not in the LLambda fragment: do it with copy?
+
+
+Define  sim : proc -> proc -> prop by
+sim P Q :=
+	forall A P1,  step P A P1  -> exists Q1,  step Q A Q1  /\ sim P1 Q1.
+
+
+Define  bisim : proc -> proc -> prop by
+bisim P Q :=
+    (forall A P1, step P A P1 -> exists Q1, step Q A Q1 /\ bisim P1 Q1) /\
+    (forall A Q1, step Q A Q1 -> exists P1, step P A P1 /\ bisim P1 Q1).
+
+
+% exploting linear logic, we synth the negation of bisim
+Define n_bisim : proc -> proc -> prop by
+  n_bisim P Q :=
+	(exists A P1, step P A P1 /\ forall Q1, step Q A Q1 -> n_bisim P1 Q1) \/
+	(exists A Q1, step Q A Q1 /\ forall P1, step P A P1 -> n_bisim Q1 P1).
+
+
+
+
+
+%% two processes similar but not bisimilar  301ms
+
+
+#assert ((N = (s (s z))) /\ is_proc N P /\ is_proc N Q /\ sim P Q /\ sim Q P
+ /\ (n_bisim P Q)).
+ % Q= par (out tau null) (out tau null) t.0 | t.0
+ % P = out tau (out tau null) t.t.0
+
+% process not bimilar to its par 
+%  P = out a null
+ #assert (N = (s z) /\ is_proc N P
+	/\ (n_bisim (par P P) P)).
+
+
+/* NOTE: for P = out a null, vale sim P (P | P) since P steps to null
+  which does not step and vacously is related to P | P. In fact, this
+  DOES NOT use coiduction, just case analysis
+
+  */
+
+
+
+
+Kind trace   type.
+Type emp     trace.
+Type tr      act -> trace -> trace.
+
+Define trace : proc -> trace -> prop by
+       trace _ emp ;
+       trace P (tr A Trace) := step P A Q /\ trace Q Trace.
+
+Define trace_equiv : proc -> proc -> prop by
+       trace_equiv P Q := (forall Trace, trace P Trace -> trace Q Trace) /\
+                          (forall Trace, trace Q Trace -> trace P Trace).
+
+Define n_trace_equiv : proc -> proc -> prop by
+       n_trace_equiv P Q := (exists Trace, trace P Trace /\ (trace Q Trace -> false)) \/
+                            (exists Trace, trace Q Trace /\ (trace P Trace -> false)).  
+
+Define inductive n_sim : proc -> proc -> prop by
+  n_sim P Q :=
+	exists A P1,  step P A P1  /\ forall Q1, step Q A Q1 -> n_sim P1 Q1.
+
+Define trace_eq_not_bisim : proc -> proc -> prop by
+       trace_eq_not_bisim P Q :=
+		N =  ((s (s z))) /\ N1 =  ((s (s (s z)))) /\ is_proc N P /\ is_proc N1 Q
+	 /\
+	 trace_equiv P Q /\ n_bisim P Q.
+
+/*
+
+
++ 69791ms
+Found a solution:
+ Q = plus (out a null) (out a (out a null))
+ P = out a (out a null)
+
+  */
+
+
+/*
+  P = (plus (out a (out b null)) (out a (out tau null)))
+  Q = (out a (plus (out b null) (out tau null))).
+      
+
+  */
+
+/* OLD
+
+% still, This formula cannot be handled by the left prover!
+% #assert (P = plus (out a (out b null)) (out a null) /\ Q = (out a (out b null)) /\ sim P Q /\ sim Q P /\ (bisim P Q -> false)).
+#assert (P = plus (out a (out b null)) (out a null) /\ Q = (out a (out b null)) /\ sim P Q /\ sim Q P /\ (n_bisim P Q)).
+
+%  (P = plus (out a (out b null)) (out a null) /\ Q = (out a (out b null)) /\ sim P Q /\ sim Q P /\ (bisim P Q -> false))
+
+% nope
+Define cex_snb : num -> proc -> proc -> prop by
+       cex_snb N P Q :=
+	 is_proc N P /\ is_proc N Q /\ sim P Q /\ sim Q P
+ /\ (bisim P Q -> false).
+  */

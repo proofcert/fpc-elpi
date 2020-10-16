@@ -1,0 +1,63 @@
+% PBT for HML logic
+
+% could parametrize over the lts, here one is fixed, following Quentin'15 paper
+% processes are nats
+
+Kind action     type.
+Kind i type.
+Type a,b,c      action.
+Type proc     nat -> i.
+Kind num type.
+Type z num.
+Type s num -> num.
+
+% Fig 4 in Q15
+Define  step :  i -> action -> i -> prop by
+ (step (proc 1) a (proc 2));
+ (step (proc 1) a (proc 3));
+ (step (proc 2) b (proc 4));
+ (step (proc 3) c (proc 5));
+       
+       (step (proc 6) a (proc 7));
+       
+        (step (proc 7) b (proc 8));
+        (step (proc 7) c (proc 9));
+ (step (proc 10) a (proc 11));
+        (step (proc 10) a (proc 12));
+    (step (proc 11) b (proc 13));
+ (step (proc 11) c (proc 14));
+ (step (proc 12) c (proc 15)).
+
+Kind hmf type.
+Type tt hmf.
+Type hconj hmf -> hmf -> hmf.
+Type hdisj hmf -> hmf -> hmf.
+Type hdiam action -> hmf -> hmf.
+Type hbox action -> hmf -> hmf.
+
+% not using negation yet
+Define inductive hsat : i -> hmf -> prop by
+       hsat _ tt;
+       hsat P (hconj F1 F2) := hsat P F1 /\ hsat P F2;
+	hsat P (hdisj F1 F2) := hsat P F1 \/ hsat P F2;
+	hsat P (hdiam A F) := exists P', step P A P' /\ hsat P' F.
+%	hsat P (hbox A F) := forall P', step P A P' -> hsat P' F.
+% not handled by the prover
+Define is_act : action -> prop by
+       is_act a; is_act b ; is_act c.
+
+
+Define is_hform :          num -> hmf  -> prop by
+is_hform _ tt;
+	 is_hform (s N) (hdiam A P) := is_act A /\ is_hform N P;
+%	is_hform (s N) (hbox A P) := is_act A /\ is_hform N P;
+is_hform (s N) (hconj P Q) := is_hform N P /\ is_hform N Q;
+	is_hform (s N) (hdisj P Q) := is_hform N P /\ is_hform N Q.
+
+#assert N = (s (s (s z))) /\ is_hform N F /\ hsat (proc 6) F  /\ (hsat (proc 1) F -> false).
+
+/*
+ F = hdiam a (hconj (hdiam b tt) (hdiam c tt))
+ N = s (s (s z))
+
+  */

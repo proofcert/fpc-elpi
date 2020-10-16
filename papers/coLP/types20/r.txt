@@ -1,0 +1,60 @@
+
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 31
+TITLE: On the Proof Theory of Property-Based Testing of Coinductive Specifications, or: PBT to Infinity and beyond
+AUTHORS: Roberto Blanco, Dale Miller and Alberto Momigliano
+
+----------- Overall evaluation -----------
+SCORE: 2 (Regular talk)
+----- TEXT:
+The authors consider tools for searching counter-examples of conjectures. In the abstract they propose an adaptation of property-based testing (PBT) setup in order to test infinite computations, which are based on coinduction and corecursion.  For modeling infinite computation, the logic with explicit rules for induction and coinduction is needed, so they suggest the use of the fixed point logic. 
+
+An extensive overview of the related work helps in understanding both the topic and the motivation. The authors gave some examples of  results which can be obtained by using their tool. Nevertheless, the contribution could be presented and explained smoother. The presentation is expected to add to the understanding.
+
+
+
+----------------------- REVIEW 2 ---------------------
+SUBMISSION: 31
+TITLE: On the Proof Theory of Property-Based Testing of Coinductive Specifications, or: PBT to Infinity and beyond
+AUTHORS: Roberto Blanco, Dale Miller and Alberto Momigliano
+
+----------- Overall evaluation -----------
+SCORE: 2 (Regular talk)
+----- TEXT:
+The abstract focuses on application of PBT techniques to proof search. The main challenge attacked by the work is to apply its principles to coinductive reasonings in Coq. The authors propose a solution based upon the muMALL logic and exploit the strength of the Bedwyr model checker to obtain actual counterexamples. It would be interesting to see some details of the solution.
+
+
+
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 31
+TITLE: On the Proof Theory of Property-Based Testing of Coinductive Specifications, or: PBT to Infinity and beyond
+AUTHORS: Roberto Blanco, Dale Miller and Alberto Momigliano
+
+----------- Overall evaluation -----------
+SCORE: 2 (Regular talk)
+----- TEXT:
+This submission describes the testing of and counterexample generation for
+coinductive behaviour. It is remarkable that the proposed approach is able to
+separate various notions of equivalences for coinductive objects automatically.
+To achieve this, the authors go via the proof theory of Bedwyr that can carry
+out proof search for coinductive predicates and generate proof certificates.
+These certificates serve as counterexamples by attempting a proof of the
+negated property to be tested against.
+
+Using the search for coinductive proof certificates as a way of testing
+coinductive behaviour is certainly interesting and would make for a good
+presentation at TYPES. A small complaint maybe that logic takes precedence
+over type theory in this abstract, but since proof certificates lie clearly
+in the intersection of these two areas, this complaint is more nit-picking
+than anything else.
+
+There are some small comments that I'd like to make:
+1. What does "and beyond" refer to in the title? [no trekkie]
+2. Typo in line 4: Should be "researchers" [done]
+3. Why are coinduction in Coq, Agda or extensions of uniform proofs [1] not
+mentioned? [done]
+4. What kind of equality is used the second line after the definition of coeval?
+Is this syntactic equality? [done]
+
+[1]H. Basold, E. Komendantskaya, and Y. Li, ‘Coinduction in Uniform: Foundations for Corecursive Proof Search with Horn Clauses’, in ESOP’19, 2019, vol. 11423.
+
