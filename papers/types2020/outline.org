@@ -1,0 +1,48 @@
+* Notes after speaking with Alberto 19-10-2020
+
+  - The focus is on using Coq and ELPI
+
+    Enrico et al has implemented ELPI as a convenient tool for
+    programming for Coq.  ELPI provides a means for treating bindings
+    and incorporates unification, all things useful for tactic
+    programming in Coq (proof refinement).
+
+    Here, we use ELPI more as a logic engine that can directly
+    interpret and manipulate proof structures via proof checking and
+    proof reconstruction.
+
+  - Other aspects of this focus
+    - proof theory vs type theory
+    - logic programming vs functional programming
+
+  - Two logics have been explored
+    - LJF, here we have undefined predicates, no induction
+    - muMALL, were we have inductive definitions
+
+
+* Three previous abstracts to consider as sources
+
+  - TYPES 2020: On the Proof Theory of Property-Based Testing of
+    Coinductive Specifications, or: PBT to Infinity and beyond by
+    Roberto Blanco, Dale Miller, and Alberto Momigliano. (A
+    ``work-in-progress'' abstract on this topic was also accepted to
+    LFMTP 2020.)
+
+  - PPDP 2019: Property-Based Testing via Proof Reconstruction by
+    Roberto Blanco, Dale Miller, and Alberto Momigliano (13 pages)
+    - LFMTP 2017: Property-Based Testing via Proof Reconstruction:
+      Work-in-progress by Roberto Blanco, Dale Miller, and Alberto
+      Momigliano (5 pages)
+
+  - FPC-Coq: Using ELPI to elaborate external proof evidence into Coq
+    proofs by Roberto Blanco, Matteo Manighetti, and Dale
+    Miller. Accepted for the Coq Workshop 2020. (Also, a two-page
+    abstract in LFMTP 2020.)
+
+* Various topics to consider
+  - PBT
+  - proof theory, FPC
+  - Coq and ELPI
+  - induction and coinductive definitions
+  - 
+
