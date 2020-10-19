@@ -14,18 +14,18 @@ Elpi Accumulate lp:{{
   solve [str "height" , int N]  [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qheight N)) (go Goal).
-
+%don't use this
   solve [str "size", int N, int M] [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qsize N M )) (go Goal).
-
+% leaving the lower bound open 
   solve [str "sizeN", int N] [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qsize N M_ )) (go Goal).  
   
-  solve [str "pair", int H, int S1, int S2] [goal _Ctx _Ev Goal _W] _OutGoals :-
+  solve [str "pair", int H, int S] [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
-    check (pair (qgen (qheight H)) (qgen (qsize S1 S2 ))) (go Goal).
+    check (pair (qgen (qheight H)) (qgen (qsize S S2_ ))) (go Goal).
 
   }}. 
 Elpi Typecheck.
@@ -44,7 +44,7 @@ Elpi Accumulate lp:{{
   }}.
 Elpi Typecheck.
 
-Elpi Bound Steps 100000.
+(* Elpi Bound Steps 100000.*)
 
 
  Inductive ordered : list nat -> Prop :=
@@ -56,8 +56,25 @@ onl : ordered []
  Goal ordered [0;1;2;6].
    elpi prolog height 10.
    Restart.
-   Fail elpi prolog sizeN 20.
-   Fail elpi prolog size 20 0 . (*why?*)
+   elpi prolog sizeN 20.
+   Restart.
    elpi dprolog 20.
    Qed.
 
+   Inductive append : list nat -> list nat -> list nat -> Prop :=
+   anl : forall xs, append [] xs xs
+   |acn : forall xs ys zs x, 
+        append xs ys zs -> append (x :: xs) ys (x :: zs).
+
+  (* Goal exists L1 L2, append L1 L2 [0;1;2;6]. *)
+  Goal append  [0] [1;2;6] [0;1;2;6].
+  elpi prolog height 10.
+  Restart.
+  elpi prolog sizeN 2.
+  Restart.
+ elpi dprolog 20.
+
+ Restart.
+ elpi prolog   pair 10 5.
+ Abort.
+ 

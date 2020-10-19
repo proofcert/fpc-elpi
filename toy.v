@@ -26,7 +26,7 @@ Goal
         (P (C 2) (C 4))
       ===>
       P 
-        (C (3 + 0))
+        (C 3)
         (P (C 2) (C 4)).
 Proof.
   apply ST_Plus1. apply ST_PlusConstConst.  Qed.

@@ -76,7 +76,7 @@ check _Cert (go A) :-
 */  
 % end trace
 
-check _Cert (bc A A) :- !.
+
 % check _Cert (go (sort _)). %% removed since we use impL -am
 % check _Cert (go {{nat}}).
 
@@ -88,7 +88,7 @@ check Cert (go Type) :-
 %   coq.term->string T2 S2,
 %   coq.say "check" Cert "bc" S1 S2, fail.
 
-check _Cert (bc A A).
+
 check Cert (go {{True}}) :-
 	tt_expert Cert.
 % addind eq case	
@@ -111,6 +111,8 @@ check Cert (go {{lp:G1 \/ lp:G2}}) :-
 		(Choice = right, check Cert' (go G2))
 	).
 % usual diff dep. vs non-dep
+check Cert (bc A A) :-
+!, tt_expert Cert.
 check Cert (bc {{lp:Ty1 ->  lp:Ty2}} Goal) :-
 !,
   prod_expert Cert Cert1 Cert2,
