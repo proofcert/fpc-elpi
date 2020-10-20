@@ -39,3 +39,4 @@ kind   goal type.
 type   go   term -> term -> goal.
 type   bc   term -> term -> list term -> goal.
 type   check   cert -> goal -> o.
+type   flatten_app term -> term.
