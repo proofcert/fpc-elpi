@@ -5,16 +5,22 @@ module kernel.
 get_head (prod _ _ T) Head :- get_head (T X_) Head.
 get_head (app L) (app L).
 
+flatten_app (app [X]) X.
+flatten_app (global X) (global X).
+flatten_app (app [X,Y | Rest]) (app [X', Y'| Rest']) :-
+  flatten_app X X',
+  std.map [Y|Rest] flatten_app [Y'|Rest'].
+
 %%%%%%%%%%%%%%%
 % Interpreter %
 %%%%%%%%%%%%%%%
 
 % interp X :- 
-%   coq.term->string X T,
+% %   coq.term->string X T,
 %   coq.say "interp" X, fail.
 % backchain A B :- 
-%   coq.term->string A T1,
-%   coq.term->string B T2,
+% %   coq.term->string A T1,
+% %   coq.term->string B T2,
 %   coq.say "backchain" A B, fail.
 
 interp {{True}}.
@@ -38,18 +44,23 @@ interp {{lp:G1 \/ lp:G2}} :-
 
 interp {{lp:G = lp:G}}.
 
-  get_head D Atom,
-  % coq.say "Select " {coq.term->string (global (indc K))},
-  backchain D Atom.
+interp (app [global (indt Prog) | _Args] as Atom) :-
+%   coq.say "prog: " Prog,
+%   coq.say "args: " Args,
+  coq.env.indt Prog _ _ _ _Type _Kn Clauses,
+	std.mem Clauses D,
+	get_head D Atom,
+	backchain D Atom.
 
-backchain (prod _ Ty (x\P)) G :- backchain P G, interp Ty.
-backchain (prod _ _Ty (x\P x)) G :- backchain (P X) G.
+backchain (prod _ Ty (x\P)) G :- !, backchain P G, interp Ty.
+backchain (prod _ _Ty (x\P x)) G :- !, backchain (P X) G.
 backchain G G.
 
 %%%%%%%%%%%
 % Checker %
 %%%%%%%%%%%
 
+% check A B :- coq.say "check" A B, fail.
 % check Cert (bc A1 A2 Terms) :-
 %   coq.term->string A1 S1,
 %   coq.term->string A2 S2,
@@ -104,14 +115,14 @@ check Cert (bc (prod _ Ty1 Ty2) Goal [Tm|ArgsList]) :-
 %  coq.say "backchain on" {coq.term->string Ty1} {coq.term->string (Ty2 Tm)},
   check Cert (go Ty1 Tm).
 
-check Cert (go (global (indt Prog) as Atom) Kons) :-
-  coq.env.indt Prog _ _ _ _Type Kn Clauses,
-  Kons = global (indc K),
-  unfold_expert Kn Cert Cert' K,
-  %% Use the selected constructor as key to find its
-  %% clause in the zipped list of constructors and clauses.
-  std.lookup {std.zip Kn Clauses} K Clause, 
-  check Cert' (bc Clause Atom []).
+% check Cert (go (global (indt Prog) as Atom) Kons) :-
+%   coq.env.indt Prog _ _ _ _Type Kn Clauses,
+%   Kons = global (indc K),
+%   unfold_expert Kn Cert Cert' K,
+%   %% Use the selected constructor as key to find its
+%   %% clause in the zipped list of constructors and clauses.
+%   std.lookup {std.zip Kn Clauses} K Clause, 
+%   check Cert' (bc Clause Atom []).
 
 check Cert (go (global (indt Prog) as Atom) Term) :-
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
@@ -120,17 +131,18 @@ check Cert (go (global (indt Prog) as Atom) Term) :-
   %% Use the selected constructor as key to find its
   %% clause in the zipped list of constructors and clauses.
   std.lookup {std.zip Kn Clauses} K Clause, 
-  check Cert' (bc Clause Atom [L|ListArgs]),
-  Term = app [Kons | [L|ListArgs]].
+  check Cert' (bc Clause Atom ListArgs),
+  Term' = app [Kons | ListArgs],
+  flatten_app Term' Term.
 
-check Cert (go (app [global (indt Prog) | _Args] as  Atom) Kons) :-
-  coq.env.indt Prog _ _ _ _Type Kn Clauses,
-	Kons = global (indc K),
-	unfold_expert Kn Cert Cert' K,
-	%% Use the selected constructor as key to find its
-	%% clause in the zipped list of constructors and clauses.
-	std.lookup {std.zip Kn Clauses} K Clause, 
-	check Cert' (bc Clause Atom []).
+% check Cert (go (app [global (indt Prog) | _Args] as  Atom) Kons) :-
+%   coq.env.indt Prog _ _ _ _Type Kn Clauses,
+% 	Kons = global (indc K),
+% 	unfold_expert Kn Cert Cert' K,
+% 	%% Use the selected constructor as key to find its
+% 	%% clause in the zipped list of constructors and clauses.
+% 	std.lookup {std.zip Kn Clauses} K Clause, 
+% 	check Cert' (bc Clause Atom []).
 
 check Cert (go (app [global (indt Prog) | _Args] as  Atom) Term) :-
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
@@ -139,8 +151,9 @@ check Cert (go (app [global (indt Prog) | _Args] as  Atom) Term) :-
 	%% Use the selected constructor as key to find its
 	%% clause in the zipped list of constructors and clauses.
 	std.lookup {std.zip Kn Clauses} K Clause, 
-	check Cert' (bc Clause Atom [L|ListArgs]),
-  Term = (app [Kons,L|ListArgs]).
+	check Cert' (bc Clause Atom ListArgs),
+  Term' = (app [Kons|ListArgs]),
+  flatten_app Term' Term.
 
 %% Perform simple reduction in the head
 check Cert (go (app [(fun A B C)| Args]) Term) :-
