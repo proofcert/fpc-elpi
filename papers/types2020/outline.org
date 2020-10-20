@@ -1,24 +1,69 @@
-* Notes after speaking with Alberto 19-10-2020
-
-  - The focus is on using Coq and ELPI
+* The focus is on using Coq and ELPI and the dichotomies this reveals
 
     Enrico et al has implemented ELPI as a convenient tool for
     programming for Coq.  ELPI provides a means for treating bindings
     and incorporates unification, all things useful for tactic
-    programming in Coq (proof refinement).
+    programming in Coq (proof refinement).  ELPI is a good
+    meta-language for Coq structures.
 
-    Here, we use ELPI more as a logic engine that can directly
-    interpret and manipulate proof structures via proof checking and
-    proof reconstruction.
+     - These applications are not necessarily focused on the
+       underlying declarative nature of lambda Prolog.
 
-  - Other aspects of this focus
+     - In this paper, we limit our attention mostly to using lambda
+       Prolog for declarative processing: i.e., where logic plays a
+       central role in describing operations.  (Type checking is an
+       example of such processing, but we do not focus on type
+       checking here).
+
+     - Of course, being able to do declarative and not-so-declarative
+       operations within the same language makes that language all the
+       more useful.
+
+    We describe using ELPI as a logic engine that can directly
+    interpret and manipulate proof structures via proof checking,
+    proof reconstruction, and proof generation.
+
+  - Various dichotomies we find in this work.
     - proof theory vs type theory
     - logic programming vs functional programming
+    - sequent calculus vs natural deduction
 
-  - Two logics have been explored
+  - On the proof theory side of this work, we use two different proof
+    systems.
+
     - LJF, here we have undefined predicates, no induction
-    - muMALL, were we have inductive definitions
+    - muMALL, were we have inductive definitions of predicates
 
+    The Coq world provides for both of these kinds of predicate using
+    Prop (corresponds to undefined) and Set (inductively defined).
+
+* We develop two applications
+
+    Both applications us logic programming to support deductive tasks.
+
+    Both of these tasks use lambda Prolog's depth-first search but in
+    a controlled setting.  That control is based on FPCs which are
+    designed using recent advances in the proof theory of sequent
+    calculus. 
+
+  - Our implementations are mostly meant currently as
+    proof-of-concepts.  More efficient implementations are possible
+    within the current implementation of ELPI.
+
+   - Proof checking
+     Use ELPI to compute proof objects that can be given directly to
+     Coq for its kernel to check.
+
+   - Property based testing
+     Use ELPI to discover counterexamples to a proposed theorem.  Only
+     a list of terms are returned to Coq and only to be reported to
+     the user.  No further processing of those terms is proposed.
+
+* Related work
+   
+   Hybrid -
+   Abella -
+   
 
 * Three previous abstracts to consider as sources
 
@@ -38,11 +83,4 @@
     proofs by Roberto Blanco, Matteo Manighetti, and Dale
     Miller. Accepted for the Coq Workshop 2020. (Also, a two-page
     abstract in LFMTP 2020.)
-
-* Various topics to consider
-  - PBT
-  - proof theory, FPC
-  - Coq and ELPI
-  - induction and coinductive definitions
-  - 
 

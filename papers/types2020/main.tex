@@ -1,5 +1,5 @@
 
-\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2019}
+\documentclass[a4paper,USenglish,cleveref, autoref, thm-restate]{lipics-v2019}
 %This is a template for producing LIPIcs articles. 
 %See lipics-manual.pdf for further information.
 %for A4 paper format use option "a4paper", for US-letter use option "letterpaper"
@@ -14,17 +14,42 @@
 
 \bibliographystyle{plainurl}% the mandatory bibstyle
 
-\title{Dummy title} %TODO Please add
+\title{Interfacing logic programming and Coq} % Other suggestions?
+\titlerunning{Interfacing logic programming and Coq}
 
-\titlerunning{Dummy short title} %TODO optional, please use if title is longer than one line
+%TODO mandatory, please use full name; only 1 author per \author
+%macro; first two parameters are mandatory, other parameters can be
+%empty. Please provide at least the name of the affiliation and the
+%country. The full address is optional 
 
-\author{John Q. Public}{Dummy University Computing Laboratory, [optional: Address], Country \and My second affiliation, Country \and \url{http://www.myhomepage.edu} }{johnqpublic@dummyuni.org}{https://orcid.org/0000-0002-1825-0097}{(Optional) author-specific funding acknowledgements}%TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional
+\author{Dale Miller}
+       {Inria, Palaiseau, France \and LIX, Ecole Polytechnique, France
+         \and \url{http://www.lix.polytechnique.fr/Labo/Dale.Miller/} }
+       {dale.miller@inria.fr}
+       {}%https://orcid.org/0000-0003-0274-4954
+       {}
 
-\author{Joan R. Public\footnote{Optional footnote, e.g. to mark corresponding author}}{Department of Informatics, Dummy College, [optional: Address], Country}{joanrpublic@dummycollege.org}{[orcid]}{[funding]}
+\author{Matteo Manighetti}
+       {Inria, Palaiseau, France \and LIX, Ecole Polytechnique, France
+         \and \url{http://www.lix.polytechnique.fr/Labo/Matteo.Manighetti/}}
+       {matteo.manighetti@inria.fr}
+       {}
+       {}
 
-\authorrunning{J.\,Q. Public and J.\,R. Public} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
+\author{Alberto Momigliano}
+       {Dipartimento di Informatica, Universit\`a degli studi di Milano, Italy \and
+       \url{http://momigliano.di.unimi.it/}}
+       {momigliano@di.unimi.it}
+       {}
+       {}
 
-\Copyright{John Q. Public and Joan R. Public} %TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+\authorrunning{D. Miller, M. Manighetti, and A. Momigliano}
+ %TODO mandatory. First: Use abbreviated first/middle names. Second
+ %(only in severe cases): Use first author plus 'et al.' 
+
+\Copyright{D. Miller, M. Manighetti, and A. Momigliano}
+%TODO mandatory, please use full first names. LIPIcs license is
+%"CC-BY";  http://creativecommons.org/licenses/by/3.0/ 
 
 \ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
 
