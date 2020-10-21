@@ -6,6 +6,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  From elpi Require Import elpi.
  Require Import Arith List. Import ListNotations.
  Require Import pbt.
+ Require Import dep_pbt.
  
  
  Inductive tm : Type :=
@@ -90,10 +91,12 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
          forall (x : X) (y1 y2 : Y), R x y1 -> R x y2 -> y1 = y2.
  
  (* progress holds*)
+ Elpi Bound Steps 100000.
+
  Goal forall e, progress e has_type step.
  unfold progress.
  intros e t Ht.    
- Fail elpi pbt (Ht) (True) 15 (e).
+ Fail elpi pbt (Ht) (True) 5 (e).
  Abort.
  
  
@@ -133,12 +136,15 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  End M1.
  
+ Elpi Bound Steps 1000000.
+
  (* Adapted from Types.v in volume  of SF *)
   (* OK *)
  Goal forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
- elpi pbt (Ht) (True) 5 (e). (* it finds cex:  (tsucc ttrue) *)
+ elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *)
+ elpi dep_pbt 3 (Ht) (e) .  (* does not work generating "t"*) 
  Abort.
  
  (* variation 3: failure of step det *)
@@ -182,15 +188,16 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  End M3.  
  
  (* (tif tfalse ?e1 ?e0 = tif ttrue ?e0 ?e6) 
- Finds the cex, albeit not fully instantiated: should have a is_exp generetor
- *)
+ Finds the cex, albeit not fully instantiated: 
+ dep_pbt does it! *)
  Goal deterministic M3.step.
  unfold deterministic.
  intros.
- elpi pbt (H ) (H0)  5 (x). 
+ elpi pbt (H ) (H0)  5 (x).
+ elpi dep_pbt 3 (H /\ H0) (x). 
  Abort.
  
- 
+ (* now obsolete, given dep_pbt*)
  Inductive is_tm : tm  -> Prop :=
    | I_Tru :        is_tm ttrue 
    | I_Fls :       is_tm tfalse 
@@ -211,7 +218,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  *)
  Goal forall (e1 e2 e3  : tm), is_tm e1 ->  M3.step e1 e2 -> M3.step e1 e3 -> e2 = e3.
    intros.
-   elpi pbt (H) (H0 /\ H1) 10 (e2).
+   elpi pbt (H) (H0 /\ H1) 4 (e2).
  Abort.
  
  
@@ -251,7 +258,8 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Goal forall e e', preservation e e' M6.has_type step.
  unfold preservation.
  intros e e' t Hs Ht.    
- elpi pbt (Ht) (Hs)  5 (e). 
+ elpi pbt (Ht) (Hs)  3 (e).
+ elpi dep_pbt 3 (Ht /\ Hs) (e). 
  Abort.
  
  (* Next  fails with same cex
@@ -260,18 +268,12 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  T2 = tbool
  Recall: set a low bound*)
  
- 
+ Elpi Bound Steps 1000000.
  Goal deterministic M6.has_type.
  unfold deterministic.
  intros.
- elpi pbt (H ) (H0) 5 (x). 
+ Fail elpi dep_pbt 3 (H  /\ H0) (x). 
  Abort.
- (*Elpi Query lp:{{
-   check (qgen (qheight 10)) (go {{M6.has_type (tpred tzero) TBool}}).
-   }}. 
- 
- 
- *)
  
  (* a typo-like mutation*)
  Module Mty.
@@ -300,12 +302,13 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  End Mty.
  
  
- 
+ (*???*)
  (* Elpi Bound Steps 10000*)
  Goal forall e, progress e Mty.has_type step.
  unfold progress.
- intros e t Ht.    
- elpi pbt (Ht) (True) 5 (e). (* it finds cex:  tiszero(ttrue)
+ intros e t Ht.
+ Fail elpi dep_pbt 5 (Ht) (e).    
+ Fail elpi pbt (Ht) (True) 5 (e). (* it finds cex:  tiszero(ttrue)
  T = tnat*)
  Abort.
  

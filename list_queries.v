@@ -1,9 +1,10 @@
 From elpi Require Import elpi.
-Require Import Arith List. Import ListNotations.
- Import Coq.Lists.List.
- Require Import list.
+Require Import Arith. 
+Require Import Coq.Lists.List.
+Import ListNotations.
  Require Import pbt.
  Require Import dep_pbt.
+ Require Import list.
 
  Elpi Bound Steps 50000.
 

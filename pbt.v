@@ -1,7 +1,7 @@
 From elpi Require Import elpi.
-Require Import Arith List. Import ListNotations.
+Require Import Arith.
 Require Import Coq.Lists.List.
-
+Import ListNotations.
 Elpi Tactic pbt.
 Elpi Accumulate File "pbt/src/kernel.mod".
 Elpi Accumulate File "pbt/src/fpc-qbound.mod".
@@ -43,9 +43,46 @@ Elpi Accumulate lp:{{
     coq.say "Trying:" {coq.term->string Result}, 
     not (interp PropGoal),
     coq.say "Cex:" {coq.term->string PropGoal}.
+%qsize
+  solve [str "size", trm Spec, trm Prog, int N, trm Monitor] [goal Ctx _Ev Ty _Who] _OutGoals :-
+    build_clauses Ctx Cs,
+    env_clauses Ctx Progs,
+    (Progs => ( copy Spec SpecType,
+    copy Prog ProgType)),
+    (Cs => (copy SpecType SpecGoal,
+    copy ProgType ProgGoal,
+    copy Ty PropGoal)),
+    coq.say "Spec:" {coq.term->string SpecGoal},
+    coq.say "Prog:" {coq.term->string ProgGoal},
+    coq.say "Prop:" {coq.term->string PropGoal},
+    check (qgen (qsize N N0_)) (go SpecGoal),
+    interp ProgGoal,
+    (Cs => copy Monitor Result),
+    coq.say "Trying:" {coq.term->string Result}, 
+    not (interp PropGoal),
+    coq.say "Cex:" {coq.term->string PropGoal}.
+
+%pairing
+solve [str "pair", trm Spec, trm Prog, int N, int S, trm Monitor] [goal Ctx _Ev Ty _Who] _OutGoals :-
+    build_clauses Ctx Cs,
+    env_clauses Ctx Progs,
+    (Progs => ( copy Spec SpecType,
+    copy Prog ProgType)),
+    (Cs => (copy SpecType SpecGoal,
+    copy ProgType ProgGoal,
+    copy Ty PropGoal)),
+    coq.say "Spec:" {coq.term->string SpecGoal},
+    coq.say "Prog:" {coq.term->string ProgGoal},
+    coq.say "Prop:" {coq.term->string PropGoal},
+    check (pair (qgen (qheight N)) (qgen (qsize S S2_ ))) (go SpecGoal),
+    interp ProgGoal,
+    (Cs => copy Monitor Result),
+    coq.say "Trying:" {coq.term->string Result}, 
+    not (interp PropGoal),
+    coq.say "Cex:" {coq.term->string PropGoal}.
 }}.
 Elpi Typecheck.
-(* Elpi Query lp:{{not (interp {{rev [] []}})}}. *)
+
 (* Elpi Trace. *)
 Elpi Bound Steps 100000.
 

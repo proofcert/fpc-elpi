@@ -11,15 +11,12 @@ Elpi Accumulate File "pbt/src/fpc-pair.mod".
 
 
 Elpi Accumulate lp:{{
-  solve [str "height" , int N]  [goal _Ctx _Ev Goal _W] _OutGoals :-
+  solve [int N]  [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qheight N)) (go Goal).
-%don't use this
-  solve [str "size", int N, int M] [goal _Ctx _Ev Goal _W] _OutGoals :-
-    coq.say "Goal:" {coq.term->string Goal},
-    check (qgen (qsize N M )) (go Goal).
+
 % leaving the lower bound open 
-  solve [str "sizeN", int N] [goal _Ctx _Ev Goal _W] _OutGoals :-
+  solve [str "size", int N] [goal _Ctx _Ev Goal _W] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qsize N M_ )) (go Goal).  
   
@@ -41,6 +38,16 @@ Elpi Accumulate lp:{{
     check (qgen (qheight N)) (go Goal Term),
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
+ solve [str "size", int N] [goal _Ctx Ev Goal _Who] _OutGoals :-
+    coq.say "Goal:" {coq.term->string Goal},
+    check (qgen (qsize N N_)) (go Goal Term),
+    Ev = Term,
+    coq.say "Proof:" {coq.term->string Ev}.
+solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
+      coq.say "Goal:" {coq.term->string Goal},
+    check (pair (qgen (qheight H)) (qgen (qsize S S2_ ))) (go Goal Term),
+    Ev = Term,
+    coq.say "Proof:" {coq.term->string Ev}.
   }}.
  Elpi Typecheck. 
 
@@ -55,15 +62,17 @@ onl : ordered []
 
 Goal exists Xs, ordered Xs.
 eexists.
-elpi prolog height 3.
+elpi prolog  3.
 apply onl.
+Restart.
+eexists.
+elpi dprolog 10.
 Qed.
 
  Goal ordered [0;1;2;6].
-   elpi prolog height 10.
-   Restart.
-   elpi prolog sizeN 20.
-   Restart.
+   elpi prolog  10.
+   Fail elpi prolog size 10.
+
    elpi dprolog 20.
    Qed.
 
@@ -74,17 +83,10 @@ Qed.
 
   (* Goal exists L1 L2, append L1 L2 [0;1;2;6]. *)
   Goal append  [0] [1;2;6] [0;1;2;6].
-  elpi prolog height 10.
-  Restart.
-  elpi prolog sizeN 2.
-  Restart.
- elpi dprolog 20.
+  elpi dprolog 20.
+Qed.
 
- Restart.
- elpi prolog   pair 10 5.
- Abort.
  Goal exists L, append  L [1;2;6] [0;1;2;6].
  eexists.
- elpi prolog height 20.
- repeat constructor.
+ elpi dprolog  20.
  Qed.

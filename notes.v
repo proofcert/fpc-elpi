@@ -1,5 +1,14 @@
 (*
 
+- make the arguments uniform in the call to the tactic ????
+
+ex: 
+(dep)_prolog  N: call with height default
+             size/pair N M:
+
+something similar with pbt             
+
+-------------------------
 can we preprocess the constructors of Inductive
 with copy, so that we put them n "clausal" forms, by removing
 the Coq quantifiers? Then we can remove backchaining altoghether.
