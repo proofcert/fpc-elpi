@@ -1,9 +1,9 @@
 * The focus is on using Coq and ELPI and the dichotomies this reveals
 
-    Enrico et al have provided an implementation of lambda Prolog, 
-    called ELPI, as a plugin to Coq. ELPI provides a means for treating bindings
-    and incorporates unification, all things useful for tactic
-    programming in Coq (proof refinement).  ELPI is a good
+    Enrico et al have provided an implementation of lambda Prolog,
+    called ELPI, as a plugin to Coq. ELPI provides a means for
+    treating bindings and incorporates unification, all things useful
+    for tactic programming in Coq (proof refinement).  ELPI is a good
     meta-language for Coq structures.
 
      - These applications are not necessarily focused on the
@@ -28,12 +28,47 @@
     the logic programming interpreter, here ELPI, soundly implements 
     unification and backchaining proof search.
 
-  The origin story to ML (Meta language) is that it supported LFC-style tactics and tacticals.  The strong typing of ML provided some guarantees: only theorems were ever given type thm.  But many steps of evolution have now taken place since then.  Isabelle's different approach to tactics.  Logic and proof theory, when used with Church's simple theory of types and Gentzen's sequent calculus, provides a far richer meta language: that provides an immediate and declarative treatment of bindings as well as for proof search (without the need of exception handling, etc).  [I'm making the case that FP is not a particularly natural framework for proof assistants.  Of course, lots of libraries have now been built in the FP style.]
+  Given that lP and Coq are both examples of mixing the
+  lambda-calculus with logic, it is important to understand their
+  difference, something that can be very confusing.  Take the
+  confusion around the term HOAS.  In some circles, this is a
+  appropriate and sensible approach.  In other circles, it is
+  semantically questionable.  But, in fact, this concept (using
+  meta-level binding for object-level binding) plays our 
+  differently depending on the meta language!
+
+  The origin story to ML (Meta language) is that it supported
+  LFC-style tactics and tacticals.  The strong typing of ML provided
+  some guarantees: only theorems were ever given type thm.  But many
+  steps of evolution have now taken place since then.  Isabelle's
+  different approach to tactics.  Logic and proof theory, when used
+  with Church's simple theory of types and Gentzen's sequent calculus,
+  provides a far richer meta language: that provides an immediate and
+  declarative treatment of bindings as well as for proof search
+  (without the need of exception handling, etc).  [I'm making the case
+  that FP is not a particularly natural framework for proof
+  assistants.  Of course, lots of libraries have now been built in the
+  FP style.]
   
   - Various dichotomies we find in this work.
     - proof theory vs type theory
     - logic programming vs functional programming
     - sequent calculus vs natural deduction
+
+  - While both lambda Prolog and Coq are based on an amalgamation of
+    $\lambda$-calculus and logic, these two languages take strikingly
+    different approaches to bindings.  In lambda Prolog, bindings are
+    syntactic and extensionality at any type is not available.  In
+    Coq, however, higher-order typed quantification encodes
+    extensional functions.  In lambda Prolog, (exists w. [lambda x. x]
+    = [lambda x. w]) fails, no matter the type of w.  If this query
+    was about functions, then this equation would be true when the
+    type of w is a singleton.  But in lP, this is a query only about
+    binding structures, and this fails to be proved since there is no
+    capture-avoiding substitution (the only substitution supported by
+    Church's STT) for w that makes the resulting two terms alpha,
+    beta, eta convertible.  [Is this true in Coq?  What is equality
+    here?]
 
   - On the proof theory side of this work, we use two different proof
     systems.
@@ -73,10 +108,10 @@
  
 * Future work
  
-   - One can imagine that logic programming could replace, to some degree, 
-     the proof refinement layer of a proof assistant such as Coq.  If that 
-     is true, it is important to appreciate the ``two culures'' that 
-     such a tool would contain.
+  - One can imagine that logic programming could replace, to some
+    degree, the proof refinement layer of a proof assistant such as
+    Coq.  If that is true, it is important to appreciate the ``two
+    culures'' that such a tool would contain.
 
 * Three previous abstracts to consider as sources
 
