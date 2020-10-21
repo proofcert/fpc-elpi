@@ -36,11 +36,6 @@ interp {{lp:G1 \/ lp:G2}} :-
 	interp G1;
 	interp G2.
 
-% interp (some G) :-
-% 	interp (G _).
-
-% interp (nabla G) :-
-% 	pi x\ interp (G x).
 
 interp {{lp:G = lp:G}}.
 
@@ -71,7 +66,8 @@ backchain G G.
 %   coq.term->string Term T1,
 %   coq.say "check go" A Term, fail.
 
-check _Cert (bc A A []).
+check Cert (bc A A []) :-
+	tt_expert Cert .
 check Cert (go X Term ):-
   var X,
   declare_constraint (check Cert (go X Term)) [X],

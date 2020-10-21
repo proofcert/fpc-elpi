@@ -42,7 +42,7 @@ Elpi Accumulate lp:{{
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
   }}.
-Elpi Typecheck.
+(* Elpi Typecheck. *)
 
 (* Elpi Bound Steps 100000.*)
 
@@ -52,6 +52,12 @@ onl : ordered []
 | oss : forall x : nat, ordered [x]
 | ocn : forall (x y : nat) (l : list nat),
      ordered (y :: l) -> x <= y -> ordered (x :: y :: l).
+
+Goal exists Xs, ordered Xs.
+eexists.
+elpi prolog height 3.
+apply onl.
+Qed.
 
  Goal ordered [0;1;2;6].
    elpi prolog height 10.
@@ -77,4 +83,8 @@ onl : ordered []
  Restart.
  elpi prolog   pair 10 5.
  Abort.
- 
+ Goal exists L, append  L [1;2;6] [0;1;2;6].
+ eexists.
+ elpi prolog height 20.
+ repeat constructor.
+ Qed.
