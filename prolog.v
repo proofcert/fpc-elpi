@@ -42,7 +42,7 @@ Elpi Accumulate lp:{{
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
   }}.
-(* Elpi Typecheck. *)
+ Elpi Typecheck. 
 
 (* Elpi Bound Steps 100000.*)
 

@@ -5,6 +5,7 @@ Require Import Arith List. Import ListNotations.
  Require Import pbt.
  Require Import dep_pbt.
 
+ Elpi Bound Steps 50000.
 
 (* ****** QUERIES****** *)
 
@@ -16,7 +17,7 @@ ordered_bad xs -> insert 0 xs rs ->
 ordered_bad rs.
 
 intros xs rs Gen H1 H2.
-elpi pbt (Gen /\ H1) (H2) 15 (rs). 
+elpi pbt (Gen /\ H1) (H2) 5 (rs). 
 Abort.
 
 
@@ -26,7 +27,7 @@ Goal forall xs rs,
 is_natlist xs -> ordered_bad xs -> insert 0 xs rs -> ordered_bad rs.
 
 intros xs rs Gen H1 H2.
-elpi pbt (Gen) (H1 /\ H2) 15 (rs). 
+elpi pbt (Gen) (H1 /\ H2) 5 (rs). 
 Abort.
 
 (* generating both nat and natlist*)
@@ -35,35 +36,36 @@ Goal forall x xs rs,
 is_nat x -> is_natlist xs -> ordered_bad xs -> insert x xs rs -> ordered_bad rs.
 
 intros x xs rs GenN GenL  H1 H2.
-elpi pbt (GenN /\ GenL ) (H1 /\ H2) 15 (rs). 
+elpi pbt (GenN /\ GenL ) (H1 /\ H2) 5 (rs). 
 Abort.
 
 
 (* This property is true *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> rev rs xs.
 intros xs rs Gen H.
-Fail elpi pbt (Gen) (H) 10 (xs).
+Fail elpi pbt (Gen) (H) 5 (xs).
 Abort.
 
 (* This property is false *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> xs = rs.
 intros xs rs Gen H.
-elpi pbt (Gen) (H) 10 (xs).
+elpi pbt (Gen) (H) 5 (xs).
 Abort.
 
 (* true *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> rev2 xs rs.
 intros xs rs Gen HR.
-Fail elpi pbt (Gen) (HR) 15 (xs).
+Fail elpi pbt (Gen) (HR) 5 (xs).
 Abort.
 
 (* false *)
+Elpi Bound Steps 100000.
 Goal forall xs ys aps raps rxs rys,
 is_natlist xs -> is_natlist ys -> 
 append xs ys aps -> rev xs rxs -> rev ys rys ->
 rev aps raps -> append rxs rys raps.
 intros.
-elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 10 (xs /\ ys).
+elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 5 (xs /\ ys).
 Abort.
 
 Goal forall x x' y: list nat,
@@ -74,12 +76,9 @@ intros.
 elpi pbt (H) (H0 /\ H1) 5 (x).
 Abort.
 
+(*trying existentials*)
 
 (* ****** DEP QUERIES****** *)
-
-
-
-(* ****** QUERIES****** *)
 
 
 Goal forall xs rs, rev xs rs -> xs = rs.
@@ -107,7 +106,7 @@ intros xs rs HR.
 Fail elpi dep_pbt 5 (HR) (xs).
 Abort.
 
-(* false, but fails*)
+(* false*)
 Goal forall xs ys aps raps rxs rys,
 
 append xs ys aps -> rev xs rxs -> rev ys rys ->
