@@ -1,13 +1,16 @@
 * The focus is on using Coq and ELPI and the dichotomies this reveals
 
-    Enrico et al has implemented ELPI as a convenient tool for
-    programming for Coq.  ELPI provides a means for treating bindings
+    Enrico et al have provided an implementation of lambda Prolog, 
+    called ELPI, as a plugin to Coq. ELPI provides a means for treating bindings
     and incorporates unification, all things useful for tactic
     programming in Coq (proof refinement).  ELPI is a good
     meta-language for Coq structures.
 
      - These applications are not necessarily focused on the
-       underlying declarative nature of lambda Prolog.
+       underlying declarative nature of lambda Prolog.  For 
+       example, ELPI has various extensions, such as ``spilling''
+       that are designed to make some aspects of logic programming
+       appear to be more functional.
 
      - In this paper, we limit our attention mostly to using lambda
        Prolog for declarative processing: i.e., where logic plays a
@@ -19,10 +22,14 @@
        operations within the same language makes that language all the
        more useful.
 
-    We describe using ELPI as a logic engine that can directly
-    interpret and manipulate proof structures via proof checking,
-    proof reconstruction, and proof generation.
+    We describe using ELPI as a logic engine for directly
+    interpreting and manipulating proof structures via proof checking,
+    proof reconstruction, and proof generation.  Here, it is expected that 
+    the logic programming interpreter, here ELPI, soundly implements 
+    unification and backchaining proof search.
 
+  The origin story to ML (Meta language) is that it supported LFC-style tactics and tacticals.  The strong typing of ML provided some guarantees: only theorems were ever given type thm.  But many steps of evolution have now taken place since then.  Isabelle's different approach to tactics.  Logic and proof theory, when used with Church's simple theory of types and Gentzen's sequent calculus, provides a far richer meta language: that provides an immediate and declarative treatment of bindings as well as for proof search (without the need of exception handling, etc).  [I'm making the case that FP is not a particularly natural framework for proof assistants.  Of course, lots of libraries have now been built in the FP style.]
+  
   - Various dichotomies we find in this work.
     - proof theory vs type theory
     - logic programming vs functional programming
@@ -63,7 +70,13 @@
    
    Hybrid -
    Abella -
-   
+ 
+* Future work
+ 
+   - One can imagine that logic programming could replace, to some degree, 
+     the proof refinement layer of a proof assistant such as Coq.  If that 
+     is true, it is important to appreciate the ``two culures'' that 
+     such a tool would contain.
 
 * Three previous abstracts to consider as sources
 
