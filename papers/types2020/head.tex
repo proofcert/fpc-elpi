@@ -1,1 +1,113 @@
-\newcommand{\lP}{$\lambda$Prolog}
+\usepackage{amssymb,amsmath}
+\usepackage{proof}
+\usepackage{xspace}
+\usepackage{listings}
+\usepackage{letltxmacro}
+\usepackage[dvipsnames]{xcolor}
+
+% \newcommand{\blue}[1]{{\color[rgb]{0,0,1} #1}}
+% \newcommand{\tup}[1]{\langle #1\rangle}
+% \newcommand{\tupp}[2]{\blue{\langle #1,}#2{\blue{\rangle}}}
+
+\newcommand{\instan}[1]{\hbox{\sl grnd}~(#1)}
+\newcommand{\Pscr}{{\mathcal P}}
+
+\newcommand{\ok}{\checkmark}
+% DM The use of pifont and txfonts broke typesetting for me: equality
+% signs never appearred and some parentheses did not appear either.
+%\newcommand{\noc}{\ding{56}}
+\newcommand{\noc}{\ddag}
+\newcommand{\lP}{$\lambda$Prolog\xspace}
+\newcommand{\nat }{\hbox{\sl nat}\xspace}
+\newcommand{\plus}{\hbox{\sl app}\xspace}
+\newcommand{\lst}{\hbox{\sl lst}\xspace}
+\newcommand{\sort}{\hbox{\sl sort}}
+\newcommand{\rev}{\hbox{\sl rev}}
+\newcommand{\ordered}{\hbox{\sl ordered}}
+
+%\newcommand{\atac}{A2Tac\xspace}
+\newcommand{\atac}{ACheck\xspace}
+%\newcommand{\lra}{\mathrel{\longrightarrow}}
+\newcommand{\lra}{\mathrel{\vdash}}
+\newcommand{\seq}[2]{#1\lra #2}
+
+\newcommand{\true}{tt}
+
+%%%%%%%%%%%%%%%% LJF
+\newcommand{\truen}{t^-}
+\newcommand{\truep}{t^+}
+\newcommand{\falsen}{f^-}
+\newcommand{\falsep}{f^+}
+\newcommand{\wedgep}{\wedge^{\!+}}
+\newcommand{\wedgen}{\wedge^{\!-}}
+\newcommand{\veep}{\vee^{\!+}}
+\newcommand{\veen}{\vee^{\!-}}
+\newcommand{\with}{\&}
+
+\newcommand{\Nscr}{{\cal N}}
+\newcommand{\Rscr}{{\cal R}}                                   % Used for an ambiguous rhs
+%\newcommand{\Rscr}{\Delta_1\Downarrow\Delta_2}                % Used for an ambiguous rhs
+\newcommand{\jUnf    }[4]{#1\mathbin\Uparrow#2\vdash#3\mathbin\Uparrow #4} % unfocused sequent
+\newcommand{\jUnfG   }[2]{\jUnf{\Gamma}{#1}{#2}{{}}}           % unf sequ with \Gamma
+\newcommand{\jUnfamb }[3]{#1\mathbin\Uparrow#2\vdash#3 \Rscr}  % unfocused sequent
+\newcommand{\jUnfGamb}[1]{\Gamma\mathbin\Uparrow#1\vdash \Rscr}% unf sequ with \Gamma
+\newcommand{\jLf     }[3]{#1\Downarrow#2\vdash#3}              % left focused sequent
+\newcommand{\jLfG    }[1]{\jLf{\Gamma}{#1}{E}}                 % left foc seq with \Gamma 
+\newcommand{\jRf     }[2]{#1\vdash #2\Downarrow}               % right focused sequent
+\newcommand{\jRfG    }[1]{\jRf{\Gamma}{#1}}                    % right foc seq with \Gamma
+%%%%%%%%%%%%%%%% 
+\newcommand{\bxi}[1]{\blue{\Xi_{#1}}}
+\newcommand{\bXi}[1]{\blue{\Xi_{#1} :\null}}
+
+\newcommand{\andClerk}[3]{{\wedge_c}(#1,#2,#3)}
+\newcommand{\falseClerk}[2]{f_c(#1,#2)}
+\newcommand{\orClerk}[2]{{\vee_c}(#1,#2)}
+\newcommand{\allClerk}[2]{\forall_c(#1,#2)}
+\newcommand{\storeClerk}[3]{\hbox{\sl store}_c(#1,#2,#3)}
+
+\newcommand{\trueExpert }[1]{{\true_e}(#1)}
+\newcommand{\eqExpert }[1]{{=_e}(#1)}
+\newcommand{\unfoldExpert}[2]{{\hbox{\sl unfold}_e}(#1,#2)}
+\newcommand{\andExpert}[3]{{\wedge_e}(#1,#2,#3)}
+\newcommand{\andExpertLJF}[6]{{\wedge_e}(#1,#2,#3,#4,#5,#6)}
+\newcommand{\orExpert  }[3]{{\vee_e}(#1,#2,#3)}
+\newcommand{\someExpert}[3]{\exists_e(#1,#2,#3)}
+\newcommand{\initExpert}[2]{\hbox{\sl init}_e(#1,#2)}
+\newcommand{\cutExpert}[4]{\hbox{\sl cut}_e(#1,#2,#3,#4)}
+\newcommand{\decideExpert}[3]{\hbox{\sl decide}_e(#1,#2,#3)}
+\newcommand{\releaseExpert}[2]{\hbox{\sl release}_e(#1,#2)}
+%%%%%%%%%%%%%%%%
+
+%
+\newcommand{\step}{\longrightarrow}
+\newcommand{\sstlc}{\textit{STLC}\xspace}
+\newcommand{\vds}{\vdash_\Sigma}
+
+
+\def\bnfas{\mathrel{::=}}
+\def\bnfalt{\mid}
+
+\def\lam{\lambda}
+\def\Lam{\Lambda}
+\def\arrow{\rightarrow}
+\def\oftp{\mathord{:}}
+\def\hastype{\mathrel{:}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Editorials
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\long\def\ednote#1{\footnote{[{\it #1\/}]}\message{ednote!}}
+%\long\def\ednote#1{\begin{quote}[{\it #1\/}]\end{quote}\message{note!}}
+\newenvironment{metanote}{\begin{quote}\message{note!}[\begingroup\it}%
+                         {\endgroup]\end{quote}}
+\long\def\ignore#1{}
+
+\newcommand{\todo}[1]{\begin{metanote}TODO: #1\end{metanote}}
+%
+%\setlength{\textwidth}{13.2cm}
+%\setlength{\textheight}{19.9cm}
+
+
+\input listing-macros  % Use to get better highlighing of code
+\lstset{language=lprolog}
+\lstset{language=abella}

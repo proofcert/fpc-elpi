@@ -1,6 +1,20 @@
+%% Important dates:
+%%  Paper submission: 19 October 31 October 2020
+%%  Author notification: 18 January 2021
+%%  Final version:  15 February 2021
+%%  Publication (presumably): end of March 2021
+
+%% Style requirements of LIPIcs.  The recommended length of a paper is
+%% 12-15 pages, excluding front-page(s) (authors, affiliation, keywords,
+%% abstract, ...), bibliography and an appendix of max 5 pages. If you
+%% need more pages, please ask the editors.
+
+%% Papers have to be submitted in pdf through EasyChair:
+%% https://easychair.org/conferences/?conf=types2020postproceed 
+
 \documentclass[a4paper,USenglish,cleveref, autoref, thm-restate]{lipics-v2019}
-\input preamble
 \input head
+\input preamble
 
 \title{Interfacing logic programming and Coq} % Other suggestions?
 \titlerunning{Interfacing logic programming and Coq}
@@ -16,118 +30,500 @@ We do stuff
 \label{sec:intro}
 
 Recently, C. Sacerdoti Coen and E. Tassi developed the ELPI
-implementation \cite{dunchev15lpar} of \lP 
-\cite{miller12proghol}.  More recently, Tassi has made ELPI available
-as a plugin to the Coq proof assistant \cite{tassi18coqpl}.
-%
-This implementation of \lP extends earlier implementations in
-primarily two directions.  First, ELPI adds a notion of contraints,
-which makes it more expressive than, say, the Teyjus implementation of
-\lP \cite{nadathur99cade}.  Second, the plugin version of ELPI comes
-equip with an API for accessing the Coq environment and a quotation
-and anti-quotation syntax allowing for Coq expressions to be mixed in
-with \lP program elements.
+implementation \cite{dunchev15lpar} of \lP \cite{miller12proghol}.
+More recently, Tassi has made ELPI available as a plugin to the Coq
+proof assistant \cite{tassi18coqpl}.  This implementation of \lP
+extends earlier implementations in primarily two directions.  First,
+ELPI adds a notion of constraints, which makes it more expressive than,
+say, the Teyjus implementation of \lP \cite{nadathur99cade}.  Second,
+the plugin version of ELPI comes equip with an API for accessing the
+Coq environment and a quotation and anti-quotation syntax allowing for
+Coq expressions to be mixed in with \lP program elements.
 
 ELPI provides a means for treating bindings and unification (of
 structures containing bindings) that are convenient for various
 meta-programming tasks in logic programming all things useful for
-tactic programming in Coq (proof refinement).  For examples,
-ELPI programmers are spared from dealing with low-level aspects of
+tactic programming in Coq (proof refinement).  For examples, ELPI
+programmers are spared from dealing with low-level aspects of
 representing bindings (e.g., De Bruijn indexes) while still having
-clean and effective ways to manipulate binding structures.
-%
-In short, ELPI appears to be a useful meta-language for Coq
-\cite{coen19mscs,tassi18coqpl,tassi19itp}.
-%
-In this paper, we outline two applications of the Coq plugin for ELPI
-that support this claim.
-%
+clean and effective ways to manipulate binding structures.  In short,
+ELPI appears to be a useful meta-language for Coq
+\cite{coen19mscs,tassi18coqpl,tassi19itp}.  In this paper, we outline
+two applications of the Coq plugin for ELPI that support this claim.
 With these examples, we shall illustrate that ELPI is a useful
 meta-language not just because for its treatment of bindings and
 syntactic structures in general but also because it is actually based
 on a sound implementation of a higher-order intuitionistic logic.
-%
 Type inference is a well-known example of a meta-programming task for
 which logic programming often provides immediate and elegant
-implementations via the sound implementation of logic.
-%
-In this paper, we present two additional project in which an
-implementation of proof search provides direct, elegant, and compact
-implementations of meta-programming tasks.
-%
-Before we present these two examples, we first discuss the different
-world views that the integration of ELPI and Coq focuses us to
-confront. 
+implementations via the sound implementation of logic.  In this paper,
+we present two additional project in which an implementation of proof
+search provides direct, elegant, and compact implementations of
+meta-programming tasks.  Before we present these two examples, we
+first discuss the different world views that the integration of ELPI
+and Coq forces us to confront.
 
 \section{Two cultures}
 
-{\color{red} The rest of this section are just notes.}
+In proof theory, one learns quickly that things always come in pairs:
+negative/positive, left/right, bottom-up/top-down,
+premises/conclusion, introduction/elimination,
+% determinism/nondeterminism,
+% invertible/noninvertible, 
+etc.
+%
+When we examine the larger setting of this project of linking a logic
+programming engine with Coq and its kernel, we find a large number of
+pairing that are valuable to explicitly describe.
 
-These applications are not necessarily focused on the underlying
-declarative nature of lambda Prolog.  For example, ELPI has various
-extensions, such as ``spilling'' that are designed to make some
-aspects of logic programming appear to be more functional.
+\subsection{Proof theory vs type theory}
 
-In this paper, we limit our attention mostly to using lambda Prolog
-for declarative processing: i.e., where logic plays a central role in
-describing operations.  (Type checking is an example of such
-processing, but we do not focus on type checking here).
+In many ways, (structural) proof theory is more elementary and
+low-level than most approaches to type theory.  For example, type
+theories usually answer the question ``What is a proof?'' with the
+response ``a dependently typed $\lambda$-term''.  That is, when
+describing a type theory, one usually decides that a proof is a
+certain kind of term within the system.  In contrast, the proof theory
+treats logical propositions and proofs as separate.  For example,
+proof theory does not assume that there are terms within the logic
+that describe proofs.
 
-Of course, being able to do declarative and not-so-declarative
-operations within the same language makes that language all the more
-useful.
+Gentzen's discovery that the key to treating classical and
+intuitionistic logics in the same proof system was the invention of
+the weakening and contraction structural rules on the right-side of
+sequents~\cite{gentzen35}.  This discovery lead him away from natural
+deduction to the invention of multiple-conclusion sequent calculus, a
+very important kind of proof that has not been given a satisfactory
+representation in type theory.  This same innovation of Gentzen also
+opened the way to the invention of another key proof theoretic
+discovery, that of linear logic \cite{girard87tcs}.
+Similarly, sequent calculus provides an elegant presentation for
+linear logic while most treatments of linear logic in type theory
+usually only capture linearity in a partial fashion.
+
+Proof theory also has rather immediate and natural treatments for
+co-induction (as well as induction: see
+\cite{baelde12tocl,momigliano12jal}) whereas the treatment of
+coinduction within type theory remains more challenging and is well
+developed only for various syntactic conditions (see, for example,
+\cite{bertot08entcs}).
+
+\subsection{Proof search vs proof normalization}
+
+Gentzen-style proofs are used to model computation in at least two
+different ways.  The functional programming paradigm, following the
+Curry-Howard correspondence, models computation abstractly as the
+$\beta$-reduction of natural deduction proof: that is, computation is
+modeled using \emph{proof normalization}.  On the other hand, the
+logic programming paradigm, following the notion of goal-directed
+proof search, models computation abstractly as a regimented search of
+cut-free sequent calculus proofs: that is, computation is modeled
+using \emph{proof search}.
+
+Proof search has proved to have some richness that is hard to capture
+in the proof normalization setting.  In particular, Gentzen's
+invention of \emph{eigenvariables} are a kind of a proof-level
+binder.  In the proof normalization setting, such eigenvariables
+are instantiated during proof normalization.  In contrast, during the
+search for cut-free proofs, eigenvariables are part of the syntax of
+terms and formulas.  As a result, they can be used in the treatment of
+bindings in data structures more generally.  Hence, the logic
+programming paradigm provides a completely natural, elegant, and
+powerful method, called $\lambda$-tree syntax, for treating bindings
+within syntax.
+
+In this paper, we shall use two different proof systems.  The first
+logic is first-order intuitionistic logic.  Here, predicates
+are not inductively defined and quantification will be limited to
+range over first-order term.  Actually, we shall examine only the Horn
+clause fragment of that logic.
+%
+The second logic will allow for inductively defined predicates using a
+fixed point notation.   Given again our restriction to essentially
+Horn clause specifications, it is possible to view intuitionistic
+reasoning with such specification as if they are actually
+specification in $\mu$MALL, an extension of multiplicative additive
+linear logic with the least and greatest fixed point operators
+\cite{baelde12tocl,baelde07lpar,heath19jar}.
+%
+The difference between these two logics and associate proof theories
+is reminiscent to the difference between the type \lsti{Prop}
+(corresponding to undefined propositions) and Sets (corresponding to
+inductively defined propositions).
+
+\subsection{\lP vs Coq}
+
+Given that \lP and Coq are both examples of mixing the
+$\lambda$-calculus with logic, it is important to understand their
+differences.  The confusion around the term \emph{higher-order
+abstract syntax} (HOAS), for example, helps to illustrate their
+differences.  In the functional programming setting, including the Coq
+system, the HOAS approach leads to encoding binding structures within
+terms using functions.  Such encodings have results in surprisingly
+complicated encodings, allowing, for example, for \emph{exotic terms}
+\cite{despeyroux95tlca} and to structures on which induction is not
+possible \cite{roeckl01fossacs}.  In the logic programming setting,
+particularly \lP, HOAS is well supported in both the availability of
+binders allowed with terms ($\lambda$-bindings), in formulas
+(quantifiers), and in proofs (eigenvariables).  For this reason, the
+term $\lambda$-tree syntax was introduced to name this particular take
+on HOAS \cite{miller19jar}.  The Abella proof assistant
+\cite{baelde14jfr} was designed, in part, to allow for inductive and
+co-inductive proofs for specifications using the $\lambda$-tree syntax
+approach.
+
+Another difference between \lP and functional programming can be
+illustrated by considering how they are used in the specification of
+tactics that are popular in modern proof assistants.  In fact, the
+origin story for the ML functional programming language was that ML
+was the meta-language for implementing the LCF suite of tactics and
+tacticals \cite{gordon79}.  In order to implement tactics, ML adopted
+not only novel features such as polymorphically typed higher-order
+functional programming but also the non-functional mechanisms of
+failure and exception handling.  While \lP is also based on
+polymorphically typed higher-order relational programming, it also
+comes with a completely declarative version of failure and
+backtracking search.  Combining those features along with its support
+of unification (even in the presence of term-level bindings), \lP
+provides a rather different approach to the specification of tactics
+\cite{felty93jar}.
+
+While \lP is a typed language, it only uses simple types and these are
+more often used to indicate syntactic categories.  Any dependency
+information needs to be captured using predicates and quantifiers. 
 
 
-  Given that lP and Coq are both examples of mixing the
-  lambda-calculus with logic, it is important to understand their
-  difference, something that can be very confusing.  Take the
-  confusion around the term HOAS.  In some circles, this is a
-  appropriate and sensible approach.  In other circles, it is
-  semantically questionable.  But, in fact, this concept (using
-  meta-level binding for object-level binding) plays our 
-  differently depending on the meta language!
+\section{Proof theory and proof certificates}
 
-  The origin story to ML (Meta language) is that it supported
-  LFC-style tactics and tacticals.  The strong typing of ML provided
-  some guarantees: only theorems were ever given type thm.  But many
-  steps of evolution have now taken place since then.  Isabelle's
-  different approach to tactics.  Logic and proof theory, when used
-  with Church's simple theory of types and Gentzen's sequent calculus,
-  provides a far richer meta language: that provides an immediate and
-  declarative treatment of bindings as well as for proof search
-  (without the need of exception handling, etc).  [I'm making the case
-  that FP is not a particularly natural framework for proof
-  assistants.  Of course, lots of libraries have now been built in the
-  FP style.]
-  
-  - Various dichotomies we find in this work.
-    - proof theory vs type theory
-    - logic programming vs functional programming
-    - sequent calculus vs natural deduction
+{\color{red} The goal in this section is to say a bit about focusing
+  generally, and to give a bit of detail about FPC for Horn clauses.
+  Initial draft of text taken from \cite{blanco19ppdp}.
+}
 
-  - While both lambda Prolog and Coq are based on an amalgamation of
-    $\lambda$-calculus and logic, these two languages take strikingly
-    different approaches to bindings.  In lambda Prolog, bindings are
-    syntactic and extensionality at any type is not available.  In
-    Coq, however, higher-order typed quantification encodes
-    extensional functions.  In lambda Prolog, (exists w. [lambda x. x]
-    = [lambda x. w]) fails, no matter the type of w.  If this query
-    was about functions, then this equation would be true when the
-    type of w is a singleton.  But in lP, this is a query only about
-    binding structures, and this fails to be proved since there is no
-    capture-avoiding substitution (the only substitution supported by
-    Church's STT) for w that makes the resulting two terms alpha,
-    beta, eta convertible.  [Is this true in Coq?  What is equality
-    here?]
+\subsection{Focused proof systems}
+\label{ssec:focused}
 
-  - On the proof theory side of this work, we use two different proof
-    systems.
+The proof search approach to encoding Horn clause computation
+results in the structuring of proofs with repeated
+switching between a \emph{goal-reduction} phase and a
+\emph{backchaining} phase~\cite{miller91apal}.
+%
+The notion of \emph{focused proof systems}~\cite{andreoli92jlc,liang09tcs}
+generalizes this view of proof construction by identifying the
+following two phases. % of proof construction.
+\begin{enumerate}
+\item The \emph{negative}%
+\footnote{The terminology of negative and positive phases is a bit
+  unfortunate: historically, these terms do not refer to positive or negative
+  subformula occurrences but rather to certain semantic models used in
+  the study of linear logic~\cite{girard87tcs}.}
+%
+  phase corresponds to  goal-reduction: in this phase,
+  inference rules that involve \emph{don't-care-non\-de\-ter\-min\-ism} are
+  applied.
+%
+  As a result, there is no need to consider backtracking over choices
+  made in building this phase.
 
-    - LJF, here we have undefined predicates, no induction
-    - muMALL, were we have inductive definitions of predicates
+\item The \emph{positive} phase corresponding to  backchaining: in this phase, inference rules that involve
+  \emph{don't-know-non\-de\-ter\-min\-ism} are applied: here,
+  inference rules need to be supplied with information in order to
+  ensure that a completed proof can be built.
+%
+  That information can be items such as which term is needed to
+  instantiate a universally quantified formula and which disjunct of a
+  disjunctive goal formula should be proved.
+\end{enumerate}
+%
+Thus, when building a proof tree (in the sequent calculus) from the
+conclusion to its leaves, the negative phase corresponds to a simple
+computation that needs no external information, while the positive
+phase may need such external information to be supplied.
+%
+In the literature, it is common to refer to a repository of such
+external information as either an \emph{oracle} or a \emph{proof
+certificate}.
 
-    The Coq world provides for both of these kinds of predicate using
-    Prop (corresponds to undefined) and Set (inductively defined).
+When using a focused proof system for logic extended with fixed
+points, such as  employed in Bedwyr~\cite{baelde07cade} and described
+in~\cite{baelde12tocl,heath17linearity}, proofs of formulas such as
+\[
+  \exists x [(\tau(x)\wedge P(x)) \wedge \neg Q(x)]
+  \tag{*}\label{eq:full}
+\]
+are a single \emph{bipole}: that is, when reading a proof bottom up, a
+positive phase is followed on all its premises by a single negative
+phase that completes the proof.%
+\footnote{The reader familiar with focusing will understand that there
+are two ``polarized'' conjunctions, written in linear logic as
+$\otimes$ and $\with$ or in classical and intuitionistic logics as
+$\wedgep$ and $\wedgen$, respectively.  In this paper, we use simply
+$\wedge$ to denote the positive biased conjunction.}
+%
+In particular, the positive phase corresponds to the \emph{generation} phase
+and the negative phase corresponds to the \emph{testing} phase.
+%
+
+Instead of giving a full focused proof system of a logic including
+fixed points (since, as we will argue, that proof system will not, in
+fact, be needed to account for PBT ), we offer the following analogy.
+%
+Suppose that we are given a finite search tree and we are asked to
+prove that there is a secret located in one of the nodes of that
+tree.
+%
+A proof that we have found that secret can be taken to be a
+description of the path to that node from the root of the tree: that
+path can be seen as the proof certificate for that claim.
+%
+On the other hand, a proof that no node contains the secret is a
+rather different thing: here, one expects to use a blind and
+exhaustive search (via, say, depth-first or breath-first search) and
+that the result of that search never discovers the secret.
+%
+A proof of this fact requires \emph{no} external information: instead it
+requires a lot of computation involved with exploring the tree until
+exhaustion.
+%
+This follows the familiar pattern where the positive (generate) phase
+requires external information while the negative (testing) phase
+requires none.
+%
+Thus, a proof certificate for $(\ref{eq:full})$ is also a proof
+certificate for 
+\[
+  \exists x [\tau(x)\wedge P(x)].
+  \tag{**}\label{eq:short}
+\]
+Such a certificate would contain the witness (closed) term $t$ for the
+existential quantifier and sufficient information to confirm that
+$P(t)$ can be proved (a proof of a typing judgment such as $\tau(t)$
+is usually trivial).
+%
+%In short\ednote{AM: a bit repetitious}, a proof certificate for
+%$(\ref{eq:short})$ can play the part 
+%of a proof certificate also for $(\ref{eq:full})$, if we also use
+%negation-as-finite-failure  with $Q(t)$.
+%  ****
+Since a proof certificate for the existence-of-a-counterexample formula
+$(\ref{eq:full})$ can be taken as a proof certificate of
+$(\ref{eq:short})$, then we only need to consider proof certificates
+for Horn clause programs.
+%
+%Since the logic of Horn clauses is rather simple,
+We illustrate next what such proofs and proof certificates look like
+for the rather simple logic of Horn clauses.
+
+
+\subsection{Certificate checking with expert predicates}
+%\subsection{Adding certificates and experts to a proof system}
+\label{ssec:fpc}
+
+%% \begin{metanote}
+%%   AM: I know this is well known and boring, but using \texttt{prog A
+%%     G} in Fig \ref{fig:augmented} is imprecise --- in the comment of
+%%   next figure we mention \texttt{A :- G} and we gloss over the
+%%   instantiation of \texttt{prog A' G} to match the goal \texttt{A},
+%%   which we assume to be ground, given the exists rule
+%% \end{metanote}
+
+%% DM I've modified the text a bit to hopefully improve the state of
+%% things here.  The formal proof theory is all about closed
+%% formulas.  The prolog implementation allows open formulas.  This
+%% difference invades most aspects of proof checking, not just the
+%% prog predicate.
+
+% DM We should find a place to smooth over this issue (which is not
+% hard, I think).
+
+\begin{figure}
+\newcommand{\XXi}{{\color{blue}{\Xi}}}
+\[
+\infer{\XXi\vdash t = t}
+      {\eqExpert{\XXi}}
+\qquad
+\infer{\XXi\vdash \true}
+      {\trueExpert{\XXi}}
+\qquad
+\infer{\XXi\vdash G_1\vee G_2}
+      {\XXi'\vdash G_i\qquad \orExpert{\XXi}{\XXi'}{i}}
+\qquad
+\infer{\XXi\vdash \exists x. G}
+      {\XXi'\vdash G[t/x]\qquad \someExpert{\XXi}{\XXi'}{t}}
+\]
+\vskip -6pt
+\[
+\infer{\XXi\vdash G_1\wedge G_2}
+      {\XXi_1\vdash G_1\quad \XXi_2\vdash G_2\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}}
+\qquad
+\infer{\XXi\vdash A}
+      {\XXi'\vdash G \quad (A~\hbox{\tt :-}~G)\in\instan\Pscr
+                     \quad \unfoldExpert{\XXi}{\XXi'}}
+\]
+\caption{A proof system augmented with proof certificates and
+  additional ``expert'' premises.}
+\label{fig:augmented}
+\lstinputlisting[linerange={sigs-end}]{code/kernel.sig}
+\lstinputlisting[linerange={check-end}]{code/kernel.mod}
+\caption{A simple proof checking kernel.}
+\label{fig:kernel}
+\end{figure}
+
+Figure~\ref{fig:augmented} contains a simple proof system for Horn
+clause provability in which each inference rule is augmented with an
+additional premise involving an \emph{expert predicate}, a
+certificate $\Xi$, and possibly continuations of certificates ($\Xi'$,
+$\Xi_1$, $\Xi_2$) with extracted information from certificates (in the
+case of $\vee$ and $\exists$).
+%
+%
+The premise $(A~\hbox{\tt :-}~G)\in\instan{\Pscr}$ in the last
+inference rule of Figure~\ref{fig:augmented} states that the logic
+programming clause $(A~\hbox{\tt :-}~G)$ is a ground instance of some
+clause in a fixed program $\Pscr$.
+%
+Although this proof system is a focused proof system, the
+richness of focusing is not apparent in this simplified 
+setting: thus, we drop the adjective ``focused'' from this point forward.
+
+Figure~\ref{fig:kernel} contains the \lP implementation of the
+inference rules in Figure~\ref{fig:augmented}: here the infix
+turnstile $\vdash$ symbol is replaced by the \lst<i{check} predicate.
+%
+Notice that it is easy to show that no matter how the expert predicates
+are defined, if the goal \lsti{check Cert B} is provable in \lP then
+\lsti{B} must be a sound consequence of the program clauses stored in
+the \lsti{prog} predicate (which provides a natural implementation of
+the premise $(A~\hbox{\tt :-}~G)\in\instan{\Pscr}$.
+% AM: not there
+% in Figure~\ref{fig:kernel}). 
+
+As we mentioned in the introduction, our notion of proof certificates
+ is taken from the general setting of \emph{foundational
+  proof certificates}~\cite{chihani17jar}.
+%
+In our case here, an FPC is a collection of \lP clauses that
+provide the remaining details not supplied in Figure~\ref{fig:kernel}:
+that is, the exact set of constructors for the \lsti{cert} type as
+well as the exact specification of the six expert predicates listed in
+that figure.
+%
+Figure~\ref{fig:resources} displays two such FPCs,
+both of which can be used to describe proofs where we bound
+the number of occurrences of unfoldings in a proof.
+%
+For example, the first FPC
+provides the experts for treating certificates that are constructed
+using the \lsti{qheight} constructor.
+%
+As is easy to verify, the query \mbox{\lsti{(check (qheight 5) B)}} (for the
+encoding \lsti{B} of a goal formula) is provable in \lP using the
+clauses in Figures~\ref{fig:kernel} and~\ref{fig:resources} if and
+only if the height of that proof is 5 or less.
+%
+Similarly, the second FPC uses the constructor \lsti{qsize} (with two
+integers) and can be used to bound the total number of instances of
+unfoldings in a proof.
+%
+In particular, the query \mbox{\lsti{sigma H\ (check (qsize 5 H) B)}}
+% \begin{lstlisting}
+% sigma H\ (check (qsize 5 H) B)
+% \end{lstlisting}
+is provable if and only if the total number of unfoldings of that
+proof is 5 or less.
+
+
+\begin{figure}
+\lstinputlisting[linerange={resources-end}]{code/fpcs.sig}
+\lstinputlisting[linerange={resources-end}]{code/fpcs.mod}
+\caption{Two FPCs that describe proofs that are limited in either
+  height or in size.}
+\label{fig:resources}
+\end{figure}
+
+Finally, Figure~\ref{fig:max} contains the FPC based on the constructor
+\lsti{max} that is used to record explicitly all information within a
+proof: in particular, all disjunctive choices and all substitution
+instances for existential quantifiers are collected into a binary tree
+structure of type \lsti{max}.
+%
+In this sense, proof certificates built with the \lsti{max}
+constructor are \emph{maximally} explicit.
+%
+Such proof certificates are used, for example, in~\cite{Pair}; it is
+important to note that proof checking with such maximally explicit
+certificates can be done with much simpler proof-checkers than those
+used in logic programming since backtracking search and unification
+are not needed.
+%
+
+\begin{figure}
+\lstinputlisting[linerange={max-end}]{code/fpcs.sig}
+\lstinputlisting[linerange={max-end}]{code/fpcs.mod}
+\caption{The \lsti{max} FPC}
+\label{fig:max}
+\end{figure}
+
+Further, if we view a particular FPC as a means of restricting proofs, it is
+possible to build an FPC that \emph{restricts} proofs satisfying two FPCs
+simultaneously.
+%
+In particular, Figure~\ref{fig:pairing} defines an FPC based on the
+(infix) constructor \lsti{<c>}, which \emph{pairs} two terms of type
+\lsti{cert}.
+%
+The pairing experts for the certificate \lsti{Cert1 <c> Cert2} simply
+request that the corresponding experts also succeed for both
+\lsti{Cert1} and \lsti{Cert2} and, in the case of the \lsti{orE} and
+\lsti{someE}, also return the same choice and substitution term,
+respectively.
+%
+Thus, the query 
+\begin{lstlisting}
+?- check ((qheight 4) <c> (qsize 10)) B
+\end{lstlisting}
+will succeed if there is a proof of \lsti{B} that has a height less
+than or equal to 4 while also being of size less than or equal to 10.
+%
+A related use of the pairing of two proof certificates is to %use it to
+\emph{distill} or \emph{elaborate} proof certificates. 
+%
+For example, the proof certificate \lsti{(qsize 5 0)} is rather implicit
+since it will match any proof that used unfold exactly 5 times.
+%
+However, the query
+\begin{lstlisting}
+?- check ((qsize 5 0) <c> (max Max)) B.
+\end{lstlisting}
+will store into the \lP variable \lsti{Max} more complete details of
+any proof that satisfies the \lsti{(qsize 5 0)} constraint.
+%
+In particular, this forms the infrastructure of 
+ an \emph{explanation} tool for attributing ``blame'' for
+the origin of a counterexample; these maximal
+certificates are an appropriate starting point for documenting
+both the counterexample and why it serves as a counterexample.
+
+
+\begin{figure}
+\lstinputlisting[linerange={pairing-end}]{code/fpcs.sig}
+\lstinputlisting[linerange={pairing-end}]{code/fpcs.mod}
+\caption{FPC for pairing}
+\label{fig:pairing}
+\end{figure}
+
+Various  additional examples and experiments using the pairing of FPCs
+can be found in~\cite{Pair}. Using similar techniques, it is possible to define FPCs that target
+specific types for special treatment: for example, when generating
+integers, only (user-defined) small integers could be inserted into
+counterexamples.
+
+
+
+\section{Property-based testing for Coq}
+
+Simplest setting since we are only sending back to Coq a term (a
+counterexample), not a general proof.  
 
 
 \section{Elaboration of external proof certificates for the Coq
@@ -135,12 +531,9 @@ useful.
 
 Follow the text in \cite{blanco20coq}.
 
-\section{Property based testing for Coq}
 
 \section{Conclusion}
 
 
-% Not part of git repo.  Need to find a fix
-\bibliography{../../../../repo/parsifal/papers/references/master} 
-
+\bibliography{l}
 \end{document}
