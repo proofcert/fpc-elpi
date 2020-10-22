@@ -48,18 +48,20 @@ programmers are spared from dealing with low-level aspects of
 representing bindings (e.g., De Bruijn indexes) while still having
 clean and effective ways to manipulate binding structures.  In short,
 ELPI appears to be a useful meta-language for Coq
-\cite{coen19mscs,tassi18coqpl,tassi19itp}.  In this paper, we outline
+\cite{coen19mscs,tassi18coqpl,tassi19itp}.  
+Type inference is a well-known example of a meta-programming task for
+which logic programming often provides immediate and elegant
+implementations via the sound implementation of logic.  % In this paper,
+% we present two additional project in which an implementation of proof
+% search provides direct, elegant, and compact implementations of
+% meta-programming tasks.
+In this paper, we outline
 two applications of the Coq plugin for ELPI that support this claim.
 With these examples, we shall illustrate that ELPI is a useful
 meta-language not just because for its treatment of bindings and
 syntactic structures in general but also because it is actually based
 on a sound implementation of a higher-order intuitionistic logic.
-Type inference is a well-known example of a meta-programming task for
-which logic programming often provides immediate and elegant
-implementations via the sound implementation of logic.  In this paper,
-we present two additional project in which an implementation of proof
-search provides direct, elegant, and compact implementations of
-meta-programming tasks.  Before we present these two examples, we
+Before we present these two examples, we
 first discuss the different world views that the integration of ELPI
 and Coq forces us to confront.
 
@@ -88,6 +90,11 @@ treats logical propositions and proofs as separate.  For example,
 proof theory does not assume that there are terms within the logic
 that describe proofs.
 
+\begin{metanote}
+  This paragraph seem to identify proof and type theory with sequents and nat ded and while
+  I agree with the gist (although people such as Frank would argue that sequents are a way of organizing proof search for nat ded), we're not gonna make a lot of friends at types and more importantly is a big hammer to nail the point that logic programming is helpful with Coq --am 
+\end{metanote}
+
 Gentzen's discovery that the key to treating classical and
 intuitionistic logics in the same proof system was the invention of
 the weakening and contraction structural rules on the right-side of
@@ -107,6 +114,9 @@ co-induction (as well as induction: see
 coinduction within type theory remains more challenging and is well
 developed only for various syntactic conditions (see, for example,
 \cite{bertot08entcs}).
+\begin{metanote}
+  The criticism applies to Coq, less to type theory, see co-patterns --am
+\end{metanote}
 
 \subsection{Proof search vs proof normalization}
 
@@ -150,6 +160,9 @@ The difference between these two logics and associate proof theories
 is reminiscent to the difference between the type \lsti{Prop}
 (corresponding to undefined propositions) and Sets (corresponding to
 inductively defined propositions).
+\begin{metanote}
+  Still not onboard with this --am
+\end{metanote}
 
 \subsection{\lP vs Coq}
 
@@ -193,347 +206,22 @@ more often used to indicate syntactic categories.  Any dependency
 information needs to be captured using predicates and quantifiers. 
 
 
-\section{Proof theory and proof certificates}
+\input sec3
 
-{\color{red} The goal in this section is to say a bit about focusing
-  generally, and to give a bit of detail about FPC for Horn clauses.
-  Initial draft of text taken from \cite{blanco19ppdp}.
-}
+\input pbt
 
-\subsection{Focused proof systems}
-\label{ssec:focused}
-
-The proof search approach to encoding Horn clause computation
-results in the structuring of proofs with repeated
-switching between a \emph{goal-reduction} phase and a
-\emph{backchaining} phase~\cite{miller91apal}.
-%
-The notion of \emph{focused proof systems}~\cite{andreoli92jlc,liang09tcs}
-generalizes this view of proof construction by identifying the
-following two phases. % of proof construction.
-\begin{enumerate}
-\item The \emph{negative}%
-\footnote{The terminology of negative and positive phases is a bit
-  unfortunate: historically, these terms do not refer to positive or negative
-  subformula occurrences but rather to certain semantic models used in
-  the study of linear logic~\cite{girard87tcs}.}
-%
-  phase corresponds to  goal-reduction: in this phase,
-  inference rules that involve \emph{don't-care-non\-de\-ter\-min\-ism} are
-  applied.
-%
-  As a result, there is no need to consider backtracking over choices
-  made in building this phase.
-
-\item The \emph{positive} phase corresponding to  backchaining: in this phase, inference rules that involve
-  \emph{don't-know-non\-de\-ter\-min\-ism} are applied: here,
-  inference rules need to be supplied with information in order to
-  ensure that a completed proof can be built.
-%
-  That information can be items such as which term is needed to
-  instantiate a universally quantified formula and which disjunct of a
-  disjunctive goal formula should be proved.
-\end{enumerate}
-%
-Thus, when building a proof tree (in the sequent calculus) from the
-conclusion to its leaves, the negative phase corresponds to a simple
-computation that needs no external information, while the positive
-phase may need such external information to be supplied.
-%
-In the literature, it is common to refer to a repository of such
-external information as either an \emph{oracle} or a \emph{proof
-certificate}.
-
-When using a focused proof system for logic extended with fixed
-points, such as  employed in Bedwyr~\cite{baelde07cade} and described
-in~\cite{baelde12tocl,heath17linearity}, proofs of formulas such as
-\[
-  \exists x [(\tau(x)\wedge P(x)) \wedge \neg Q(x)]
-  \tag{*}\label{eq:full}
-\]
-are a single \emph{bipole}: that is, when reading a proof bottom up, a
-positive phase is followed on all its premises by a single negative
-phase that completes the proof.%
-\footnote{The reader familiar with focusing will understand that there
-are two ``polarized'' conjunctions, written in linear logic as
-$\otimes$ and $\with$ or in classical and intuitionistic logics as
-$\wedgep$ and $\wedgen$, respectively.  In this paper, we use simply
-$\wedge$ to denote the positive biased conjunction.}
-%
-In particular, the positive phase corresponds to the \emph{generation} phase
-and the negative phase corresponds to the \emph{testing} phase.
-%
-
-Instead of giving a full focused proof system of a logic including
-fixed points (since, as we will argue, that proof system will not, in
-fact, be needed to account for PBT ), we offer the following analogy.
-%
-Suppose that we are given a finite search tree and we are asked to
-prove that there is a secret located in one of the nodes of that
-tree.
-%
-A proof that we have found that secret can be taken to be a
-description of the path to that node from the root of the tree: that
-path can be seen as the proof certificate for that claim.
-%
-On the other hand, a proof that no node contains the secret is a
-rather different thing: here, one expects to use a blind and
-exhaustive search (via, say, depth-first or breath-first search) and
-that the result of that search never discovers the secret.
-%
-A proof of this fact requires \emph{no} external information: instead it
-requires a lot of computation involved with exploring the tree until
-exhaustion.
-%
-This follows the familiar pattern where the positive (generate) phase
-requires external information while the negative (testing) phase
-requires none.
-%
-Thus, a proof certificate for $(\ref{eq:full})$ is also a proof
-certificate for 
-\[
-  \exists x [\tau(x)\wedge P(x)].
-  \tag{**}\label{eq:short}
-\]
-Such a certificate would contain the witness (closed) term $t$ for the
-existential quantifier and sufficient information to confirm that
-$P(t)$ can be proved (a proof of a typing judgment such as $\tau(t)$
-is usually trivial).
-%
-%In short\ednote{AM: a bit repetitious}, a proof certificate for
-%$(\ref{eq:short})$ can play the part 
-%of a proof certificate also for $(\ref{eq:full})$, if we also use
-%negation-as-finite-failure  with $Q(t)$.
-%  ****
-Since a proof certificate for the existence-of-a-counterexample formula
-$(\ref{eq:full})$ can be taken as a proof certificate of
-$(\ref{eq:short})$, then we only need to consider proof certificates
-for Horn clause programs.
-%
-%Since the logic of Horn clauses is rather simple,
-We illustrate next what such proofs and proof certificates look like
-for the rather simple logic of Horn clauses.
-
-
-\subsection{Certificate checking with expert predicates}
-%\subsection{Adding certificates and experts to a proof system}
-\label{ssec:fpc}
-
-%% \begin{metanote}
-%%   AM: I know this is well known and boring, but using \texttt{prog A
-%%     G} in Fig \ref{fig:augmented} is imprecise --- in the comment of
-%%   next figure we mention \texttt{A :- G} and we gloss over the
-%%   instantiation of \texttt{prog A' G} to match the goal \texttt{A},
-%%   which we assume to be ground, given the exists rule
-%% \end{metanote}
-
-%% DM I've modified the text a bit to hopefully improve the state of
-%% things here.  The formal proof theory is all about closed
-%% formulas.  The prolog implementation allows open formulas.  This
-%% difference invades most aspects of proof checking, not just the
-%% prog predicate.
-
-% DM We should find a place to smooth over this issue (which is not
-% hard, I think).
-
-\begin{figure}
-\newcommand{\XXi}{{\color{blue}{\Xi}}}
-\[
-\infer{\XXi\vdash t = t}
-      {\eqExpert{\XXi}}
-\qquad
-\infer{\XXi\vdash \true}
-      {\trueExpert{\XXi}}
-\qquad
-\infer{\XXi\vdash G_1\vee G_2}
-      {\XXi'\vdash G_i\qquad \orExpert{\XXi}{\XXi'}{i}}
-\qquad
-\infer{\XXi\vdash \exists x. G}
-      {\XXi'\vdash G[t/x]\qquad \someExpert{\XXi}{\XXi'}{t}}
-\]
-\vskip -6pt
-\[
-\infer{\XXi\vdash G_1\wedge G_2}
-      {\XXi_1\vdash G_1\quad \XXi_2\vdash G_2\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}}
-\qquad
-\infer{\XXi\vdash A}
-      {\XXi'\vdash G \quad (A~\hbox{\tt :-}~G)\in\instan\Pscr
-                     \quad \unfoldExpert{\XXi}{\XXi'}}
-\]
-\caption{A proof system augmented with proof certificates and
-  additional ``expert'' premises.}
-\label{fig:augmented}
-\lstinputlisting[linerange={sigs-end}]{code/kernel.sig}
-\lstinputlisting[linerange={check-end}]{code/kernel.mod}
-\caption{A simple proof checking kernel.}
-\label{fig:kernel}
-\end{figure}
-
-Figure~\ref{fig:augmented} contains a simple proof system for Horn
-clause provability in which each inference rule is augmented with an
-additional premise involving an \emph{expert predicate}, a
-certificate $\Xi$, and possibly continuations of certificates ($\Xi'$,
-$\Xi_1$, $\Xi_2$) with extracted information from certificates (in the
-case of $\vee$ and $\exists$).
-%
-%
-The premise $(A~\hbox{\tt :-}~G)\in\instan{\Pscr}$ in the last
-inference rule of Figure~\ref{fig:augmented} states that the logic
-programming clause $(A~\hbox{\tt :-}~G)$ is a ground instance of some
-clause in a fixed program $\Pscr$.
-%
-Although this proof system is a focused proof system, the
-richness of focusing is not apparent in this simplified 
-setting: thus, we drop the adjective ``focused'' from this point forward.
-
-Figure~\ref{fig:kernel} contains the \lP implementation of the
-inference rules in Figure~\ref{fig:augmented}: here the infix
-turnstile $\vdash$ symbol is replaced by the \lst<i{check} predicate.
-%
-Notice that it is easy to show that no matter how the expert predicates
-are defined, if the goal \lsti{check Cert B} is provable in \lP then
-\lsti{B} must be a sound consequence of the program clauses stored in
-the \lsti{prog} predicate (which provides a natural implementation of
-the premise $(A~\hbox{\tt :-}~G)\in\instan{\Pscr}$.
-% AM: not there
-% in Figure~\ref{fig:kernel}). 
-
-As we mentioned in the introduction, our notion of proof certificates
- is taken from the general setting of \emph{foundational
-  proof certificates}~\cite{chihani17jar}.
-%
-In our case here, an FPC is a collection of \lP clauses that
-provide the remaining details not supplied in Figure~\ref{fig:kernel}:
-that is, the exact set of constructors for the \lsti{cert} type as
-well as the exact specification of the six expert predicates listed in
-that figure.
-%
-Figure~\ref{fig:resources} displays two such FPCs,
-both of which can be used to describe proofs where we bound
-the number of occurrences of unfoldings in a proof.
-%
-For example, the first FPC
-provides the experts for treating certificates that are constructed
-using the \lsti{qheight} constructor.
-%
-As is easy to verify, the query \mbox{\lsti{(check (qheight 5) B)}} (for the
-encoding \lsti{B} of a goal formula) is provable in \lP using the
-clauses in Figures~\ref{fig:kernel} and~\ref{fig:resources} if and
-only if the height of that proof is 5 or less.
-%
-Similarly, the second FPC uses the constructor \lsti{qsize} (with two
-integers) and can be used to bound the total number of instances of
-unfoldings in a proof.
-%
-In particular, the query \mbox{\lsti{sigma H\ (check (qsize 5 H) B)}}
-% \begin{lstlisting}
-% sigma H\ (check (qsize 5 H) B)
-% \end{lstlisting}
-is provable if and only if the total number of unfoldings of that
-proof is 5 or less.
-
-
-\begin{figure}
-\lstinputlisting[linerange={resources-end}]{code/fpcs.sig}
-\lstinputlisting[linerange={resources-end}]{code/fpcs.mod}
-\caption{Two FPCs that describe proofs that are limited in either
-  height or in size.}
-\label{fig:resources}
-\end{figure}
-
-Finally, Figure~\ref{fig:max} contains the FPC based on the constructor
-\lsti{max} that is used to record explicitly all information within a
-proof: in particular, all disjunctive choices and all substitution
-instances for existential quantifiers are collected into a binary tree
-structure of type \lsti{max}.
-%
-In this sense, proof certificates built with the \lsti{max}
-constructor are \emph{maximally} explicit.
-%
-Such proof certificates are used, for example, in~\cite{Pair}; it is
-important to note that proof checking with such maximally explicit
-certificates can be done with much simpler proof-checkers than those
-used in logic programming since backtracking search and unification
-are not needed.
-%
-
-\begin{figure}
-\lstinputlisting[linerange={max-end}]{code/fpcs.sig}
-\lstinputlisting[linerange={max-end}]{code/fpcs.mod}
-\caption{The \lsti{max} FPC}
-\label{fig:max}
-\end{figure}
-
-Further, if we view a particular FPC as a means of restricting proofs, it is
-possible to build an FPC that \emph{restricts} proofs satisfying two FPCs
-simultaneously.
-%
-In particular, Figure~\ref{fig:pairing} defines an FPC based on the
-(infix) constructor \lsti{<c>}, which \emph{pairs} two terms of type
-\lsti{cert}.
-%
-The pairing experts for the certificate \lsti{Cert1 <c> Cert2} simply
-request that the corresponding experts also succeed for both
-\lsti{Cert1} and \lsti{Cert2} and, in the case of the \lsti{orE} and
-\lsti{someE}, also return the same choice and substitution term,
-respectively.
-%
-Thus, the query 
-\begin{lstlisting}
-?- check ((qheight 4) <c> (qsize 10)) B
-\end{lstlisting}
-will succeed if there is a proof of \lsti{B} that has a height less
-than or equal to 4 while also being of size less than or equal to 10.
-%
-A related use of the pairing of two proof certificates is to %use it to
-\emph{distill} or \emph{elaborate} proof certificates. 
-%
-For example, the proof certificate \lsti{(qsize 5 0)} is rather implicit
-since it will match any proof that used unfold exactly 5 times.
-%
-However, the query
-\begin{lstlisting}
-?- check ((qsize 5 0) <c> (max Max)) B.
-\end{lstlisting}
-will store into the \lP variable \lsti{Max} more complete details of
-any proof that satisfies the \lsti{(qsize 5 0)} constraint.
-%
-In particular, this forms the infrastructure of 
- an \emph{explanation} tool for attributing ``blame'' for
-the origin of a counterexample; these maximal
-certificates are an appropriate starting point for documenting
-both the counterexample and why it serves as a counterexample.
-
-
-\begin{figure}
-\lstinputlisting[linerange={pairing-end}]{code/fpcs.sig}
-\lstinputlisting[linerange={pairing-end}]{code/fpcs.mod}
-\caption{FPC for pairing}
-\label{fig:pairing}
-\end{figure}
-
-Various  additional examples and experiments using the pairing of FPCs
-can be found in~\cite{Pair}. Using similar techniques, it is possible to define FPCs that target
-specific types for special treatment: for example, when generating
-integers, only (user-defined) small integers could be inserted into
-counterexamples.
-
-
-
-\section{Property-based testing for Coq}
-
-Simplest setting since we are only sending back to Coq a term (a
-counterexample), not a general proof.  
-
-
-\section{Elaboration of external proof certificates for the Coq
-  kernel}
-
-Follow the text in \cite{blanco20coq}.
-
+\input elab
 
 \section{Conclusion}
 
 
 \bibliography{l}
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+% LocalWords:  Tassi ELPI Teyjus intuitionistic Gentzen's Gentzen LCF
+% LocalWords:  eigenvariables tacticals polymorphically
