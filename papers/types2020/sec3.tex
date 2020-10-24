@@ -59,8 +59,9 @@ certificate}.
 \label{ssec:fpc}
 
 \begin{metanote}
-  add proof terms and backchaining to sequents and code
+  add proof terms and backchaining to sequents and code -- now sig is commented out
 \end{metanote}
+\begin{footnotesize}
 \begin{figure}
 \newcommand{\XXi}{{\color{blue}{\Xi}}}
 \[
@@ -88,13 +89,12 @@ certificate}.
 \caption{A proof system augmented with proof certificates and
   additional ``expert'' premises.}
 \label{fig:augmented}
-TODO
-%\lstinputlisting[linerange={sigs-end}]{code/kernel.sig}
-%\lstinputlisting[linerange={check-end}]{code/kernel.mod}
+%\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
+\lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}
 \caption{A simple proof checking kernel.}
 \label{fig:kernel}
 \end{figure}
-
+\end{footnotesize}
 Figure~\ref{fig:augmented} contains a simple proof system for Horn
 clause provability in which each inference rule is augmented with an
 additional premise involving an \emph{expert predicate}, a
