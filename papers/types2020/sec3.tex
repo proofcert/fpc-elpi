@@ -6,7 +6,7 @@
 }
 
 \begin{metanote}
-  (AM): I would start with the logical reconstruction of \texttt{check}, adding the LJT-style proof terms to fig \ref{fig:augmented} and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
+  (AM): I would start with the logical reconstruction of \texttt{check}, adding the LJT-style proof terms~c\cite{Herbelin94,LengrandDM06} to fig \ref{fig:augmented} and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
 \end{metanote}
 \subsection{Focused proof systems}
 \label{ssec:focused}
@@ -21,10 +21,10 @@ generalizes this view of proof construction by identifying the
 following two phases. % of proof construction.
 \begin{enumerate}
 \item The \emph{negative}%
-\footnote{The terminology of negative and positive phases is a bit
-  unfortunate: historically, these terms do not refer to positive or negative
-  subformula occurrences but rather to certain semantic models used in
-  the study of linear logic~\cite{girard87tcs}.}
+% \footnote{The terminology of negative and positive phases is a bit
+%   unfortunate: historically, these terms do not refer to positive or negative
+%   subformula occurrences but rather to certain semantic models used in
+%   the study of linear logic~\cite{girard87tcs}.}
 %
   phase corresponds to  goal-reduction: in this phase,
   inference rules that involve \emph{don't-care-non\-de\-ter\-min\-ism} are
@@ -193,9 +193,9 @@ Further, if we view a particular FPC as a means of restricting proofs, it is
 possible to build an FPC that \emph{restricts} proofs satisfying two FPCs
 simultaneously.
 %
-In particular, Figure~\ref{fig:pairing} defines an FPC based on the
-(infix) constructor \lsti{<c>}, which \emph{pairs} two terms of type
-\lsti{cert}.
+% In particular, Figure~\ref{fig:pairing} defines an FPC based on the
+% (infix) constructor \lsti{<c>}, which \emph{pairs} two terms of type
+% \lsti{cert}.
 %
 The pairing experts for the certificate \lsti{Cert1 <c> Cert2} simply
 request that the corresponding experts also succeed for both
@@ -230,12 +230,12 @@ than or equal to 4 while also being of size less than or equal to 10.
 % both the counterexample and why it serves as a counterexample.
 
 
-\begin{figure}
-\lstinputlisting[linerange={pairing-end}]{code/fpcs.sig}
-\lstinputlisting[linerange={pairing-end}]{code/fpcs.mod}
-\caption{FPC for pairing}
-\label{fig:pairing}
-\end{figure}
+% \begin{figure}
+% \lstinputlisting[linerange={pairing-end}]{code/fpcs.sig}
+% \lstinputlisting[linerange={pairing-end}]{code/fpcs.mod}
+% \caption{FPC for pairing}
+% \label{fig:pairing}
+% \end{figure}
 
 Various  additional examples and experiments using the pairing of FPCs
 can be found in~\cite{Pair}. Using similar techniques, it is possible to define FPCs that target
