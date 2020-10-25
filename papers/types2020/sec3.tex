@@ -91,7 +91,7 @@ certificate}.
 \label{fig:augmented}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
 \lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}
-\caption{A simple proof checking kernel.}
+\caption{A dependent kernel for Coq terms.}
 \label{fig:kernel}
 \end{figure}
 \end{footnotesize}
@@ -155,9 +155,6 @@ In particular, the query \mbox{\lsti{sigma H\ (check (qsize 5 H) B)}}
 is provable if and only if the total number of unfoldings of that
 proof is 5 or less.
 
-\begin{metanote}
-  Rethink and update (with the right connectives) these FPC
-\end{metanote}
 \begin{figure}
 \lstinputlisting[linerange={resources-end}]{code/fpcs.sig}
 \lstinputlisting[linerange={resources-end}]{code/fpcs.mod}
