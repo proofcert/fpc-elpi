@@ -1,84 +1,114 @@
-\section{Property-based testing for Coq}
+\section{Revisiting property-based testing for Coq}
 
-Simplest setting since we are only sending back to Coq a term (a
-counterexample), not a general proof.
+In a previous paper~\cite{blanco19ppdp}, we presented a
+proof-theoretical reconstruction of property-based testing (PBT) of
+relational specifications, adopting techniques from foundational proof
+certificates to account for several features of these testing
+paradigm: from various \emph{generation} strategies, to
+\emph{shrinking} and fault localization.
+
+Given the connection that \textsf{coq-elpi} offers between logic
+programming and the internals of Coq, it is natural to extend the FPC-driven logic programming interpreter of the previous section to perform PBT of \lstinline{Inductive} types.
+
+While nothing prevents us from porting all the features we discussed in~\cite{blanco19ppdp}, for the sake of this paper we will implement only FPC corresponding to different flavors \emph{exhaustive} generation and their combination, as adopted, e.g., in SmallCheck~\cite{smallcheck} and  $\alpha$Check~\cite{cheney_momigliano_2017}.
+
+Of course, \textsf{QuickChick}~\cite{QChick}
+(\url{https://softwarefoundations.cis.upenn.edu/qc-current}) is a
+sophisticated and far-reaching PBT tool for Coq, which is based on a
+different perspective: being a clone of Haskell's QuickCheck, it
+emphasizes testing executable (read \emph{decidable)} specifications
+with random generators. While current research~\cite{LampropoulosPP18} aims to increase automation, it is fair to say testing, in particular of  relational specifications, is still very labor intensive. We do not intend to compete with  \textsf{QuickChick}, but as we shall see, as far as \lsti{Inductive} definitions that corresponds to pure Horn programs, we can test them immediately without any decidability proof or configuration of generators and shrinkers.
+
+
+\subsection{PBT as proof reconstruction}
+\label{ssec:pbt-lp}
 
 \begin{metanote}
-  dump from previous paper
+  I'm just saying the bare minimum -am
 \end{metanote}
 
-When using a focused proof system for logic extended with fixed
-points, such as  employed in Bedwyr~\cite{baelde07cade} and described
-in~\cite{baelde12tocl,heath17linearity}, proofs of formulas such as
+ If we view  a property as a logical formula
+\(\forall x [(\tau(x)\wedge P(x)) \supset Q(x)]\) where $\tau$ is a
+typing predicate and $P$ and $Q$ are two other predicates defined
+using Horn clause specifications, providing a counter-example
+consists of  negating the property, and \emph{searching} for a proof of
 \[
   \exists x [(\tau(x)\wedge P(x)) \wedge \neg Q(x)]
   \tag{*}\label{eq:full}
 \]
-are a single \emph{bipole}: that is, when reading a proof bottom up, a
-positive phase is followed on all its premises by a single negative
-phase that completes the proof.%
-\footnote{The reader familiar with focusing will understand that there
-are two ``polarized'' conjunctions, written in linear logic as
-$\otimes$ and $\with$ or in classical and intuitionistic logics as
-$\wedgep$ and $\wedgen$, respectively.  In this paper, we use simply
-$\wedge$ to denote the positive biased conjunction.}
-%
-In particular, the positive phase corresponds to the \emph{generation} phase
-and the negative phase corresponds to the \emph{testing} phase.
-%
+%\(\exists x [(\tau(x)\land P(x)) \land \neg Q(x)]\).
 
-Instead of giving a full focused proof system of a logic including
-fixed points (since, as we will argue, that proof system will not, in
-fact, be needed to account for PBT ), we offer the following analogy.
+In our current setting $P$ and $Q$ will be \lsti{Inductive} propositions, while $\tau$   are honest-to-goodness datatypes. We will treat the two quite differently, in so far as elements of those types will be \emph{generated}, while predicates will only be \emph{checked}. This distinction plays also a part in interpreting the negation sign.
 %
-Suppose that we are given a finite search tree and we are asked to
-prove that there is a secret located in one of the nodes of that
-tree.
+When using a focused proof system for logic extended with fixed
+points~\cite{baelde12tocl}, negation corresponds to the usual intutionistic interpretation.  % proofs of formulas such as
+% \[
+%   \exists x [(\tau(x)\wedge P(x)) \wedge \neg Q(x)]
+%   \tag{*}\label{eq:full}
+% \]
+% are a single \emph{bipole}: that is, when reading a proof bottom up, a
+% positive phase is followed on all its premises by a single negative
+% phase that completes the proof.%
+% In particular, the positive phase corresponds to the \emph{generation} phase
+% and the negative phase corresponds to the \emph{testing} phase.
+% %
+
+% Instead of giving a full focused proof system of a logic including
+% fixed points (since, as we will argue, that proof system will not, in
+% fact, be needed to account for PBT ), we offer the following analogy.
+% %
+% Suppose that we are given a finite search tree and we are asked to
+% prove that there is a secret located in one of the nodes of that
+% tree.
+% %
+% A proof that we have found that secret can be taken to be a
+% description of the path to that node from the root of the tree: that
+% path can be seen as the proof certificate for that claim.
+% %
+% On the other hand, a proof that no node contains the secret is a
+% rather different thing: here, one expects to use a blind and
+% exhaustive search (via, say, depth-first or breath-first search) and
+% that the result of that search never discovers the secret.
+% %
+% A proof of this fact requires \emph{no} external information: instead it
+% requires a lot of computation involved with exploring the tree until
+% exhaustion.
+% %
+% This follows the familiar pattern where the positive (generate) phase
+% requires external information while the negative (testing) phase
+% requires none.
 %
-A proof that we have found that secret can be taken to be a
-description of the path to that node from the root of the tree: that
-path can be seen as the proof certificate for that claim.
-%
-On the other hand, a proof that no node contains the secret is a
-rather different thing: here, one expects to use a blind and
-exhaustive search (via, say, depth-first or breath-first search) and
-that the result of that search never discovers the secret.
-%
-A proof of this fact requires \emph{no} external information: instead it
-requires a lot of computation involved with exploring the tree until
-exhaustion.
-%
-This follows the familiar pattern where the positive (generate) phase
-requires external information while the negative (testing) phase
-requires none.
-%
-Thus, a proof certificate for $(\ref{eq:full})$ is also a proof
-certificate for 
+However, for the sake of PBT, we can identify a proof certificate for
+$(\ref{eq:full})$ with a proof certificate for
 \[
   \exists x [\tau(x)\wedge P(x)].
   \tag{**}\label{eq:short}
 \]
-Such a certificate would contain the witness (closed) term $t$ for the
-existential quantifier and sufficient information to confirm that
-$P(t)$ can be proved (a proof of a typing judgment such as $\tau(t)$
-is usually trivial).
-%
-%In short\ednote{AM: a bit repetitious}, a proof certificate for
-%$(\ref{eq:short})$ can play the part 
-%of a proof certificate also for $(\ref{eq:full})$, if we also use
-%negation-as-finite-failure  with $Q(t)$.
-%  ****
-Since a proof certificate for the existence-of-a-counterexample formula
-$(\ref{eq:full})$ can be taken as a proof certificate of
-$(\ref{eq:short})$, then we only need to consider proof certificates
-for Horn clause programs.
+and will resort to negation-as-failure to check that the conclusion does not hold. This also means that we will not be able to return a Coq proof terms for the refutation of our property --- and neither does \textsf{QuickChick}, which runs at the OCaml level --- although we can return the witness for the existential.
+% Such a certificate would contain the witness (closed) term $t$ for the
+% existential quantifier and sufficient information to confirm that
+% $P(t)$ can be proved (a proof of a typing judgment such as $\tau(t)$
+% is usually trivial).
+% Since a proof certificate for the existence-of-a-counterexample formula
+% $(\ref{eq:full})$ can be taken as a proof certificate of
+% $(\ref{eq:short})$, then we only need to consider proof certificates
+% for Horn clause programs.
 %
 %Since the logic of Horn clauses is rather simple,
-We illustrate next what such proofs and proof certificates look like
-for the rather simple logic of Horn clauses.
+% We illustrate next what such proofs and proof certificates look like
+% for the rather simple logic of Horn clauses.
 
-
+\begin{metanote}
+  TODO next
+  \begin{itemize}
+  \item The elpi dep-pbt tactic
+  \item the simple reverse example
+  \item a bit of details about the \texttt{aexp} example
+  \end{itemize}
+\end{metanote}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
+
+% LocalWords:  Bedwyr bipole elpi QuickCheck OCaml TODO
