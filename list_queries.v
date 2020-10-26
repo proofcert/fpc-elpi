@@ -86,7 +86,7 @@ intros xs rs H.
 elpi dep_pbt 3 (H) (xs).
 Abort.
 
-Goal forall (xs rs : list bool), rev xs rs -> xs = rs.
+Goal forall (xs rs : list nat), rev xs rs -> xs = rs.
 intros xs rs H.
 elpi dep_pbt 3 (H) (xs).
 Abort.
