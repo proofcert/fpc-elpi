@@ -102,12 +102,12 @@ and will resort to negation-as-failure to check that the conclusion does not hol
   TODO next
   \begin{itemize}
   \item The elpi dep-pbt tactic
-  \item the simple ordered example
+  \item  the simple ordered example [DONE]
   \item a bit of details about the \texttt{aexp} example
   \end{itemize}
-\end{metanote}
+\end{metanote} 
 
-Let us consider a  relational specification of orered list, as well as insertion in such lists:
+Let us consider a  relational specification of ordered list, as well as insertion in such lists:
 \begin{lstlisting}
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 | i_n : is_nat x -> insert x [] [x]
@@ -120,10 +120,20 @@ Inductive ordered : list nat -> Prop :=
 | o_c : forall (x y : nat), forall xs,  ordered xs  -> x <= y -> ordered (x:: y :: xs).     
 \end{lstlisting}
 %
-A property we may wish to checl before embaring in a formal proof is whether insertion preserves ordered-ness. Since we did slip in an error, our tactic reports a counter-example:
+A property we may wish to check before embarking in a formal proof is whether insertion preserves ordered-ness. Since we did slip in an error, our tactic reports a counter-example, e.g.,
+\verb|(* Proof Term: [0, [0; 1; 0]] *)|:
 \begin{lstlisting}
 Conjecture ins_ord:  forall x xs rs, ordered xs -> insert x xs rs -> ordered rs.
+intros x xs rs  Ho Hi.
+elpi dep_pbt height 5 (Ho /\ Hi ) (x) (xs).
+Abort.
 \end{lstlisting}
+In this query the tactic tests the hypotheses \lsti{Ho} and \lsti{Hi}
+against data \lsti{x,xs} generated exhaustively up to proofs bounded by
+at most $5$ unfoldings of the library \lsti{Inductive} definition of
+\lsti{nat} and \lsti{list}.
+
+Note that the same query in \textsf{QuickChick} would have required much more setup: if we wished to proceed relationally as above we would have had to provide a proof of decidability of the relevant notions. Were we to use functions, then we would have to implement a generator and shrinker for ordered lists.
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
