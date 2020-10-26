@@ -7,4 +7,5 @@ force:
 	bibtex main
 
 show: main.pdf
-	evince main.pdf
+	evince main.pdf &
+
