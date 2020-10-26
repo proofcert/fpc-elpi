@@ -66,7 +66,7 @@ is_natlist xs -> is_natlist ys ->
 append xs ys aps -> rev xs rxs -> rev ys rys ->
 rev aps raps -> append rxs rys raps.
 intros.
-elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 5 (xs /\ ys).
+Fail elpi pbt (H /\ H0) (H1 /\ H2 /\ H3 /\ H4) 10 (xs /\ ys).
 Abort.
 
 Goal forall x x' y: list nat,
@@ -77,12 +77,16 @@ intros.
 elpi pbt (H) (H0 /\ H1) 5 (x).
 Abort.
 
-(*trying existentials*)
 
 (* ****** DEP QUERIES****** *)
 
 
-Goal forall xs rs, rev xs rs -> xs = rs.
+Goal forall (xs rs : list nat), rev xs rs -> xs = rs.
+intros xs rs H.
+elpi dep_pbt 3 (H) (xs).
+Abort.
+
+Goal forall (xs rs : list bool), rev xs rs -> xs = rs.
 intros xs rs H.
 elpi dep_pbt 3 (H) (xs).
 Abort.
@@ -96,19 +100,19 @@ Abort.
 
 
 (* This property is true *)
-Goal forall xs rs, rev xs rs -> rev rs xs.
+Goal forall (xs rs : list nat), rev xs rs -> rev rs xs.
 intros xs rs  H.
 Fail elpi dep_pbt 5 (H) (xs).
 Abort.
 
 (* true, *)
-Goal forall xs rs, rev xs rs -> rev2 xs rs.
+Goal forall (xs rs : list nat), rev xs rs -> rev2 xs rs.
 intros xs rs HR.
 Fail elpi dep_pbt 5 (HR) (xs).
 Abort.
 
 (* false*)
-Goal forall xs ys aps raps rxs rys,
+Goal forall (xs ys aps raps rxs rys : list nat),
 
 append xs ys aps -> rev xs rxs -> rev ys rys ->
 rev aps raps -> append rxs rys raps.

@@ -1,4 +1,4 @@
-
+(* moving list to poly*)
 Require Import Arith List. Import ListNotations.
  Import Coq.Lists.List.
  
@@ -16,23 +16,23 @@ onlb : ordered_bad []
 | ocnb : forall (x y : nat) (l : list nat),
             ordered_bad l  -> x <= y -> ordered_bad (x:: y :: l).         
 
-Inductive append : list nat -> list nat -> list nat -> Prop :=
+Inductive append {A : Set}: list A -> list A -> list A -> Prop :=
 anl : forall xs, append [] xs xs
 |acn : forall xs ys zs x, 
      append xs ys zs -> append (x :: xs) ys (x :: zs).
 
-Inductive rev : list nat -> list nat -> Prop :=
+Inductive rev {A : Set} : list A -> list A -> Prop :=
 r1nl : rev [] []
-| r1c : forall (x: nat) (l ts rs : list nat),
+| r1c : forall (x: A) (l ts rs : list A),
    append ts [x] rs -> rev l ts -> rev (x  :: l) rs.
 
 (* iterative*)
-Inductive revA : list nat -> list nat -> list nat -> Prop :=
+Inductive revA {A : Set} : list A -> list A -> list A -> Prop :=
 rnl : forall acc, revA [] acc acc
-| rc : forall (x : nat) (l acc rs : list nat),
+| rc : forall (x : A) (l acc rs : list A),
    revA l (x :: acc) rs  -> revA (x  :: l) acc rs.
 
-Inductive rev2 : list nat -> list nat -> Prop :=
+Inductive rev2 {A : Set}: list A -> list A -> Prop :=
 r: forall xs ys, revA xs [] ys -> rev2 xs ys.
 
 Inductive is_nat : nat -> Prop :=
