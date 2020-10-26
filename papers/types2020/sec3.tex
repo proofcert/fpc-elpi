@@ -58,36 +58,42 @@ certificate}.
 %\subsection{Adding certificates and experts to a proof system}
 \label{ssec:fpc}
 
-\begin{metanote}
-  add proof terms and backchaining to sequents and code -- now sig is commented out
-\end{metanote}
 \begin{footnotesize}
 \begin{figure}
-\newcommand{\XXi}{{\color{blue}{\Xi}}}
+  \newcommand{\XXi}{}
+  \newcommand{\bc}[2]{#1 >\!> #2}
 \[
 \infer{\XXi\vdash t = t}
-      {\eqExpert{\XXi}}
+{%\eqExpert{\XXi}
+}
 \qquad
 \infer{\XXi\vdash \true}
-      {\trueExpert{\XXi}}
+{%\trueExpert{\XXi}
+}
 \qquad
 \infer{\XXi\vdash G_1\vee G_2}
-      {\XXi'\vdash G_i\qquad \orExpert{\XXi}{\XXi'}{i}}
+{\XXi\vdash G_i%\qquad \orExpert{\XXi}{\XXi'}{i}
+}
 \qquad
 \infer{\XXi\vdash \exists x. G}
-      {\XXi'\vdash G[t/x]\qquad \someExpert{\XXi}{\XXi'}{t}}
-\]
-\vskip -6pt
-\[
+{\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
+}
+\qquad 
 \infer{\XXi\vdash G_1\wedge G_2}
-      {\XXi_1\vdash G_1\quad \XXi_2\vdash G_2\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}}
+{\XXi\vdash G_1\quad \XXi\vdash G_2%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
+}
 \qquad
 \infer{\XXi\vdash A}
-      {\XXi'\vdash G \quad (A~\hbox{\tt :-}~G)\in\instan\Pscr
-                     \quad \unfoldExpert{\XXi}{\XXi'}}
+      {\bc D A \quad D \in \Pscr}
 \]
-\caption{A proof system augmented with proof certificates and
-  additional ``expert'' premises.}
+\vskip -18pt
+\[
+  \infer{\bc A A}{}{}\qquad
+  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
+  \infer{\bc{G\supset D} A}{\bc D A\quad \XXi\vdash G}{}
+\]
+\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
+\caption{A proof system for Horn logic and its encoding in coq-elpi .}
 \label{fig:augmented}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
 \lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}
