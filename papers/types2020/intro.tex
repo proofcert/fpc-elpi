@@ -1,0 +1,38 @@
+\section{Introduction}
+\label{sec:intro}
+
+Recently, C. Sacerdoti Coen and E. Tassi developed the ELPI
+implementation \cite{dunchev15lpar} of \lP \cite{miller12proghol}.
+More recently, Tassi has made ELPI available as a plugin to the Coq
+proof assistant \cite{tassi18coqpl}.  This implementation of \lP
+extends earlier implementations in primarily two directions.  First,
+ELPI adds a notion of constraints, which makes it more expressive than,
+say, the Teyjus implementation of \lP \cite{nadathur99cade}.  Second,
+the plugin version of ELPI comes equip with an API for accessing the
+Coq environment and a quotation and anti-quotation syntax allowing for
+Coq expressions to be mixed with \lP program elements.
+
+ELPI provides a means for treating bindings and unification (of
+structures containing bindings) that are convenient for various
+meta-programming tasks in logic programming all things useful for
+tactic programming in Coq (proof refinement).  For examples, ELPI
+programmers are spared from dealing with low-level aspects of
+representing bindings (e.g., De Bruijn indexes) while still having
+clean and effective ways to manipulate binding structures.  In short,
+ELPI appears to be a useful meta-language for Coq
+\cite{coen19mscs,tassi18coqpl,tassi19itp}.  
+Type inference is a well-known example of a meta-programming task for
+which logic programming often provides immediate and elegant
+implementations via the sound implementation of logic.  % In this paper,
+% we present two additional project in which an implementation of proof
+% search provides direct, elegant, and compact implementations of
+% meta-programming tasks.
+In this paper, we outline
+two applications of the Coq plugin for ELPI that support this claim.
+With these examples, we shall illustrate that ELPI is a useful
+meta-language not just because for its treatment of bindings and
+syntactic structures in general but also because it is actually based
+on a sound implementation of a higher-order intuitionistic logic.
+Before we present these two examples, we
+first discuss the different world views that the integration of ELPI
+and Coq forces us to confront.
