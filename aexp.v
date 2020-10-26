@@ -97,6 +97,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  unfold progress.
  intros e t Ht.    
  Fail elpi pbt (Ht) (True) 5 (e).
+ Fail elpi dep_pbt 5 (Ht) (e).
  Abort.
  
  
@@ -144,7 +145,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  unfold progress.
  intros e t Ht.    
  elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *)
- elpi dep_pbt 3 (Ht) (e) .  (* does not work generating "t"*) 
+ elpi dep_pbt 3 (Ht) (e) (t) .  (* does not work generating !*) 
  Abort.
  
  (* variation 3: failure of step det *)
