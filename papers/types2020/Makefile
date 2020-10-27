@@ -1,4 +1,4 @@
-main.pdf: main.tex
+main.pdf: main.tex intro.tex cultures.tex sec3.tex pbt.tex elab.tex conc.tex app.tex
 	pdflatex main
 	bibtex main
 
