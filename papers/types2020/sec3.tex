@@ -16,7 +16,7 @@
   \end{itemize}
 \end{metanote}
 
-
+Stuff in red is from old paper
 \subsection{Horn logic in coq-elpi}
 
 
@@ -31,7 +31,7 @@ In Fig.~\ref{fig:interp} we give a proof system for Horn logic and its encoding 
 \begin{footnotesize}
   \begin{figure}
   \newcommand{\XXi}{}
-  \newcommand{\bc}[2]{#1 >\!> #2}
+  \newcommand{\bc}[2]{#1 \Downarrow #2}
 \[
 \infer{\XXi\vdash t = t}
 {%\eqExpert{\XXi}
@@ -75,8 +75,11 @@ In Fig.~\ref{fig:interp} we give a proof system for Horn logic and its encoding 
 
 \subsection{Focused proof systems with certificates}
 \label{ssec:focused}
+\todo{Adapt the discussion}
+\todo{Talk about the LJT thing: grammar for formulae and proof terms\cite{Herbelin94,LengrandDM06}?}
 
 %
+{\color{red}
 The notion of \emph{focused proof systems}~\cite{andreoli92jlc,liang09tcs}
 generalizes this view of proof construction by identifying the
 following two phases. % of proof construction.
@@ -112,51 +115,51 @@ phase may need such external information to be supplied.
 In the literature, it is common to refer to a repository of such
 external information as either an \emph{oracle} or a \emph{proof
 certificate}.
-
-\todo{Talk about the LJT thing: grammar for formulae and proof terms\cite{Herbelin94,LengrandDM06}?}
+}
 
 
 %\subsection{Certificate checking with expert predicates}
 %\subsection{Adding certificates and experts to a proof system}
-\label{ssec:fpc}
+%\label{ssec:fpc}
 
 
 \begin{footnotesize}
 \begin{figure}
     \newcommand{\XXi}{{\color{blue}{\Xi}}}
 
-  \newcommand{\bc}[2]{#1 >\!> #2}
+  \newcommand{\bc}[5]{#1;#2\vdash #3 : #4 \Downarrow #5}
 \[
-\infer{\XXi\vdash t = t}
-{%\eqExpert{\XXi}
+% \infer{\XXi\vdash t = t}
+% {%\eqExpert{\XXi}
+% }
+% \qquad
+% \infer{\XXi\vdash \true}
+% {%\trueExpert{\XXi}
+% }
+% \qquad
+% \infer{\XXi\vdash G_1\vee G_2}
+% {\XXi\vdash G_i%\qquad \orExpert{\XXi}{\XXi'}{i}
+% }
+% \qquad
+% \infer{\XXi\vdash \exists x. G}
+% {\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
+% }
+% \qquad 
+\infer{\XXi;\Gamma\vdash \lambda x:A.\,t : \forall x : A.\,  G}
+{\XXi;\Gamma, x : A\vdash t : G%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
 }
 \qquad
-\infer{\XXi\vdash \true}
-{%\trueExpert{\XXi}
-}
-\qquad
-\infer{\XXi\vdash G_1\vee G_2}
-{\XXi\vdash G_i%\qquad \orExpert{\XXi}{\XXi'}{i}
-}
-\qquad
-\infer{\XXi\vdash \exists x. G}
-{\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
-}
-\qquad 
-\infer{\XXi\vdash G_1\wedge G_2}
-{\XXi\vdash G_1\quad \XXi\vdash G_2%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
-}
-\qquad
-\infer{\XXi\vdash A}
-      {\bc D A \quad D \in \Pscr}
+\infer{\XXi;\Gamma\vdash t : A}
+      {\bc{\XXi}{\Gamma} t D A \quad D \in \Pscr\cup\Gamma}
 \]
 \vskip -18pt
 \[
-  \infer{\bc A A}{}{}\qquad
-  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
-  \infer{\bc{G\supset D} A}{\bc D A\quad \XXi\vdash G}{}
+  \infer{\bc {\XXi}{\Gamma} {[]} A A}{\trueExpert{\XXi}}{}\qquad
+%  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
+  \infer{\bc{\XXi}{\Gamma}{(t\ l)} {\forall x:B.\, D} A}
+  {\XXi_1;\Gamma\vdash t : A\qquad \bc{\XXi_2}{\Gamma}l {B[t/x]} A\qquad\prodExpert{\XXi}{\XXi_1}{\XXi_2}}{}
 \]
-\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
+%\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
 \caption{dep kernel.}
 \label{fig:augmented}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
@@ -168,32 +171,35 @@ certificate}.
 
 
 
-Figure~\ref{fig:augmented} contains a simple proof system for Horn
-clause provability in which each inference rule is augmented with an
+Figure~\ref{fig:augmented} contains a simple proof system \dots  in which each inference rule is augmented with an
 additional premise involving an \emph{expert predicate}, a
 certificate $\Xi$, and possibly continuations of certificates ($\Xi'$,
 $\Xi_1$, $\Xi_2$) with extracted information from certificates (in the
 case of $\vee$ and $\exists$).
 %
 %
-% 
-Although this proof system is a focused proof system, the
-richness of focusing is not apparent in this simplified 
-setting: thus, we drop the adjective ``focused'' from this point forward.
-
-Figure~\ref{fig:kernel} contains the \lP implementation of the
-inference rules in Figure~\ref{fig:augmented}: here the infix
-turnstile $\vdash$ symbol is replaced by the \lst<i{check} predicate.
 %
-Notice that it is easy to show that no matter how the expert predicates
-are defined, if the goal \lsti{check Cert B} is provable in \lP then
-\lsti{B} must be a sound consequence of the program clauses stored in
-\dots
+\todo{Explain relations with other term assignments. Note that we do not use explicit substitutions (we are cut free). Explain the choice of not having certificates represent proof terms. Explain that the unfold clause handles defined atoms and defined connectives (conjunction, disjunction, existential and also equality: this may be less efficient and proof-theoretically induce pointless phase changes, but it is arguably very elegant e simplifies proof terms that are inherited by Coq }
+
+Figure~\ref{fig:kernel} contains the elpi implementation of the
+inference rules in Figure~\ref{fig:augmented}: here the infix
+turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate.
+%
+% Notice that it is easy to show that no matter how the expert predicates
+% are defined, if the goal \lsti{check Cert B} is provable in \lP then
+% \lsti{B} must be a sound consequence of the program clauses stored in
+% \dots
 % the \lsti{prog} predicate (which provides a natural implementation of
 % the premise $(A~\hbox{\tt :-}~G)\in\instan{\Pscr}$.
 % AM: not there
 % in Figure~\ref{fig:kernel}). 
 
+\paragraph{Certificates}
+
+\todo{Shorten it}
+\todo{Show the dprolog tactic? have an example? could  be
+\lsti{Goal  exists R, insert 2 [0;1] R.} and we would move the code for insert here}
+{\color{red}
 As we mentioned in the introduction, our notion of proof certificates
  is taken from the general setting of \emph{foundational
   proof certificates}~\cite{chihani17jar}.
@@ -221,7 +227,7 @@ Similarly, the second FPC uses the constructor \lsti{qsize} (with two
 integers) and can be used to bound the total number of instances of
 unfoldings in a proof.
 %
-In particular, the query \mbox{\lsti{sigma H\ (check (qsize 5 H) B)}}
+In particular, the query \mbox{\lsti{(check (qsize 5 H) B)}}
 % \begin{lstlisting}
 % sigma H\ (check (qsize 5 H) B)
 % \end{lstlisting}
@@ -311,7 +317,7 @@ Various  additional examples and experiments using the pairing of FPCs
 can be found in~\cite{Pair}. Using similar techniques, it is possible to define FPCs that target
 specific types for special treatment: for example, when generating
 integers, only (user-defined) small integers could be produced.
-
+}
 
 %%% Local Variables:
 %%% mode: latex
