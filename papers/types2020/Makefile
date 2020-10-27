@@ -9,3 +9,5 @@ force:
 show: main.pdf
 	evince main.pdf &
 
+dropbox: main.pdf
+	cp main.pdf ~/Dropbox/Sync/Drafts/interfacing.pdf
