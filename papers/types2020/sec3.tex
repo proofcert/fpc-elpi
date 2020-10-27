@@ -1,20 +1,81 @@
 \section{Proof theory and proof certificates}
 
-{\color{red} The goal in this section is to say a bit about focusing
-  generally, and to give a bit of detail about FPC for Horn clauses.
-  Initial draft of text taken from \cite{blanco19ppdp}.
-}
+% {\color{red} The goal in this section is to say a bit about focusing
+%   generally, and to give a bit of detail about FPC for Horn clauses.
+%   Initial draft of text taken from \cite{blanco19ppdp}.
+% }
 
 \begin{metanote}
-  (AM): I would start with the logical reconstruction of \texttt{check}, adding the LJT-style proof terms~c\cite{Herbelin94,LengrandDM06} to fig \ref{fig:augmented} and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
+  (AM): Start with the logical reconstruction of \texttt{check}, to and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
+
+  One way to proceed:
+  
+  \begin{itemize}
+  \item One figure fig \ref{fig:interp} for Horn logic over Coq terms (no certificates) and its encoding with quotations 
+  \item Then the logic behind the dependent kernel with certificates and proof terms
+  \end{itemize}
 \end{metanote}
-\subsection{Focused proof systems}
-\label{ssec:focused}
+
+
+\subsection{Horn logic in coq-elpi}
+
 
 The proof search approach to encoding Horn clause computation
 results in the structuring of proofs with repeated
 switching between a \emph{goal-reduction} phase and a
 \emph{backchaining} phase~\cite{miller91apal}.
+
+In Fig.~\ref{fig:interp} we give a proof system for Horn logic and its encoding in coq-elpi
+\todo{explain the interface, quotations etc}
+
+\begin{footnotesize}
+  \begin{figure}
+  \newcommand{\XXi}{}
+  \newcommand{\bc}[2]{#1 >\!> #2}
+\[
+\infer{\XXi\vdash t = t}
+{%\eqExpert{\XXi}
+}
+\qquad
+\infer{\XXi\vdash \true}
+{%\trueExpert{\XXi}
+}
+\qquad
+\infer{\XXi\vdash G_1\vee G_2}
+{\XXi\vdash G_i%\qquad \orExpert{\XXi}{\XXi'}{i}
+}
+\qquad
+\infer{\XXi\vdash \exists x. G}
+{\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
+}
+\qquad 
+\infer{\XXi\vdash G_1\wedge G_2}
+{\XXi\vdash G_1\quad \XXi\vdash G_2%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
+}
+\qquad
+\infer{\XXi\vdash A}
+      {\bc D A \quad D \in \Pscr}
+\]
+\vskip -18pt
+\[
+  \infer{\bc A A}{}{}\qquad
+  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
+  \infer{\bc{G\supset D} A}{\bc D A\quad \XXi\vdash G}{}
+\]
+\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
+\caption{A proof system for Horn logic and its encoding in coq-elpi .}
+\label{fig:interp}
+%\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
+%\lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}
+%\caption{A dependent kernel for Coq terms.}
+%\label{fig:kernel}
+\end{figure}
+\end{footnotesize}
+
+
+\subsection{Focused proof systems with certificates}
+\label{ssec:focused}
+
 %
 The notion of \emph{focused proof systems}~\cite{andreoli92jlc,liang09tcs}
 generalizes this view of proof construction by identifying the
@@ -52,15 +113,18 @@ In the literature, it is common to refer to a repository of such
 external information as either an \emph{oracle} or a \emph{proof
 certificate}.
 
+\todo{Talk about the LJT thing: grammar for formulae and proof terms\cite{Herbelin94,LengrandDM06}?}
 
 
-\subsection{Certificate checking with expert predicates}
+%\subsection{Certificate checking with expert predicates}
 %\subsection{Adding certificates and experts to a proof system}
 \label{ssec:fpc}
 
+
 \begin{footnotesize}
 \begin{figure}
-  \newcommand{\XXi}{}
+    \newcommand{\XXi}{{\color{blue}{\Xi}}}
+
   \newcommand{\bc}[2]{#1 >\!> #2}
 \[
 \infer{\XXi\vdash t = t}
@@ -93,14 +157,17 @@ certificate}.
   \infer{\bc{G\supset D} A}{\bc D A\quad \XXi\vdash G}{}
 \]
 \lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
-\caption{A proof system for Horn logic and its encoding in coq-elpi .}
+\caption{dep kernel.}
 \label{fig:augmented}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
 \lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}
-\caption{A dependent kernel for Coq terms.}
+\caption{Implementation of a  dependent kernel for Coq terms.}
 \label{fig:kernel}
 \end{figure}
 \end{footnotesize}
+
+
+
 Figure~\ref{fig:augmented} contains a simple proof system for Horn
 clause provability in which each inference rule is augmented with an
 additional premise involving an \emph{expert predicate}, a
@@ -250,3 +317,5 @@ integers, only (user-defined) small integers could be produced.
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
+
+% LocalWords:  backchaining disjunct LJT dep qheight qsize orE someE
