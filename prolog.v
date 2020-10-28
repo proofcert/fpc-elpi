@@ -40,7 +40,7 @@ Elpi Accumulate lp:{{
     coq.say "Proof:" {coq.term->string Ev}.
  solve [str "size", int N] [goal _Ctx Ev Goal _Who] _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
-    check (qgen (qsize N N_)) (go Goal Term),
+    check (qgen (qsize N M_)) (go Goal Term),
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
 solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
@@ -51,9 +51,20 @@ solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
   }}.
  Elpi Typecheck. 
 
-(* Elpi Bound Steps 100000.*)
+ Elpi Bound Steps 100000.
 
+Inductive insert (x:nat) : list nat -> list nat -> Prop :=
+i_n : insert x [] [x]
+| i_s : forall y: nat, forall ys: list nat, x <= y -> insert x (y :: ys) (x :: y :: ys)
+| i_c : forall y: nat, forall ys: list nat, forall rs: list nat, x > y -> insert x ys rs -> insert x (y :: ys) (x :: rs).
 
+Goal insert 1 [] [1].
+Fail elpi dprolog 10.
+Abort.
+Goal  exists R, insert 2 [0;1] R.
+eexists.
+Fail elpi  dprolog 100.
+Abort.
  Inductive ordered : list nat -> Prop :=
 onl : ordered []
 | oss : forall x : nat, ordered [x]
