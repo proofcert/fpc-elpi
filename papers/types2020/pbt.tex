@@ -137,13 +137,8 @@ turn the data variables into \lP logic variables when they appear inside a speci
 In order to code this preprocessing step, we leverage extensively \lP's higher order programming features. The substitutions
 are handled with the technique of \lsti|copy| clauses.
 
-Let us consider a  relational specification of ordered list, as well as insertion in such lists:
+Let us consider a  relational specification of ordered list:
 \begin{lstlisting}
-Inductive insert (x:nat) : list nat -> list nat -> Prop :=
-| i_n : is_nat x -> insert x [] [x]
-| i_s : forall y: nat, forall ys, x <= y -> insert x (y :: ys) (x :: y :: ys)
-| i_c : forall y: nat, forall ys rs, x > y -> insert x ys rs -> insert x (y :: ys) (x :: rs).
-
 Inductive ordered : list nat -> Prop :=
 | o_n : ordered []
 | o_s : forall x : nat, ordered [x]
