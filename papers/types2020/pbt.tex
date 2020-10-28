@@ -108,36 +108,39 @@ and will resort to negation-as-failure to check that the conclusion does not hol
 \end{metanote} 
 
 \subsection{Implementing the tactic}
-The working environment we expect when the tactic is invoked is a proof
-environment, where the goal one is trying to prove is the property that the
-specification should meet. This means that, after \lsti|intro| has been used to
-introduce the relevant hypotheses, we will have a context consisting of
-typing information for a bunch of variables that we should divide in two categories:
-dependent variables, that appear also in the types of other variables, and non-dependent
-variables, that don't appear elsewhere. Obviously, the two are the result of and \lsti|intro| on either
-a dependent or a non-dependent product; in our setting, however, this division acquires an additional reading:
-since specifications are encoded as pure Horn clauses, were no dependency is involved, non-dependent variables
-simply tag the specification clauses whereas dependent variables represent the typing information for the data variables that 
-the speficications use.
+We will invoke the tactic in a
+proof environment  where the goal is % one is trying to prove is the
+property that the specification should meet. This means that, after
+\lsti|intro| has been used to introduce the relevant hypotheses, we
+will have a context % consisting of typing information for a bunch of variables
+that we  divide in two categories: dependent
+variables, which appear also in the types of other variables, and
+non-dependent variables tat do not % Obviously, the
+% two are the result of and \lsti|intro| on either a dependent or a
+% non-dependent product
+; in our setting this division acquires an additional reading beyond
+what the property looks like: since specifications are encoded as pure
+Horn clauses where no dependency is involved non-dependent variables
+simply tag the specification clauses, whereas dependent variables
+represent the typing information for the data variables that the
+speficications use.
 
-In order to generate a counterexample, we will need the user to specify which variables of the environment should
-be used for generating data and which for executing the specification. In addition to this, the user should 
-specify all the certificate information that will guide the data generation phase. The goal of the current environment will
-directly provide the property for which we want to find a counterexample. Say we want to generate a counterexample for
-some specification represented by \lsti|H1| and \lsti|H2| in the environment, and we want to generate the data for
-some variables \lsti|v1| and \lsti|v2| with a height bounded to 10: the final call to the tactic will then 
-look like:
-\begin{lstlisting}
-  elpi pbt 10 (H1 /\ H2) (v1) (v2)
-\end{lstlisting}
+Whithin the tactic the user
+specifies which variables of the environment should be used for
+generating data and which for executing the specification. In addition
+to this, the user should specify all the certificate information that
+will guide the data generation phase. The goal of the current
+environment will directly provide the property for which we want to
+find a counterexample. % Say we want to generate a counterexample for
+% some specification represented by \lsti|H1| and \lsti|H2| in the
+% environment, and we want to generate the data for some variables
+% \lsti|v1| and \lsti|v2| with a height bounded to 10: the final call to
+% the tactic will then look like:
+% \begin{lstlisting}
+%   elpi pbt 10 (H1 /\ H2) (v1) (v2)
+% \end{lstlisting}
 
-In order to generate the query to the \lsti|check| predicate, some pre-processing is needed. In particular, we need to
-turn the data variables into \lP logic variables when they appear inside a specification, and to generate querys to
-\lsti|check| for each of these logic variables in association with the type of the data variable it corresponds to.
-In order to code this preprocessing step, we leverage extensively \lP's higher order programming features. The substitutions
-are handled with the technique of \lsti|copy| clauses.
-
-Let us consider a  relational specification of ordered list:
+To exemplify, let us add to the previous specification a definition of ordered list:
 \begin{lstlisting}
 Inductive ordered : list nat -> Prop :=
 | o_n : ordered []
@@ -145,20 +148,36 @@ Inductive ordered : list nat -> Prop :=
 | o_c : forall (x y : nat), forall xs,  ordered xs  -> x <= y -> ordered (x:: y :: xs).     
 \end{lstlisting}
 %
-A property we may wish to check before embarking in a formal proof is whether insertion preserves ordered-ness. Since we did slip in an error, our tactic reports a counter-example, e.g.,
-\verb|(* Proof Term: [0, [0; 1; 0]] *)|:
+A property we may wish to check before embarking in a formal proof is whether insertion preserves ordered-ness:
 \begin{lstlisting}
 Conjecture ins_ord:  forall x xs rs, ordered xs -> insert x xs rs -> ordered rs.
-intros x xs rs  Ho Hi.
+intros x xs rs Ho Hi.
 elpi dep_pbt height 5 (Ho /\ Hi ) (x) (xs).
 Abort.
 \end{lstlisting}
 In this query the tactic tests the hypotheses \lsti{Ho} and \lsti{Hi}
-against data \lsti{x,xs} generated exhaustively up to proofs bounded by
-at most $5$ unfoldings of the library \lsti{Inductive} definition of
-\lsti{nat} and \lsti{list}.
+against data \lsti{x,xs} generated exhaustively up to proofs bounded
+by at most $5$ unfoldings of the library \lsti{Inductive} definition
+of \lsti{nat} and \lsti{list}. Since we did slip in an error (where?), our
+tactic reports a counter-example, namely
+\verb|(* Proof Term: [0, [0; 1; 0]] *)|
 
-Note that the same query in \textsf{QuickChick} would have required much more setup: if we wished to proceed relationally as above we would have had to provide a proof of decidability of the relevant notions. Were we to use functions, then we would have to implement a generator and shrinker for ordered lists.
+
+In order to generate the query to the \lsti|check| predicate, some
+pre-processing is needed. In particular, we need to turn the data
+variables into \lP logic variables when they appear inside a
+specification, and to generate querys to \lsti|check| for each of
+these logic variables in association with the type of the data
+variable it corresponds to.  In order to code this preprocessing step,
+we leverage extensively \lP's higher order programming features. The
+substitutions are handled with the technique of \lsti|copy| clauses.
+
+
+Note that the same query in \textsf{QuickChick} would have required
+much more setup: if we wished to proceed relationally as above we
+would have had to provide a proof of decidability of the relevant
+notions. Were we to use functions, then we would have to implement a
+generator and shrinker for ordered lists.
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
