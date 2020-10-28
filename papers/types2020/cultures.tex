@@ -11,7 +11,7 @@ number of new pairing that is valuable to explicitly discuss.
 
 In many ways, proof theory is more elementary and low-level than most
 approaches to type theory.  For example, type theories usually answer
-the question ``What is a proof?'' with the response ``a dependently
+the question ``What is a proof?'' with the response ``a (dependently)
 typed $\lambda$-term''.  That is, when describing a type theory, one
 usually decides that a proof is a certain kind of $\lambda$-term
 within the system.  In contrast, the proof theory treats logical
@@ -37,11 +37,13 @@ sequents~\cite{gentzen35}.  This invention lead him away from natural
 deduction to multiple-conclusion sequent calculus, a very important
 kind of proof that has not been given a satisfactory representation in
 type theory.  This same innovation of Gentzen also opened the way to
-the invention of another key proof-theoretic discovery, that of linear
-logic \cite{girard87tcs}.  Similarly, sequent calculus provides an
-elegant presentation of linear logic while most treatments of linear
-logic in type theory usually only capture linearity in a partial
-fashion.
+another key proof-theoretic discovery, that of linear logic
+\cite{girard87tcs}.  Similarly, sequent calculus provides an elegant
+presentation of linear logic while most treatments of linear logic in
+type theory usually only capture linearity in a partial fashion.
+\begin{metanote}
+  `` partial fashion.'' Isn't that a bit vague? Some references? -am
+\end{metanote}
 
 As is often observed, however, sequent calculus is too low-level to be
 used explicitly as capturing the ``essence of a proof''.  Recent
@@ -151,6 +153,7 @@ backtracking search.  Combining those features along with its support
 of unification (even in the presence of term-level bindings), \lP
 provides a rather different approach to the specification of tactics
 \cite{felty93jar}.
+
 
 While \lP is a typed language, it only uses simple, polymorphic types,
 and these are more often used to indicate syntactic categories.  Any
