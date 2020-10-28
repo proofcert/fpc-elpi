@@ -319,6 +319,41 @@ specific types for special treatment: for example, when generating
 integers, only (user-defined) small integers could be produced.
 }
 
+\paragraph{A prolog tactic}
+
+\begin{metanote}
+  Let's dump it here and see how it looks
+\end{metanote}
+
+\begin{lstlisting}
+Elpi Accumulate lp:{{
+  solve [str ''height'', int N] [goal _Ctx Ev G _Who] _OutGoals :-
+    coq.say "Goal:" {coq.term->string G},
+    check (qheight N) (go G Term),
+    Ev = Term,
+    coq.say "Proof:" {coq.term->string Ev}.
+...
+}}.
+\end{lstlisting}
+The following example show how we can do FPC-driven logic programming in Coq and return
+a Coq term
+\begin{lstlisting}
+Inductive insert (x:nat) : list nat -> list nat -> Prop :=
+| i_n : is_nat x -> insert x [] [x]
+| i_s : forall y: nat, forall ys, x <= y -> insert x (y :: ys) (x :: y :: ys)
+| i_c : forall y: nat, forall ys rs, y <= x -> insert x ys rs -> insert x (y :: ys) (x :: rs).
+Lemma i1:  exists R, insert 2 [0;1] R.
+elpi  dprolog 10.
+Qed.
+Print i1.
+\end{lstlisting}
+\begin{verbatim}
+ex_intro (fun R : list nat => insert 2 [0; 1] R) [2; 2; 2]
+  (i_c 2 0 [1] [2; 2] (le_S 0 1 (le_S 0 0 (le_n 0)))
+	 (i_c 2 1 [] [2] (le_S 1 1 (le_n 1)) (i_n 2)))
+     : exists R : list nat, insert 2 [0; 1] R
+\end{verbatim}
+%
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"

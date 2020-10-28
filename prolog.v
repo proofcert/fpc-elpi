@@ -56,7 +56,7 @@ solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 i_n : insert x [] [x]
 | i_s : forall y: nat, forall ys: list nat, x <= y -> insert x (y :: ys) (x :: y :: ys)
-| i_c : forall y: nat, forall ys: list nat, forall rs: list nat, x > y -> insert x ys rs -> insert x (y :: ys) (x :: rs).
+| i_c : forall y: nat, forall ys: list nat, forall rs: list nat, y <= x -> insert x ys rs -> insert x (y :: ys) (x :: rs).
 
 Goal insert 1 [] [1].
 Fail elpi dprolog 10.
