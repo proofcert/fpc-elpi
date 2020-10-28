@@ -107,6 +107,36 @@ and will resort to negation-as-failure to check that the conclusion does not hol
   \end{itemize}
 \end{metanote} 
 
+\subsection{Implementing the tactic}
+The working environment we expect when the tactic is invoked is a proof
+environment, where the goal one is trying to prove is the property that the
+specification should meet. This means that, after \lsti|intro| has been used to
+introduce the relevant hypotheses, we will have a context consisting of
+typing information for a bunch of variables that we should divide in two categories:
+dependent variables, that appear also in the types of other variables, and non-dependent
+variables, that don't appear elsewhere. Obviously, the two are the result of and \lsti|intro| on either
+a dependent or a non-dependent product; in our setting, however, this division acquires an additional reading:
+since specifications are encoded as pure Horn clauses, were no dependency is involved, non-dependent variables
+simply tag the specification clauses whereas dependent variables represent the typing information for the data variables that 
+the speficications use.
+
+In order to generate a counterexample, we will need the user to specify which variables of the environment should
+be used for generating data and which for executing the specification. In addition to this, the user should 
+specify all the certificate information that will guide the data generation phase. The goal of the current environment will
+directly provide the property for which we want to find a counterexample. Say we want to generate a counterexample for
+some specification represented by \lsti|H1| and \lsti|H2| in the environment, and we want to generate the data for
+some variables \lsti|v1| and \lsti|v2| with a height bounded to 10: the final call to the tactic will then 
+look like:
+\begin{lstlisting}
+  elpi pbt 10 (H1 /\ H2) (v1) (v2)
+\end{lstlisting}
+
+In order to generate the query to the \lsti|check| predicate, some pre-processing is needed. In particular, we need to
+turn the data variables into \lP logic variables when they appear inside a specification, and to generate querys to
+\lsti|check| for each of these logic variables in association with the type of the data variable it corresponds to.
+In order to code this preprocessing step, we leverage extensively \lP's higher order programming features. The substitutions
+are handled with the technique of \lsti|copy| clauses.
+
 Let us consider a  relational specification of ordered list, as well as insertion in such lists:
 \begin{lstlisting}
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=

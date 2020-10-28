@@ -4,6 +4,7 @@
 \usepackage{listings}
 \usepackage{letltxmacro}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{cmll}  % Improved linear logic symbols
 
 % \newcommand{\blue}[1]{{\color[rgb]{0,0,1} #1}}
 % \newcommand{\tup}[1]{\langle #1\rangle}
@@ -42,7 +43,7 @@
 \newcommand{\wedgen}{\wedge^{\!-}}
 \newcommand{\veep}{\vee^{\!+}}
 \newcommand{\veen}{\vee^{\!-}}
-\newcommand{\with}{\&}
+%\newcommand{\with}{\&}
 
 \newcommand{\Nscr}{{\cal N}}
 \newcommand{\Rscr}{{\cal R}}                                   % Used for an ambiguous rhs
@@ -116,4 +117,7 @@
 \lstset{language=coq}
 \lstset{basicstyle=\footnotesize,
 		breaklines=true}
+
+\newcommand{\lpar}{\mathrel{\parr}}
+
 % LocalWords:  grnd nat lst ACheck
