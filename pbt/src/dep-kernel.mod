@@ -109,7 +109,7 @@ check Cert (go Atom Term) :-
 	%% clause in the zipped list of constructors and clauses.
 	std.lookup {std.zip Kn Clauses} K Clause, 
 	check Cert' (bc Clause Atom ListArgs),
-  Term = (app [Kons|ListArgs]).
+  coq.mk-app Kons ListArgs Term.
 
 %% Perform simple reduction in the head
 check Cert (go (app [(fun A B C)| Args]) Term) :-
