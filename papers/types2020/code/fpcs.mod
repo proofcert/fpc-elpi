@@ -9,7 +9,6 @@ andE    (qheight H) (qheight H) (qheight H).
 prodE   (qheight H) (qheight H) (qheight H).
 unfoldE Kn (qheight H) (qheight H') K :-
       std.mem Kn K, H  > 0, H' is H  - 1.
-
 eqE     (qsize In In).
 ttE      (qsize In In).
 orE      (qsize In Out) (qsize In Out) _.

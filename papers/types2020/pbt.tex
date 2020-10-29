@@ -23,9 +23,9 @@ with random generators. While current research~\cite{LampropoulosPP18} aims to i
 \subsection{PBT as proof reconstruction}
 \label{ssec:pbt-lp}
 
-\begin{metanote}
-  I'm just saying the bare minimum -am
-\end{metanote}
+% \begin{metanote}
+%   I'm just saying the bare minimum -am
+% \end{metanote}
 
  If we view  a property as a logical formula
 \(\forall x [(\tau(x)\wedge P(x)) \supset Q(x)]\) where $\tau$ is a
@@ -98,14 +98,14 @@ and will resort to negation-as-failure to check that the conclusion does not hol
 % We illustrate next what such proofs and proof certificates look like
 % for the rather simple logic of Horn clauses.
 
-\begin{metanote}
-  TODO next
-  \begin{itemize}
-  \item The elpi dep-pbt tactic
-  \item  the simple ordered example [DONE]
-  \item a bit of details about the \texttt{aexp} example
-  \end{itemize}
-\end{metanote} 
+% \begin{metanote}
+%   TODO next
+%   \begin{itemize}
+%   \item The elpi dep-pbt tactic
+%   \item  the simple ordered example [DONE]
+%   \item a bit of details about the \texttt{aexp} example
+%   \end{itemize}
+% \end{metanote} 
 
 \subsection{Implementing the tactic}
 We will invoke the tactic in a
@@ -139,8 +139,17 @@ find a counterexample. % Say we want to generate a counterexample for
 % \begin{lstlisting}
 %   elpi pbt 10 (H1 /\ H2) (v1) (v2)
 % \end{lstlisting}
+Formally, for a property
+\[
+\forall x_1 \colon \tau_1\dots x_n \colon \tau_m, A_1\land\dots\land A_m \supset B
+\]
+and the specification of a FPC, the call will be:
+\begin{lstlisting}
+elpi dep_pbt <fpc> $(A_1\land\dots\land A_m) \ (x_1) \dots (x_n)$.
+\end{lstlisting}
 
-To exemplify, let us add to the previous specification a definition of ordered list:
+To exemplify, let us add to the previous specification of list
+insertion a definition of ordered list:
 \begin{lstlisting}
 Inductive ordered : list nat -> Prop :=
 | o_n : ordered []
@@ -166,18 +175,21 @@ tactic reports a counter-example, namely
 In order to generate the query to the \lsti|check| predicate, some
 pre-processing is needed. In particular, we need to turn the data
 variables into \lP logic variables when they appear inside a
-specification, and to generate querys to \lsti|check| for each of
+specification, and to generate queries to \lsti|check| for each of
 these logic variables in association with the type of the data
-variable it corresponds to.  In order to code this preprocessing step,
+variable it corresponds to.  In order to realize this preprocessing step,
 we leverage extensively \lP's higher order programming features. The
 substitutions are handled with the technique of \lsti|copy| clauses.
 
 
 Note that the same query in \textsf{QuickChick} would have required
-much more setup: if we wished to proceed relationally as above we
+much more setup: if we wished to proceed relationally as above, we
 would have had to provide a proof of decidability of the relevant
 notions. Were we to use functions, then we would have to implement a
 generator and shrinker for ordered lists.
+
+\todo{the \texttt{aexp} example}
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
