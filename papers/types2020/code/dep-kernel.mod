@@ -16,8 +16,8 @@ interp {{lp:G1 /\ lp:G2}} :- !, interp G1, interp G2.
 interp {{lp:G1 \/ lp:G2}} :- !, interp G1; interp G2.
 interp {{lp: T = lp:T}} :- !.
 interp{{ex (lp:G)}} :- !, interp (G X).
-interp (app [global (indt Prog) | _Args] as Atom) :-
-  coq.env.indt Prog _ _ _ _Type _Kn Clauses,
+interp (app [global (indt Prog) | _] as Atom) :-
+  coq.env.indt Prog _ _ _ _  _ Clauses,
   std.mem Clauses D,
   get_head D Atom,
   backchain D Atom.

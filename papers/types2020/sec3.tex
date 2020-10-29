@@ -1,4 +1,4 @@
-\newpage
+%\newpage
 \section{Proof theory and proof certificates}
 
 % {\color{red} The goal in this section is to say a bit about focusing
@@ -119,6 +119,8 @@ certificate}.
 %\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
 \caption{dep kernel.}
 \label{fig:augmented}
+\end{figure}
+\begin{figure}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
 \lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}
 \caption{Implementation of a  dependent kernel for Coq terms.}
@@ -271,7 +273,7 @@ than or equal to 4 while also being of size less than or equal to 10.
 % \end{figure}
 
 Various  additional examples and experiments using the pairing of FPCs
-can be found in~\cite{Pair}. Using similar techniques, it is possible to define FPCs that target
+can be found in~\cite{blanco17cade}. Using similar techniques, it is possible to define FPCs that target
 specific types for special treatment: for example, when generating
 integers, only (user-defined) small integers could be produced.
 }
@@ -306,10 +308,9 @@ Qed.
 Print i1.
 \end{lstlisting}
 \begin{verbatim}
-ex_intro (fun R : list nat => insert 2 [0; 1] R) [2; 2; 2]
-  (i_c 2 0 [1] [2; 2] (le_S 0 1 (le_S 0 0 (le_n 0)))
-	 (i_c 2 1 [] [2] (le_S 1 1 (le_n 1)) (i_n 2)))
-     : exists R : list nat, insert 2 [0; 1] R
+ex_intro (fun R : list nat => insert 2 [0; 1] R) [0; 1; 2]
+  (i_c 2 0 [1] [1; 2] (i_c 2 1 [] [2] (i_n 2)))
+	 : exists R : list nat, insert 2 [0; 1] R
 \end{verbatim}
 %
 %%% Local Variables:

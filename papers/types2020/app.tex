@@ -2,48 +2,51 @@
 \section{Appendix}
 \label{sec:app}
 
-Stuff we may not have space for in the paper
+In this appendix we list some definitions and pieces of code that may be helpful
+
+\subsection{Interp}
 
 
-In Fig.~\ref{fig:interp} we give a proof system for Horn logic and its encoding in coq-elpi
-\todo{explain the interface, quotations etc}
+In Fig.~\ref{fig:interp} we the encoding of the vanilla meta-interpreter used in
+the testing phase of the \lsti{dep_pbt} tactic. Differently from Fig.~\ref{fig:augmented} we appeal, via quotations, to Coq's defined connectives --- note the use of a green cut to avoid overlapping with the \lsti{Inductive} atomic case and the absence of certificates.
 
 \begin{figure}
-\newcommand{\XXi}{\Pscr}
-\newcommand{\bc}[2]{\Pscr\Downarrow #1 \vdash #2}
-\[
-\infer{\XXi\vdash t = t}
-{%\eqExpert{\XXi}
-}
-\qquad
-\infer{\XXi\vdash \true}
-{%\trueExpert{\XXi}
-}
-\qquad
-\infer{\XXi\vdash G_1\vee G_2}
-{\XXi\vdash G_i%\qquad \orExpert{\XXi}{\XXi'}{i}
-}
-\qquad
-\infer{\XXi\vdash \exists x. G}
-{\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
-}
-\qquad 
-\infer{\XXi\vdash G_1\wedge G_2}
-{\XXi\vdash G_1\quad \XXi\vdash G_2%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
-}
-\]
-\vskip -18pt
-\[
-\infer{\XXi\vdash A}
-      {\bc D A \quad D \in \Pscr}\qquad
-  \infer{\bc A A}{}{}\qquad
-  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
-  \infer{\bc{G\supset D} A}{\bc D A\quad \XXi\vdash G}{}
-\]
-In the judgment $\bc{D}{A}$, the variable $A$ ranges over only atomic
-formulas.
+% \newcommand{\XXi}{\Pscr}
+% \newcommand{\bc}[2]{\Pscr\Downarrow #1 \vdash #2}
+% \[
+% \infer{\XXi\vdash t = t}
+% {%\eqExpert{\XXi}
+% }
+% \qquad
+% \infer{\XXi\vdash \true}
+% {%\trueExpert{\XXi}
+% }
+% \qquad
+% \infer{\XXi\vdash G_1\vee G_2}
+% {\XXi\vdash G_i%\qquad \orExpert{\XXi}{\XXi'}{i}
+% }
+% \qquad
+% \infer{\XXi\vdash \exists x. G}
+% {\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
+% }
+% \qquad 
+% \infer{\XXi\vdash G_1\wedge G_2}
+% {\XXi\vdash G_1\quad \XXi\vdash G_2%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
+% }
+% \]
+% \vskip -18pt
+% \[
+% \infer{\XXi\vdash A}
+%       {\bc D A \quad D \in \Pscr}\qquad
+%   \infer{\bc A A}{}{}\qquad
+%   \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
+%   \infer{\bc{G\supset D} A}{\bc D A\quad \XXi\vdash G}{}
+% \]
+% In the judgment $\bc{D}{A}$, the variable $A$ ranges over only atomic
+% formulas.
+ \lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
 \lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
-\caption{A proof system for Horn logic and its encoding in coq-elpi.}
+\caption{Encoding in coq-elpi of the vanilla meta-interpreter}
 \label{fig:interp}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
 %\lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}

@@ -1,23 +1,37 @@
 \section{Revisiting property-based testing for Coq}
 
-In a previous paper~\cite{blanco19ppdp}, we presented a
+We have presented n a previous paper~\cite{blanco19ppdp} a
 proof-theoretical reconstruction of property-based testing (PBT) of
 relational specifications, adopting techniques from foundational proof
-certificates to account for several features of these testing
+certificates to account for several features of this testing
 paradigm: from various \emph{generation} strategies, to
 \emph{shrinking} and fault localization.
 
 Given the connection that \textsf{coq-elpi} offers between logic
-programming and the internals of Coq, it is natural to extend the FPC-driven logic programming interpreter of the previous section to perform PBT of \lstinline{Inductive} types.
+programming and the internals of Coq, it is natural to extend the
+FPC-driven logic programming interpreter of the previous section to
+perform PBT over \lstinline{Inductive} types.
 
-While nothing prevents us from porting all the features we discussed in~\cite{blanco19ppdp}, for the sake of this paper we will implement only FPC corresponding to different flavors \emph{exhaustive} generation and their combination, as adopted, e.g., in SmallCheck~\cite{smallcheck} and  $\alpha$Check~\cite{cheney_momigliano_2017}.
+While nothing prevents us from porting all the features we discussed
+in~\cite{blanco19ppdp}, for the sake of this paper we will implement
+only FPC corresponding to different flavors \emph{exhaustive}
+generation and their combination, as adopted, e.g., in
+SmallCheck~\cite{smallcheck} and
+$\alpha$Check~\cite{cheney_momigliano_2017}.
 
-Of course, \textsf{QuickChick}~\cite{QChick}
+Of course, Coq already features \textsf{QuickChick}~\cite{QChick}
 (\url{https://softwarefoundations.cis.upenn.edu/qc-current}) is a
-sophisticated and far-reaching PBT tool for Coq, which is based on a
-different perspective: being a clone of Haskell's QuickCheck, it
-emphasizes testing executable (read \emph{decidable)} specifications
-with random generators. While current research~\cite{LampropoulosPP18} aims to increase automation, it is fair to say testing, in particular of  relational specifications, is still very labor intensive. We do not intend to compete with  \textsf{QuickChick}, but as we shall see, as far as \lsti{Inductive} definitions that corresponds to pure Horn programs, we can test them immediately without any decidability proof or configuration of generators and shrinkers.
+sophisticated and well-supported PBT tool, based on a different
+perspective: being a clone of Haskell's QuickCheck, it emphasizes
+testing executable (read \emph{decidable)} specifications with random
+generators. While current research~\cite{LampropoulosPP18} aims to
+increase automation, it is fair to say that testing, in particular of
+relational specifications, is still very labor intensive. We do not
+intend to compete with \textsf{QuickChick}, but we shall see that we
+can test them immediately \lsti{Inductive} definitions that
+corresponds to pure Horn programs, without any decidability proof nor
+commitment to the random generation strategy, and related
+configuration of generators and shrinkers.
 
 
 \subsection{PBT as proof reconstruction}
@@ -107,25 +121,25 @@ and will resort to negation-as-failure to check that the conclusion does not hol
 %   \end{itemize}
 % \end{metanote} 
 
-\subsection{Implementing the tactic}
+\subsection{An Elpi tactic for PBT}
 We will invoke the tactic in a
 proof environment  where the goal is % one is trying to prove is the
-property that the specification should meet. This means that, after
+the property that the system-under-test should meet. This means that, after
 \lsti|intro| has been used to introduce the relevant hypotheses, we
-will have a context % consisting of typing information for a bunch of variables
-that we  divide in two categories: dependent
-variables, which appear also in the types of other variables, and
-non-dependent variables tat do not % Obviously, the
+ have a proof context % consisting of typing information for a bunch of variables
+where eigenvariables  play different roles:  dependent
+variables, that is the ones appearing also in the types of other variables, are subject to generation, while
+non-dependent ones tags assumptions that are only to tested. This is reminiscent of bi.directional type-checking. % Obviously, the
 % two are the result of and \lsti|intro| on either a dependent or a
 % non-dependent product
-; in our setting this division acquires an additional reading beyond
-what the property looks like: since specifications are encoded as pure
-Horn clauses where no dependency is involved non-dependent variables
-simply tag the specification clauses, whereas dependent variables
-represent the typing information for the data variables that the
-speficications use.
+% ; in our setting this division acquires an additional reading beyond
+% what the property looks like: since specifications are encoded as pure
+% Horn clauses where no dependency is involved, non-dependent variables
+% simply tag the specification clauses, whereas dependent variables
+% represent the typing information for the data variables that the
+% specifications use.
 
-Whithin the tactic the user
+Within the tactic the user therefore
 specifies which variables of the environment should be used for
 generating data and which for executing the specification. In addition
 to this, the user should specify all the certificate information that
@@ -139,14 +153,19 @@ find a counterexample. % Say we want to generate a counterexample for
 % \begin{lstlisting}
 %   elpi pbt 10 (H1 /\ H2) (v1) (v2)
 % \end{lstlisting}
-Formally, for a property
+Concretely, for a property
 \[
 \forall x_1 \colon \tau_1\dots x_n \colon \tau_m, A_1\land\dots\land A_m \supset B
 \]
-and the specification of a FPC, the call will be:
+and the specification of a FPC, the call to the tactic will be:
 \begin{lstlisting}
 elpi dep_pbt <fpc> $(A_1\land\dots\land A_m) \ (x_1) \dots (x_n)$.
 \end{lstlisting}
+The tactic will call \lsti{check} with the given FPC on the dependent variables and will simply call a vanilla meta-interpreter (see Fig.~\ref{fig:interp} in the appendix) to test
+\begin{lstlisting}
+interp $(A_1\land\dots\land A_m$), not (interp $B$)}
+\end{lstlisting}
+where \lsti{not} in \lP's negation-as-failure operator.
 
 To exemplify, let us add to the previous specification of list
 insertion a definition of ordered list:
@@ -157,9 +176,10 @@ Inductive ordered : list nat -> Prop :=
 | o_c : forall (x y : nat), forall xs,  ordered xs  -> x <= y -> ordered (x:: y :: xs).     
 \end{lstlisting}
 %
-A property we may wish to check before embarking in a formal proof is whether insertion preserves ordered-ness:
+A property we may wish to check before embarking in a formal proof is
+whether insertion preserves ordered-ness:
 \begin{lstlisting}
-Conjecture ins_ord:  forall x xs rs, ordered xs -> insert x xs rs -> ordered rs.
+Conjecture ins_ord:  forall (x : nat) xs rs, ordered xs -> insert x xs rs -> ordered rs.
 intros x xs rs Ho Hi.
 elpi dep_pbt height 5 (Ho /\ Hi ) (x) (xs).
 Abort.
@@ -177,7 +197,7 @@ pre-processing is needed. In particular, we need to turn the data
 variables into \lP logic variables when they appear inside a
 specification, and to generate queries to \lsti|check| for each of
 these logic variables in association with the type of the data
-variable it corresponds to.  In order to realize this preprocessing step,
+variable it corresponds to.  In order to realize this pre-processing step,
 we leverage extensively \lP's higher order programming features. The
 substitutions are handled with the technique of \lsti|copy| clauses.
 

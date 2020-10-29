@@ -1,6 +1,8 @@
 sig kernel.
 /* sigs */
-
+type   interp    term -> o.
+type   backchain    term -> term -> o.
+/* end */
 % Certificates
 kind   choice        type.
 type   left, right   choice.
@@ -15,10 +17,7 @@ type   unfold_expert   list constructor -> cert -> cert -> constructor -> o.
 
 % Checker and interpreter
 kind   goal         type.
-type   interp    term -> o.
-type   backchain    term -> term -> o.
 type   go   term -> term -> goal.
 type   bc   term -> term -> list term -> goal.
 type   check   cert -> goal -> o.
 type   flatten_app term -> term -> o.
-/* end */
