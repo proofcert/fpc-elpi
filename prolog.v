@@ -51,20 +51,27 @@ solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
   }}.
  Elpi Typecheck. 
 
- Elpi Bound Steps 100000.
+ Elpi Bound Steps 1000000.
 
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 i_n : insert x [] [x]
 | i_s : forall y: nat, forall ys: list nat, x <= y -> insert x (y :: ys) (x :: y :: ys)
-| i_c : forall y: nat, forall ys: list nat, forall rs: list nat, y <= x -> insert x ys rs -> insert x (y :: ys) (x :: rs).
+| i_c : forall y: nat, forall ys: list nat, forall rs: list nat,  insert x ys rs -> insert x (y :: ys) (y :: rs).
 
 Goal insert 1 [] [1].
-Fail elpi dprolog 10.
-Abort.
-Goal  exists R, insert 2 [0;1] R.
+elpi dprolog 10.
+Qed.
+Lemma i1:  exists R, insert 2 [0;1] R.
+elpi  dprolog 10.
+Qed.
+Lemma i2:  exists R, insert 2 [0;1] R.
 eexists.
-Fail elpi  dprolog 100.
-Abort.
+apply i_c.
+apply i_c.
+apply i_n.
+Qed.
+Print i2.
+Print le.
  Inductive ordered : list nat -> Prop :=
 onl : ordered []
 | oss : forall x : nat, ordered [x]
