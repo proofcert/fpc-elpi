@@ -1,4 +1,4 @@
-% Version of official code copied here and edited for possible inclusion in the paper
+(* Version of official code copied here and edited for possible inclusion in the paper *)
 (* An example file using the kernel with dependent types and direct term construction *)
 From elpi Require Import elpi.
 
