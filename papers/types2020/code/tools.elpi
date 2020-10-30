@@ -1,0 +1,4 @@
+module mkproplist.
+type mkproplist list A -> (A -> prop) -> list prop -> prop.
+mkproplist [] _ [].
+mkproplist [A|R] P [(P A)|R'] :- mkproplist R P R'.
