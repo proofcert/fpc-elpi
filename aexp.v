@@ -71,8 +71,12 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
        t1 ===> t1' -> (tiszero t1) ===> (tiszero t1')
  
  where "t1 '===>' t2" := (step t1 t2).
-   
+
  
+ (* subject expansion*)
+ Goal forall e e' t, step e e' -> has_type e' t -> has_type e t. 
+ intros e e' t HS HT.
+ elpi dep_pbt 3 (HS /\ HT) (e).
   (*parametric defs of progress and preservation *) 
  
   Inductive notstuck (e : tm) (Step : tm -> tm -> Prop) : Prop :=

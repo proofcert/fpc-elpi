@@ -138,9 +138,9 @@ case of $\vee$ and $\exists$).
 %
 %
 %
-\todo{Explain relations with other term assignments. Note that we do not use explicit substitutions (we are cut free). Explain the choice of not having certificates represent proof terms. Explain that the unfold clause handles defined atoms and defined connectives (conjunction, disjunction, existential and also equality: this may be less efficient and proof-theoretically induce pointless phase changes, but it is arguably very elegant e simplifies proof terms that are inherited by Coq }
+\todo{Explain relations with other term assignments. Note that we do not use explicit substitutions (we are cut free). Explain the choice of not having certificates represent proof terms. Explain that the unfold clause handles defined atoms and defined connectives (conjunction, disjunction, existential and also equality): this may be less efficient and proof-theoretically induce pointless phase changes, but it is arguably very elegant e simplifies proof terms that arand inherited by Coq }
 
-Figure~\ref{fig:kernel} contains the elpi implementation of the
+Figure~\ref{fig:kernel} contains the Elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: here the infix
 turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate.
 %
@@ -306,12 +306,10 @@ eexists.
 elpi  dprolog 10.
 Qed.
 Print i1.
-\end{lstlisting}
-\begin{verbatim}
 ex_intro (fun R : list nat => insert 2 [0; 1] R) [0; 1; 2]
-  (i_c 2 0 [1] [1; 2] (i_c 2 1 [] [2] (i_n 2)))
-	 : exists R : list nat, insert 2 [0; 1] R
-\end{verbatim}
+  (i_c 2 0 [1] [1; 2] (i_c 2 1 [] [2] (i_n 2)) : exists R : list nat, insert 2 [0; 1] R
+\end{lstlisting}
+
 %
 %%% Local Variables:
 %%% mode: latex

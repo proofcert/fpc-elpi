@@ -54,9 +54,55 @@ the testing phase of the \lsti{dep_pbt} tactic. Differently from Fig.~\ref{fig:a
 %\label{fig:kernel}
 \end{figure}
 
+\subsection{Semantics of the typed arithmetic language}
+\label{ssec:types}
+
+\begin{lstlisting}
+Inductive has_type : tm -> typ -> Prop :=
+   | T_Tru : has_type ttrue TBool
+   | T_Fls : has_type tfalse TBool
+    | T_Test : forall t1 t2 t3 T,
+        has_type t1 TBool -> has_type t2 T -> has_type t3 T ->  has_type (tif  t1 t2 t3) T 
+   | T_Zro : has_type tzero TNat
+   | T_Scc : forall t1,
+         has_type t1 TNat -> has_type (tsucc t1) TNat
+   | T_Prd : forall t1,
+        has_type t1 TNat -> has_type (tpred t1 ) TNat
+   | T_Iszro : forall t1,
+        has_type t1 TNat ->  has_type (tiszero t1) TBool.
+Inductive nvalue : tm -> Prop :=
+| nv_zero : nvalue tzero   | nv_succ : forall t, nvalue t -> nvalue (tsucc t).
+Inductive bvalue : tm -> Prop :=
+| bv_t : bvalue ttrue   | bv_f : bvalue tfalse. 
+ Reserved Notation "t1 '===>' t2" (at level 40).
+ Inductive step : tm -> tm -> Prop :=
+   | ST_IfTrue : forall t1 t2,
+       (tif ttrue t1 t2) ===> t1
+   | ST_IfFalse : forall t1 t2,
+       (tif tfalse t1 t2) ===> t2
+   | ST_If : forall t1 t1' t2 t3,
+       t1 ===> t1' -> (tif t1 t2 t3) ===> (tif t1' t2 t3)
+   | ST_Succ : forall t1 t1',
+       t1 ===> t1' -> (tsucc t1) ===> (tsucc t1')
+   | ST_PredZero : (tpred tzero) ===> tzero
+   | ST_PredSucc : forall t1,
+       nvalue t1 -> (tpred (tsucc t1)) ===> t1
+   | ST_Pred : forall t1 t1',
+       t1 ===> t1' -> (tpred t1) ===> (tpred t1')
+   | ST_IszeroZero : (tiszero tzero) ===> ttrue
+   | ST_IszeroSucc : forall t1,
+        nvalue t1 ->  (tiszero (tsucc t1)) ===> tfalse
+   | ST_Iszero : forall t1 t1',
+       t1 ===> t1' -> (tiszero t1) ===> (tiszero t1')
+ where "t1 '===>' t2" := (step t1 t2).
+Inductive notstuck (e : tm) (Step : tm -> tm -> Prop) : Prop :=
+  | pn : nvalue e  -> notstuck e Step
+  | pb : bvalue e -> notstuck e Step
+  | ps e' : Step e e' -> notstuck e Step.
+\end{lstlisting}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
 
-% LocalWords:  LJF
+% LocalWords:  LJF Interp dep pbt coq elpi

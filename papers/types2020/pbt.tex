@@ -208,11 +208,49 @@ would have had to provide a proof of decidability of the relevant
 notions. Were we to use functions, then we would have to implement a
 generator and shrinker for ordered lists.
 
-\todo{the \texttt{aexp} example}
+%\todo{the \texttt{aexp} example}
 
+For a more significant case study, let us turn to the semantic of programming languages, where PBT has been used extensively and successfully~\cite{Klein12}. Here we will use a far simple example, the a typed arithmetic language featuring numerals with predecessor and Booleans with if-then-else and test-for-zero, which comes from (\url{https://softwarefoundations.cis.upenn.edu/plf-current/Types.html}):
+\begin{lstlisting}
+Inductive tm : Type :=
+ | ttrue : tm | tfalse : tm | tif : tm -> tm -> tm -> tm | tzero : tm | tsucc : tm -> tm
+ | tpred : tm -> tm | tiszero : tm -> tm.
+ Inductive typ : Type := |TBool : typ |TNat : typ.
+\end{lstlisting}
+The static and small step dynamic semantics are reported in appendix~\ref{ssec:types}.
+
+While it is obvious that \emph{subject expansion} fails for this calculus, it is gratifying to have it confirmed, with \lsti{e = tif ttrue tzero ttrue}:
+\begin{lstlisting}
+Conjecture subexp:  forall e e' t, step e e' -> has_type e' t -> has_type e t. 
+ intros e e' t HS HT.
+ elpi dep_pbt height 2 (HS /\ HT) (e).
+\end{lstlisting}
+
+Another way to asses the fault detection capability of our PBT setup is via \emph{mutation analysis}, whereby localized bugs are voluntarily inserted, with the view that they should caught (``killed'') by the testing suite. Following on  an exercise if the aforementioned chapter of SF, we modify the typing relation by adding the following additional clause:
+
+\begin{lstlisting}
+Module M1.
+Inductive has_type : tm -> typ -> Prop :=
+$\dots$
+  | T_SuccBool : forall t, has_type t TBool -> has_type (tsucc t) TBool.
+end M1.
+\end{lstlisting}
+Some of the required properties for a typing system now fails, not
+only type uniqueness, but also progress with counterexample \lsti{e = tsucc ttrue}:
+\begin{lstlisting}
+Definition progress (e :tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
+     forall t, Has_type e t -> notstuck e Step.
+Conjecture progress_m1:  forall e, progress e M1.has_type step.
+ unfold progress.
+ intros e t Ht.    
+ elpi dep_pbt 2 height (Ht) (e) .  
+\end{lstlisting}
+Whereas the \emph{Types} examples is admittedly quite simple-minded,
+it has been used as a benchmark for evaluating \textsf{QuickChick}'s automation of generators under invariants~\cite{LampropoulosPP18}, and to be amenable to the tool, the specification had to be massaged non-insignificantly. 
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
 
-% LocalWords:  Bedwyr bipole elpi QuickCheck OCaml TODO
+% LocalWords:  Bedwyr bipole elpi QuickCheck OCaml TODO coq xs nat
+% LocalWords:  tif ttrue tzero tsucc

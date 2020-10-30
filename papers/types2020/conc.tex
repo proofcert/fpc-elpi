@@ -6,15 +6,15 @@ Link to the repo
 
 \begin{itemize}
 \item Brief discussion/comparison with \texttt{auto}
-\item Mention other papers by Enrico as applications of coq-elpi
-\item Say we \textbf{do} not talk about Coq metaprogramming (Ltac, Mtac), do say that doing our to application in say MetaCoq would be a disaster (reimplement unfication, backtracking, binders)
+\item Mention other papers by Enrico as applications of coq-elpi~\cite{coen19mscs,tassi19itp}\dots
+\item Say we \textbf{do} not talk about Coq metaprogramming (Ltac, Mtac), do say that doing our to application in MetaCoq~\cite{sozeau2020metacoq} would be a disaster (reimplement unfication, backtracking, binders)
 \end{itemize}
 
 \subsection{Future work}
 \label{ssec:fut}
 
 
-A mention to the use of \emph{delays} in \texttt{check}: instead of generating only ground terms, we could generate say lists with at least two elements as \texttt{[1;2|Tail]} or simply not commit to a base type. This  is similar to the use of needed narrowing in LazySmallCheck to generate partial trace or the idea of using CLP for data generation (see Dubois' FocalTest or the stuff by Fabio Fioravanti).
+A mention to the use of \emph{delays} in \texttt{check}: instead of generating only ground terms, we could generate say lists with at least two elements as \texttt{[1;2|Tail]} or simply not commit to a base type. This  is similar to the use of needed narrowing in LazySmallCheck to generate partial trace or the idea of using CLP for data generation (see Dubois' FocalTest or~\cite{FioravantiPS15}).
 
 Extending our tactic to handle computations (\texttt{simp})
 
