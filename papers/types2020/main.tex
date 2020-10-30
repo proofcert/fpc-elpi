@@ -16,17 +16,30 @@
 \input head
 \input preamble
 
-\title{Interfacing logic programming and Coq} % Other suggestions?
+\title{Two applications of logic programming to Coq} % Other suggestions?
 % bit too general -- elpi-coq is such an interface -a,
 % on the usefulness of logic programming in Coq
 % two applications of logic programming to Coq
-\titlerunning{Interfacing logic programming and Coq}
+\titlerunning{Two applications of logic programming to Coq}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We do stuff
+The \emph{foundational proof certificate} (FPC) framework is capable
+of checking and elaborating a wide range of proof evidence and can easily
+be implemented using the logic programming language \lP.
+%
+% The checking of a proof certificate in this higher-order logic
+% programming language can yield a fully detailed, dependently
+% typed $\lambda$-terms that can be checked by the Coq kernel.
+%
+We use the recently released Coq-Elpi plugin for Coq in which the Elpi
+implementation of \lP can send and retrive information to and from the Coq kernel.
+%
+We provide two examples: first we implement a FPC-driven sequent calculus for a fragment of the Calculus of Inductive Constructions and we package it into a tactic to perform property-based testing of Inductive types corresponding to pure (higher-order) Horn programs. Secondly, we implement a proof checker for first-order LJF to demonstrate how  proof certificates
+can be supplied by external (to Coq) provers and elaborated into the
+fully detailed proof terms that can be checked by the Coq kernel.
 \end{abstract}
 
 \input intro
@@ -46,4 +59,4 @@ We do stuff
 %%% TeX-master: t
 %%% End:
 
-% LocalWords:  pbt elab conc
+% LocalWords:  pbt elab conc Elpi LJF
