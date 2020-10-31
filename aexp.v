@@ -76,7 +76,8 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  (* subject expansion*)
  Goal forall e e' t, step e e' -> has_type e' t -> has_type e t. 
  intros e e' t HS HT.
- elpi dep_pbt 3 (HS /\ HT) (e).
+ elpi dep_pbt 2 (HS /\ HT) (e).
+ Abort.
   (*parametric defs of progress and preservation *) 
  
   Inductive notstuck (e : tm) (Step : tm -> tm -> Prop) : Prop :=
@@ -149,7 +150,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  unfold progress.
  intros e t Ht.    
  elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *)
- elpi dep_pbt 3 (Ht) (e) (t) .  (* does not work generating !*) 
+ elpi dep_pbt 2 (Ht) (e) .   
  Abort.
  
  (* variation 3: failure of step det *)

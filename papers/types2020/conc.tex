@@ -1,25 +1,41 @@
 \section{Conclusion and future work}
 
-Link to the repo
-\subsection{Related work}
-\label{ssec:rel}
+\todo{sum up}
 
-\begin{itemize}
-\item Brief discussion/comparison with \texttt{auto}
-\item Mention other papers by Enrico as applications of coq-elpi~\cite{coen19mscs,tassi19itp}\dots
-\item Say we \textbf{do} not talk about Coq metaprogramming (Ltac, Mtac), do say that doing our to application in MetaCoq~\cite{sozeau2020metacoq} would be a disaster (reimplement unfication, backtracking, binders)
-\end{itemize}
+\begin{metanote}
+  Decided against a related work section: most is already discussed in the intro, the rest can be mentioned in passing --am
+\end{metanote}
+% \subsection{Related work}
+% \label{ssec:rel}
+
+% \begin{itemize}
+% \item Brief discussion/comparison with \texttt{auto}
+% \item Mention other papers by Enrico as applications of coq-elpi~\cite{coen19mscs,tassi19itp}\dots
+% \item Say we \textbf{do} not talk about Coq metaprogramming (Ltac, Mtac), do say that doing our to application in MetaCoq~\cite{sozeau2020metacoq} would be a disaster (reimplement unfication, backtracking, binders)
+% \end{itemize}
 
 \subsection{Future work}
 \label{ssec:fut}
 
+The code reported in Fig.~\ref{fig:augmented} is somewhat idealized in
+so far that we omitted a rule performing weak-head reduction (allowing
+to handle directly existential goals) and more importantly that used
+the \emph{delay} mechanism. This a distinguished feature of Elpi, whose
+usefulness has been advocated in ~\cite{DunchevCT16,coen19mscs}.  The
+use of constraints for data generation is well
+developed~\cite{FioravantiPS15} and we could try to leverage to
+improve PBT using partially instantiated terms: for example generating
+say lists with at least two elements as \texttt{[1,2|Tail]}, without
+recurring to needed narrowing as in in
+LazySmallCheck~\cite{smallcheck}.
 
-A mention to the use of \emph{delays} in \texttt{check}: instead of generating only ground terms, we could generate say lists with at least two elements as \texttt{[1;2|Tail]} or simply not commit to a base type. This  is similar to the use of needed narrowing in LazySmallCheck to generate partial trace or the idea of using CLP for data generation (see Dubois' FocalTest or~\cite{FioravantiPS15}).
-
-Extending our tactic to handle computations (\texttt{simp})
+\todo{Link to the repo}
+Extending our tactic to handle computations (\texttt{simp}) and/or to return the partial proof state, unsolved goals in particular. Mention \emph{Harpoon}, Beluga's new tactic language?
 
 Extending the LJF kernel to handle defined atoms
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
+
+% LocalWords:  Elpi
