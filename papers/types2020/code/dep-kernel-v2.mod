@@ -23,9 +23,9 @@ atomic A :- not (non_atomic A).
 is_imp (prod _  Ty (x\D))   Ty D.
 is_uni (prod _ _Ty (x\D x)) D.
 
-definition Atom Clauses :- 
+definition Atom Kn Clauses :- 
   coq.safe-dest-app Atom (global (indt Prog)) _Args,
-  coq.env.indt Prog _ _ _ _Type _Kn Clauses.
+  coq.env.indt Prog _ _ _ _Type Kn Clauses.
 
 %%%%%%%%%%%%%%%
 % Interpreter %
@@ -38,12 +38,11 @@ interp {{lp:G1 /\ lp:G2}} :- interp G1, interp G2.
 interp {{lp:G1 \/ lp:G2}} :- interp G1; interp G2.
 interp {{lp:T = lp:T}}.
 interp {{ex (lp:G)}} :- interp (G X).
-interp Atom :- atomic Atom, definition Atom Clauses, 
+interp Atom :- atomic Atom, definition Atom _ Clauses, 
                std.mem Clauses D, backchain D Atom.
-
 backchain A A :- atomic A.
 backchain D A :- is_imp D A D', !, backchain D' A, interp Ty.
-backchain D A :- is_uni D D',      backchain (D' X) A.
+backchain D A :- is_uni D D',  backchain (D' X) A.
 /* end */
 
 %%%%%%%%%%%
@@ -55,20 +54,16 @@ check _ (go (sort S) Term):-
 check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
 	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).
 check Cert (go Atom Term) :-
-  coq.safe-dest-app Atom (global (indt Prog)) _Args,
-  coq.env.indt Prog _ _ _ _Type Kn Clauses,
-	Kons = global (indc K),
-	unfold_expert Kn Cert Cert' K,
-	std.lookup {std.zip Kn Clauses} K Clause, 
-	check Cert' (bc Clause Atom ListArgs),
+  definition Atom Kn Clauses,
+  unfold_expert Kn Cert Cert' K,
+  Kons = global (indc K),
+  std.lookup {std.zip Kn Clauses} K Clause, 
+  check Cert' (bc Clause Atom ListArgs),
   Term = (app [Kons|ListArgs]).
-check Cert (go (app [(fun A B C)| Args]) Term) :-
-  coq.mk-app (fun A B C) Args App,
-	check Cert (go App Term).
 check Cert (bc (prod _ Ty1 Ty2) Goal [Tm|ArgsList]) :-
   prod_expert Cert Cert1 Cert2,
   check Cert1 (bc (Ty2 Tm) Goal ArgsList),
- 	check Cert2 (go Ty1 Tm).
+  check Cert2 (go Ty1 Tm).
 check Cert (bc A A []) :-
 	tt_expert Cert .
 /* end */

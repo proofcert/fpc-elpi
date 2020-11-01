@@ -7,8 +7,8 @@ In this appendix we list some definitions and pieces of code that may be helpful
 \subsection{Interp}
 
 
-In Fig.~\ref{fig:interp} we the encoding of the vanilla meta-interpreter used in
-the testing phase of the \lsti{dep_pbt} tactic. Differently from Fig.~\ref{fig:augmented} we appeal, via quotations, to Coq's defined connectives --- note the use of a green cut to avoid overlapping with the \lsti{Inductive} atomic case and the absence of certificates.
+In Fig.~\ref{fig:interp} we report the encoding of the vanilla meta-interpreter used in
+the testing phase of the \lsti{dep_pbt} tactic. Differently from Fig.~\ref{fig:augmented} we appeal, via quotations, to Coq's defined connectives. An \lsti{atomic} proposition is one defined \lsti{Inductive}ly. The predicate \lsti{definition} hides the API call to the constructors of such a type.
 
 \begin{figure}
 % \newcommand{\XXi}{\Pscr}
@@ -45,7 +45,7 @@ the testing phase of the \lsti{dep_pbt} tactic. Differently from Fig.~\ref{fig:a
 % In the judgment $\bc{D}{A}$, the variable $A$ ranges over only atomic
 % formulas.
  \lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
-\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
+\lstinputlisting[linerange={interp-end}]{code/dep-kernel-v2.mod}
 \caption{Encoding in coq-elpi of the vanilla meta-interpreter}
 \label{fig:interp}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
@@ -57,6 +57,7 @@ the testing phase of the \lsti{dep_pbt} tactic. Differently from Fig.~\ref{fig:a
 \subsection{Semantics of the typed arithmetic language}
 \label{ssec:types}
 
+We list the rules for static and dynamic semantics of the language mentioned in section~\ref{ssec:dep_pbt} and related notions:
 \begin{lstlisting}
 Inductive has_type : tm -> typ -> Prop :=
    | T_Tru : has_type ttrue TBool

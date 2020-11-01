@@ -7,27 +7,20 @@
 % }
 
 \begin{metanote}
-  (AM): Start with the logical reconstruction of \texttt{check}, to and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
- One way to proceed:
+  (AM): Start with the logical reconstruction of \texttt{check}, to and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). % In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
+% One way to proceed:
   % \begin{itemize}
   % \item One figure fig \ref{fig:interp} for Horn logic over Coq terms (no certificates) and its encoding with quotations 
   % \item Then the logic behind the dependent kernel with certificates and proof terms
   % \end{itemize}
-
+%
 Stuff in red is from old paper
 \end{metanote}
-
-%\subsection{Horn logic in coq-elpi}
-
-
-
-
-
 
 \subsection{Focused proof systems with certificates}
 \label{ssec:focused}
 \todo{Adapt the discussion}
-\todo{grammar for formulae and proof terms\cite{Herbelin94,LengrandDM06}?}
+\todo{grammar for formulae and proof terms \cite{Herbelin94,LengrandDM06}  or just the figure? Mention spine calculus}
 
 
 The proof search approach to encoding Horn clause computation
@@ -79,7 +72,7 @@ certificate}.
 %\subsection{Adding certificates and experts to a proof system}
 %\label{ssec:fpc}
 
-
+\todo{Figure now uses Dale kernel-v2 --- needs further abstraction and explanation, see appendix}
 \begin{footnotesize}
 \begin{figure}
     \newcommand{\XXi}{{\color{blue}{\Xi}}}
@@ -122,7 +115,7 @@ certificate}.
 \end{figure}
 \begin{figure}
 %\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
-\lstinputlisting[linerange={check-end}]{code/dep-kernel.mod}
+\lstinputlisting[linerange={check-end}]{code/dep-kernel-v2.mod}
 \caption{Implementation of a  dependent kernel for Coq terms.}
 \label{fig:kernel}
 \end{figure}
@@ -153,20 +146,20 @@ turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate.
 % AM: not there
 % in Figure~\ref{fig:kernel}). 
 
-\subsection{Certificates}
+%\subsection{Certificates}
 
-\todo{Shorten it}
+\todo{What happened to the unfold certificate???}
 % \todo{Show the dprolog tactic? have an example? could  be
 % \lsti{Goal  exists R, insert 2 [0;1] R.} and we would move the code for insert here}
-{\color{red}
-As we mentioned in the introduction, our notion of proof certificates
+{\color{red}}
+The notion of proof certificates
  is taken from the general setting of \emph{foundational
   proof certificates}~\cite{chihani17jar}.
 %
 In our case here, an FPC is a collection of \lP clauses that
 provide the remaining details not supplied in Figure~\ref{fig:kernel}:
 that is, the exact set of constructors for the \lsti{cert} type as
-well as the exact specification of the six expert predicates listed in
+well as the exact specification of the expert predicates listed in
 that figure.
 %
 Figure~\ref{fig:resources} displays two such FPCs,
@@ -177,21 +170,21 @@ For example, the first FPC
 provides the experts for treating certificates that are constructed
 using the \lsti{qheight} constructor.
 %
-As is easy to verify, the query \mbox{\lsti{(check (qheight 5) B)}} (for the
-encoding \lsti{B} of a goal formula) is provable in \lP using the
-clauses in Figures~\ref{fig:kernel} and~\ref{fig:resources} if and
-only if the height of that proof is 5 or less.
+As is easy to verify, the query \mbox{\lsti{(check (qheight 5) B)}} is
+provable in  the kernel using the clauses in Figures~\ref{fig:kernel}
+and~\ref{fig:resources} if and only if the height of that proof is 5
+or less.
 %
 Similarly, the second FPC uses the constructor \lsti{qsize} (with two
 integers) and can be used to bound the total number of instances of
 unfoldings in a proof.
 %
-In particular, the query \mbox{\lsti{(check (qsize 5 H) B)}}
+%In particular, the query \mbox{\lsti{(check (qsize 5 H) B)}}
 % \begin{lstlisting}
 % sigma H\ (check (qsize 5 H) B)
 % \end{lstlisting}
-is provable if and only if the total number of unfoldings of that
-proof is 5 or less.
+%is provable if and only if the total number of unfoldings of that
+%proof is 5 or less.
 
 \begin{figure}
 \lstinputlisting[linerange={resources-end}]{code/fpcs.sig}
@@ -201,28 +194,6 @@ proof is 5 or less.
 \label{fig:resources}
 \end{figure}
 
-% Finally, Figure~\ref{fig:max} contains the FPC based on the constructor
-% \lsti{max} that is used to record explicitly all information within a
-% proof: in particular, all disjunctive choices and all substitution
-% instances for existential quantifiers are collected into a binary tree
-% structure of type \lsti{max}.
-% %
-% In this sense, proof certificates built with the \lsti{max}
-% constructor are \emph{maximally} explicit.
-% %
-% Such proof certificates are used, for example, in~\cite{Pair}; it is
-% important to note that proof checking with such maximally explicit
-% certificates can be done with much simpler proof-checkers than those
-% used in logic programming since backtracking search and unification
-% are not needed.
-%
-
-% \begin{figure}
-% \lstinputlisting[linerange={max-end}]{code/fpcs.sig}
-% \lstinputlisting[linerange={max-end}]{code/fpcs.mod}
-% \caption{The \lsti{max} FPC}
-% \label{fig:max}
-% \end{figure}
 
 Further, if we view a particular FPC as a means of restricting proofs, it is
 possible to build an FPC that \emph{restricts} proofs satisfying two FPCs
@@ -234,51 +205,19 @@ simultaneously.
 %
 The pairing experts for the certificate \lsti{Cert1 <c> Cert2} simply
 request that the corresponding experts also succeed for both
-\lsti{Cert1} and \lsti{Cert2} and, in the case of the \lsti{orE} and
-\lsti{someE}, also return the same choice and substitution term,
-respectively.
+\lsti{Cert1} and \lsti{Cert2} 
 %
-Thus, the query 
-\begin{lstlisting}
-?- check ((qheight 4) <c> (qsize 10)) B
-\end{lstlisting}
+Thus, the query \lsti{check ((qheight 4) <c> (qsize 10)) B}
 will succeed if there is a proof of \lsti{B} that has a height less
 than or equal to 4 while also being of size less than or equal to 10.
-%
-% A related use of the pairing of two proof certificates is to %use it to
-% \emph{distill} or \emph{elaborate} proof certificates. 
-% %
-% For example, the proof certificate \lsti{(qsize 5 0)} is rather implicit
-% since it will match any proof that used unfold exactly 5 times.
-% %
-% However, the query
-% \begin{lstlisting}
-% ?- check ((qsize 5 0) <c> (max Max)) B.
-% \end{lstlisting}
-% will store into the \lP variable \lsti{Max} more complete details of
-% any proof that satisfies the \lsti{(qsize 5 0)} constraint.
-% %
-% In particular, this forms the infrastructure of 
-%  an \emph{explanation} tool for attributing ``blame'' for
-% the origin of a counterexample; these maximal
-% certificates are an appropriate starting point for documenting
-% both the counterexample and why it serves as a counterexample.
+
+% Various  additional examples and experiments using the pairing of FPCs
+% can be found in~\cite{blanco17cade}. Using similar techniques, it is possible to define FPCs that target
+% specific types for special treatment: for example, when generating
+% integers, only (user-defined) small integers could be produced.
 
 
-% \begin{figure}
-% \lstinputlisting[linerange={pairing-end}]{code/fpcs.sig}
-% \lstinputlisting[linerange={pairing-end}]{code/fpcs.mod}
-% \caption{FPC for pairing}
-% \label{fig:pairing}
-% \end{figure}
-
-Various  additional examples and experiments using the pairing of FPCs
-can be found in~\cite{blanco17cade}. Using similar techniques, it is possible to define FPCs that target
-specific types for special treatment: for example, when generating
-integers, only (user-defined) small integers could be produced.
-}
-
-\subsection{A prolog tactic}
+\subsection{A prolog-like tactic}
 
 \begin{metanote}
   Let's dump it here and see how it looks
@@ -310,7 +249,10 @@ ex_intro (fun R : list nat => insert 2 [0; 1] R) [0; 1; 2]
   (i_c 2 0 [1] [1; 2] (i_c 2 1 [] [2] (i_n 2)) : exists R : list nat, insert 2 [0; 1] R
 \end{lstlisting}
 
-\todo{Brief discussion/comparison with \texttt{auto}: depth first, explanatiom mechanism fixed, fails gracefully, can use hints}
+The \lsti{dprolog} tactic can be seen as a programmable version of
+Coq's \lsti{auto}: it currently lacks the latter capability of solving
+goals by \lsti{reflexivity} and the modularity capability of using
+\lsti{Hints}, but it is not compelled to use depth-first search, since it follows the dictate of the given FPC. For example the FPC can provide a \emph{trace}, which may be more customable that the one offered by the \lsti{Debug} option.
 %
 %%% Local Variables:
 %%% mode: latex
@@ -318,3 +260,4 @@ ex_intro (fun R : list nat => insert 2 [0; 1] R) [0; 1; 2]
 %%% End:
 
 % LocalWords:  backchaining disjunct LJT dep qheight qsize orE someE
+% LocalWords:  Elpi modularity
