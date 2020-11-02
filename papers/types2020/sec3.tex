@@ -95,12 +95,16 @@ certificate}.
 % {\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
 % }
 % \qquad 
+\infer{\XXi;\Gamma\vdash A : s}
+{(A,s) \in \mathcal{A}
+}
+\qquad
 \infer{\XXi;\Gamma\vdash \lambda x:A.\,t : \forall x : A.\,  G}
 {\XXi;\Gamma, x : A\vdash t : G%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
 }
 \qquad
-\infer{\XXi;\Gamma\vdash t : A}
-      {\bc{\XXi}{\Gamma} t D A \quad D \in \Pscr\cup\Gamma}
+\infer{\XXi;\Gamma\vdash k l : A}
+      {\bc{\XXi}{\Gamma} l D A \quad k : D \in \Pscr_A\cup\Gamma}
 \]
 \vskip -18pt
 \[
@@ -121,7 +125,28 @@ certificate}.
 \end{figure}
 \end{footnotesize}
 
+The proof system we use is a sequent calculus inspired by the calculus for
+proof search in Pure Type Systems introduced in \cite{LengrandDM06}, based on
+its turn on ideas stemming from focusing (in particular, the LJT calculus of
+Herbelin \cite{Herbelin94}). Similarly to that calculus, we have a term
+language that includes terms and lists of terms, and two distinct typing
+judgements for the two categories. In our case, where proof search steps are
+viewed as computation, the term judgement corresponds to a goal-reduction
+step while the list judgement corresponds to a backchaining step.
 
+Since we are only dealing with types that correspond to Horn clauses, and
+atomic types are inductively defined, we will never have occurrences of
+applications of hypotetic assumptions. This means, at the term level, that
+we don't need free variables in our grammar of terms. 
+
+\begin{align*}
+t,u :=& k l \;|\; t t \;|\; \forall x : t.\, u \\
+l :=& [] \;|\; (t l)
+\end{align*}
+
+The syntax will depend on the external set of inductive definitions available
+in the context: we denote by $\Pscr_A$ the set of type declarations for the
+constructors of type $A$, of the form $k : D$ where
 
 Figure~\ref{fig:augmented} contains a simple proof system \dots  in which each inference rule is augmented with an
 additional premise involving an \emph{expert predicate}, a
@@ -133,7 +158,7 @@ case of $\vee$ and $\exists$).
 %
 \todo{Explain relations with other term assignments. Note that we do not use explicit substitutions (we are cut free). Explain the choice of not having certificates represent proof terms. Explain that the unfold clause handles defined atoms and defined connectives (conjunction, disjunction, existential and also equality): this may be less efficient and proof-theoretically induce pointless phase changes, but it is arguably very elegant e simplifies proof terms that arand inherited by Coq }
 
-Figure~\ref{fig:kernel} contains the Elpi implementation of the
+Figure~\ref{fig:kernel} contains the elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: here the infix
 turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate.
 %
