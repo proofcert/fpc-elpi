@@ -3,13 +3,14 @@ sig deb-fpc.
 accum_sig ljf-certificates.
 accum_sig deb-fpc.
 
-kind deb            type.
+/* start */
+kind deb                              type.
+type lambda                     deb -> deb.
 type apply          int -> list deb -> deb.
-type lc             int ->      deb -> cert.
-type args           int -> list deb -> cert.    
-type idx                       int -> index.
-
-type lambda          deb -> deb.
+type idx                      int -> index.
+type lc                 int -> deb -> cert.
+type args          int -> list deb -> cert.    
+/* end */
 
 kind tm             type.
 type ap             tm -> tm -> tm.

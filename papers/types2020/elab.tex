@@ -1,4 +1,4 @@
-\newpage
+%\newpage
 \section{Elaboration of external proof certificates for the Coq
   kernel}
 
@@ -12,11 +12,13 @@ intuitionistic logic.  The rest of the Coq system, especially its
 tactic language, is designed to help a human user build
 proofs-as-$\lambda$-terms that can be checked by the kernel.
 
-There are many theorem provers for intuitionistic logic for which a
-successful proof is not the kind of detailed $\lambda$-term required
-by the Coq kernel.  Most prover provide, instead, a trace of some key
-aspects of a proof: some details are often not included in such a
-trace.  For example:
+There are many theorem provers for intuitionistic logic
+\cite{raths07jar} for which a successful proof is not the kind of
+detailed $\lambda$-term required by the Coq kernel.  Often, such
+provers provide no information about the proofs they discover.  To the
+extent that some prove evidence is output after a successful run, such
+evidence is usually just a trace of some key aspects of a proof: some
+details are often not included in such a trace.  For example:
 \begin{enumerate}
 
 \item Substitution instances of quantifiers might not be recorded in a
@@ -32,19 +34,20 @@ trace.  For example:
   reconstruct an equivalent simplification.
 \end{enumerate}
 
-As we have describe above, the Foundational Proof Certificate (FPC)
-framework has been designed for formally defining a rich collection of
-proof certificates that do not necessarily contain full details.
-Proof checkers for FPC certificates can be written using simple logic
-programs: the standard implementation mechanisms of unification and
-backtracking search can then be used to reconstruct missing proof
-details \cite{miller17fac}.  Such proof checking kernels can also be
-used to elaborate such certificates into fully detailed proofs
-\cite{blanco17phd,blanco17cade}.
+As we have describe in Section~\ref{sec:three}, the Foundational Proof
+Certificate (FPC) framework has been designed for formally defining a
+rich collection of proof certificates that do not necessarily contain
+full details.  Proof checkers for FPC certificates can be written
+using simple logic programs: the standard implementation mechanisms of
+unification and backtracking search can then be used to reconstruct
+missing proof details \cite{miller17fac}.  Such proof checking kernels
+can also be used to elaborate such certificates into fully detailed
+proofs \cite{blanco17phd,blanco17cade}.
 
 We describe here briefly how to use the technology behind FPCs and
 logic programming in order to provide a flexible approach to
-connecting external provers of intuitionistic logic to Coq.
+connecting external provers of first-order intuitionistic logic to
+Coq.
 %
 Following the general outline that has been described in
 \cite{blanco17cade}, we assume that the following step are taken.
@@ -76,45 +79,38 @@ proof structure, then the FPC for that structure could also be built
 into the checker (via, say, partial evaluation of logic programs
 \cite{lloyd91jlp}).
 
-To illustrate the possibilities ***
+To illustrate this approach to elaborating externally provided proof
+structures into terms the Coq kernel can check, we consider here
+examples take from the file \verb+coq_fpc.v+, which is part of the
+repository \url{https://github.com/proofcert/fpc-elpi/}.
+Figure~\ref{fig:debruijn} presents the specific FPC that defines the
+proof semantics of using the De Briujn notions for untyped
+$\lambda$-terms as proof evidence of a proof in intuitionistic
+propositional logic.  That FPC definition, along with a proof checker
+capable of synthesizing Coq proof terms during proof checker, makes it
+possible to use the term denoting the untyped $\lambda$-term
+$\lambda x (x (\lambda y (\lambda z (x (\lambda u z)))))$
+
+\begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
+(lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
+                                                    [lambda (apply 1 [])])])]))
+\end{lstlisting}
+as a proof of following theorem of Coq.
+\begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
+Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q).
+\end{lstlisting}
+
+\begin{figure}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.mod}
+\caption{The FPC definition of De Bruijn notation as proof evidence.}
+\label{fig:debruijn}
+\end{figure}
 
 
 
-** We limit our attention here to first-order intuitionistic logic:
-that is, we do not consider here inductive definitions.
 
-** Note that with intuitionistic logic, there is much less ambiguity
-of polarities possible.  In particular, only the conjunction and the
-atomic formulas can have ambiguous polarizations.  The two
-conjunctions are familiar to those working with typed
-$\lambda$-calculus: 
-
-the negative conjunction (corresponding to $\with$ in linear logic)
-corresponds to surjective pairing.
-
-the positive conjunction (corresponding to $\with$ in linear logic)
-corresponds to ***.
-
-The choice between negated atoms and positive atoms is similar to the
-choice in representing $\beta$-normal terms using either head-normal
-form or administrative normal form.
-
-
-
-We built the fpccoq system to demonstrate the feasibility of using
-logic programming to check proof certificates produced by external
-provers and to elaborate such certificates into proofs with sufficient
-details that they can be given directly to Coq's kernel to
-check.  Note that one does not need to trust the external prover nor
-the fpccoq tool-chain: one only needs to trust the Coq kernel.
-
-
-De Bruijn
-decide depth
-simply typed lambda terms
-
-
-\newpage
+%\newpage
 
 %%% Local Variables:
 %%% mode: latex
