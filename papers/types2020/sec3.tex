@@ -76,8 +76,7 @@ certificate}.
 \todo{Figure now uses Dale kernel-v2 --- needs further abstraction and explanation, see appendix}
 \begin{footnotesize}
 \begin{figure}
-    \newcommand{\XXi}{{\color{blue}{\Xi}}}
-
+  \newcommand{\XXi}{{\color{blue}{\Xi}}}
   \newcommand{\bc}[5]{#1;#2\vdash #3 : #4 \Downarrow #5}
 \[
 % \infer{\XXi\vdash t = t}
@@ -99,19 +98,19 @@ certificate}.
 \infer{\XXi;\Gamma\vdash A : s}
 {(A,s) \in \mathcal{A}
 }
+% \qquad
+% \infer{\XXi;\Gamma\vdash \lambda x:A.\,t : \forall x : A.\,  G}
+% {\XXi;\Gamma, x : A\vdash t : G%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
+% }
 \qquad
-\infer{\XXi;\Gamma\vdash \lambda x:A.\,t : \forall x : A.\,  G}
-{\XXi;\Gamma, x : A\vdash t : G%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
-}
-\qquad
-\infer{\XXi;\Gamma\vdash k l : A}
-      {\bc{\XXi}{\Gamma} l D A \quad k : D \in \Pscr_A\cup\Gamma}
+\infer{\XXi_1;\Gamma\vdash k\ l : A}
+      {\bc{\XXi_2}{\Gamma} l D A \quad k : D \in \Pscr_A\cup\Gamma\qquad \unfoldExpert{\XXi_1}{\XXi_2}} 
 \]
 \vskip -18pt
 \[
   \infer{\bc {\XXi}{\Gamma} {[]} A A}{\trueExpert{\XXi}}{}\qquad
 %  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
-  \infer{\bc{\XXi}{\Gamma}{(t\ l)} {\forall x:B.\, D} A}
+  \infer{\bc{\XXi}{\Gamma}{(t\ ::\ l)} {\forall x:B.\, D} A}
   {\XXi_1;\Gamma\vdash t : A\qquad \bc{\XXi_2}{\Gamma}l {B[t/x]} A\qquad\prodExpert{\XXi}{\XXi_1}{\XXi_2}}{}
 \]
 %\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
@@ -137,31 +136,75 @@ step while the list judgement corresponds to a backchaining step.
 
 Since we are only dealing with types that correspond to Horn clauses, and
 atomic types are inductively defined, we will never have occurrences of
-applications of hypotetic assumptions. This means, at the term level, that
-we don't need free variables in our grammar of terms. 
+applications of hypotetic assumptions. This means, at the term level, that we
+don't need to have variables in our grammar of terms. Terms are always
+applied to a (possibly empty) list of arguments, and as is usual in Pure Type
+Systems we have the same grammar for terms and types, as shown in figure~\ref{fig:terms}.
 
+\begin{figure}
 \begin{align*}
-t,u :=& k l \;|\; t t \;|\; \forall x : t.\, u \\
-l :=& [] \;|\; (t l)
+t,u :=& k\ l \;|\; \forall x : t.\, u \\
+l :=& [] \;|\; (t\ ::\ l)
 \end{align*}
+\caption{Grammar of terms}
+\label{fig:terms}
+\end{figure}
 
-The syntax will depend on the external set of inductive definitions available
-in the context: we denote by $\Pscr_A$ the set of type declarations for the
-constructors of type $A$, of the form $k : D$ where
+The syntax depends on the external set of inductive definitions available in
+the context: we denote by $\Pscr_A$ the set of type declarations for the
+constructors of type $A$, of the form $k : D$ where $D$ is of the form
+$\forall x_1 : t_1.\, \dots \forall x_n : t_n.\, D\ u_1 \dots u_m$. We denote
+by $\mathcal{A}$ the set of arity declaration for the inductive types.
 
-Figure~\ref{fig:augmented} contains a simple proof system \dots  in which each inference rule is augmented with an
-additional premise involving an \emph{expert predicate}, a
-certificate $\Xi$, and possibly continuations of certificates ($\Xi'$,
-$\Xi_1$, $\Xi_2$) with extracted information from certificates (in the
-case of $\vee$ and $\exists$).
+Figure~\ref{fig:augmented} contains a simple proof system \dots in which each
+inference rule is augmented with an additional premise involving an
+\emph{expert predicate}, a certificate $\Xi$, and possibly continuations of
+certificates ($\Xi'$, $\Xi_1$, $\Xi_2$) with extracted information from
+certificates.% (in the case of $\vee$ and $\exists$).
 %
 %
 %
-\todo{Explain relations with other term assignments. Note that we do not use explicit substitutions (we are cut free). Explain the choice of not having certificates represent proof terms. Explain that the unfold clause handles defined atoms and defined connectives (conjunction, disjunction, existential and also equality): this may be less efficient and proof-theoretically induce pointless phase changes, but it is arguably very elegant e simplifies proof terms that arand inherited by Coq }
+\todo{Explain relations with other term assignments. Note that we do not use
+explicit substitutions (we are cut free). Explain the choice of not having
+certificates represent proof terms. Explain that the unfold clause handles
+defined atoms and defined connectives (conjunction, disjunction, existential
+and also equality): this may be less efficient and proof-theoretically induce
+pointless phase changes, but it is arguably very elegant e simplifies proof
+terms that arand inherited by Coq }
 
-Figure~\ref{fig:kernel} contains the elpi implementation of the
+Figure~\ref{fig:kernel} contains the Elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: here the infix
-turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate.
+turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate, and every rule
+is directly mapped to a clause in the code. The argument of the clause is
+either given by a \lsti{go} or a \lsti{bc} constructor, signaling whether the clause
+is a goal-reduction or a backchaining one.
+
+Coq terms are accessed through the Coq-Elpi API, and their representation
+in \lP takes advantage of the native \lP constructs such as lists and binders.
+The following is the signature of the term constructors we use:
+\begin{lstlisting}
+  kind term   type.
+  type prod   name -> term -> (term -> term) -> term.
+  type app    list term -> term.
+  type global gref -> term.
+  type indt   inductive -> gref.
+  type indc   constructor -> gref.
+\end{lstlisting}
+
+The constructor for products forms a term from a term and a \lP function from
+terms to terms; when, in the implementation of the product-left rule, we
+apply the second argument of \lsti{prod _ Ty1 Ty2} to the variable \lsti{Tm},
+we get a term that can be used to continue backchaining. The meaning of this
+application is meta-level substitution, in the style of Higher Order Abstract
+Syntax: one can think as if something of type \lsti{term -> term} were a
+\lsti{term} with a hole in it for another \lsti{term}.
+
+The unfolding rule makes use of the Coq-Elpi primitives
+\lsti{coq.safe-dest-app} in order to obtain the head term of a (possibly
+nested) application, and \lsti{coq.env.indt} in order to access the global
+environment of inductive definitions and query for information about them.
+
+
 %
 % Notice that it is easy to show that no matter how the expert predicates
 % are defined, if the goal \lsti{check Cert B} is provable in \lP then
@@ -174,7 +217,6 @@ turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate.
 
 %\subsection{Certificates}
 
-\todo{What happened to the unfold certificate???}
 % \todo{Show the dprolog tactic? have an example? could  be
 % \lsti{Goal  exists R, insert 2 [0;1] R.} and we would move the code for insert here}
 {\color{red}}
