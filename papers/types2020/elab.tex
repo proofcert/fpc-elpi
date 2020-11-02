@@ -89,7 +89,7 @@ $\lambda$-terms as proof evidence of a proof in intuitionistic
 propositional logic.  That FPC definition, along with a proof checker
 capable of synthesizing Coq proof terms during proof checker, makes it
 possible to use the term denoting the untyped $\lambda$-term
-$\lambda x (x (\lambda y (\lambda z (x (\lambda u z)))))$
+$\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$.
 
 \begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
 (lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
@@ -106,8 +106,6 @@ Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q)
 \caption{The FPC definition of De Bruijn notation as proof evidence.}
 \label{fig:debruijn}
 \end{figure}
-
-
 
 
 %\newpage
