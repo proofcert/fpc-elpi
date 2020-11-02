@@ -51,15 +51,12 @@ backchain D A :- is_uni D D',  backchain (D' X) A.
 /* check */
 check _ (go (sort S) Term):-
   coq.typecheck Term (sort S) _. 
-check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
-	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).
 check Cert (go Atom Term) :-
   definition Atom Kn Clauses,
   unfold_expert Kn Cert Cert' K,
-  Kons = global (indc K),
   std.lookup {std.zip Kn Clauses} K Clause, 
   check Cert' (bc Clause Atom ListArgs),
-  Term = (app [Kons|ListArgs]).
+  Term = (app [global (indc K)|ListArgs]).
 check Cert (bc (prod _ Ty1 Ty2) Goal [Tm|ArgsList]) :-
   prod_expert Cert Cert1 Cert2,
   check Cert1 (bc (Ty2 Tm) Goal ArgsList),
@@ -67,3 +64,5 @@ check Cert (bc (prod _ Ty1 Ty2) Goal [Tm|ArgsList]) :-
 check Cert (bc A A []) :-
 	tt_expert Cert .
 /* end */
+% check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
+% 	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).
