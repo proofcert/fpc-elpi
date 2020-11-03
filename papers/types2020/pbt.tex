@@ -1,8 +1,8 @@
 \section{Revisiting property-based testing for Coq}
 
 We have presented in a previous paper~\cite{blanco19ppdp} a
-proof-theoretical reconstruction of property-based testing~\cite{fink97sen} (PBT) of
-relational specifications adopting techniques from foundational proof
+proof-theoretical reconstruction of property-based testing (PBT) of
+relational specifications, adopting techniques from foundational proof
 certificates to account for several features of this testing
 paradigm: from various \emph{generation} strategies, to
 \emph{shrinking} and fault localization.
@@ -19,18 +19,20 @@ generation, as adopted, e.g., in SmallCheck~\cite{smallcheck} and
 $\alpha$Check~\cite{cheney_momigliano_2017}, and their combination. Note however that it would take additional two lines of code to the \lsti{unfold} expert to implement a form of random data generation in the sense of randomized backtracking~\cite{pltredexconstraintlogic}.
 
 Of course, Coq already features \textsf{QuickChick}~\cite{QChick}
-(\url{https://softwarefoundations.cis.upenn.edu/qc-current}),  a
-sophisticated and well-supported PBT tool, based on a different
+(\url{https://softwarefoundations.cis.upenn.edu/qc-current}), which is
+a sophisticated and well-supported PBT tool, based on a different
 perspective: being a clone of Haskell's QuickCheck, it emphasizes
 testing executable (read \emph{decidable)} specifications with random
 generators. While current research~\cite{LampropoulosPP18} aims to
-increase automation, it is fair to say that testing with ~\cite{QChick}, in particular of
-relational specifications, is still very labor intensive. We do not
-intend to compete with \textsf{QuickChick}, but we shall see that we
-can test immediately \lsti{Inductive} definitions that
-corresponds to pure Horn programs, without any decidability proof nor
-commitment to the random generation strategy, and related
-configuration of generators and shrinkers.
+increase automation, it is fair to say that testing with
+~\cite{QChick}, in particular of relational specifications, is still
+very labor intensive. We do not intend to compete with
+\textsf{QuickChick}, but we shall see that we can test immediately
+\lsti{Inductive} definitions that corresponds to pure Horn
+programs. We can do that without having to provide a decidability
+proof for those definitions. Furthermore, we are not committed to a
+fixed random generation strategy, which in gnereal requires additional
+work in the configuration of generators and shrinkers.
 
 \todo{Drop the subsections?}
 \subsection{PBT as proof reconstruction}
@@ -40,6 +42,7 @@ configuration of generators and shrinkers.
 %   I'm just saying the bare minimum -am
 % \end{metanote}
 
+
 If we view  a property as a many-sorted logical formula:
 \[
   \forall x_1 \colon \tau_1\dots x_n \colon \tau_m, A_1\land\dots\land A_m \supset B\tag{*}\label{eq:prop}
@@ -47,8 +50,8 @@ If we view  a property as a many-sorted logical formula:
 %\(\forall x [(\tau(x)\wedge P(x)) \supset Q(x)]\) where $\tau$ is a
 %typing predicate and
   where the $A_i$ and $B$ are  predicates defined
-using Horn clause specifications, providing a counter-example
-consists of  negating the property, and \emph{searching} for a proof of
+using Horn clause specifications, a counter-example to this conjecture
+consists of a witness to the negated formula
 \[
   \exists x_1 \colon \tau_1\dots x_n \colon \tau_n [A_1\land\dots\land A_m\wedge \neg B]
   \tag{**}\label{eq:full}
@@ -105,7 +108,7 @@ intutionistic interpretation, which is  what Coq supports.  % proofs of formulas
 However, for the sake of PBT and as we argued in~\cite{blanco19ppdp}  , we can identify a proof certificate for
 $(\ref{eq:full})$ simply with a proof certificate for
 $
- \exists x_1 \colon \tau_1\dots x_n \colon \tau_n [A_1\land\dots\land A_m].
+ \exists x_1 \colon \tau_1\dots x_n \colon \tau_n [A_1\land\dots\land A_m]
 $
 and we can resort to negation-as-failure to check that the conclusion does not hold without caring for any evidence for the latter. This also means that we do not produce a Coq proof terms for the refutation of our property --- and neither does \textsf{QuickChick}, which runs at the OCaml level --- although we can return the witness for the existential.
 % Such a certificate would contain the witness (closed) term $t$ for the
@@ -142,7 +145,6 @@ after \lsti|intro| has been used to introduce the relevant hypotheses,
 % % simply tag the specification clauses, whereas dependent variables
 % % represent the typing information for the data variables that the
 % % specifications use.
-
 % Within the tactic
 the user therefore
 specifies which variables of the environment should be used for
@@ -172,7 +174,7 @@ variables and will simply call a vanilla meta-interpreter (see
 Fig.~\ref{fig:interp} in the appendix) to test the hypotheses and the negation of the
 goal:
 \begin{lstlisting}
-interp $(A_1\land\dots\land A_m$), not (interp $B$)}
+interp $(A_1\land\dots\land A_m$), not (interp $B$)
 \end{lstlisting}
 where \lsti{not} is \lP's negation-as-failure operator.
 
@@ -226,10 +228,9 @@ derivation of the former does not (yet) work for this kind of specification.
 
 For a more significant case study, let us turn to the semantics of
 programming languages, where PBT has been used extensively and
-successfully~\cite{Klein12}. Here we will consider a far simple example,
+successfully~\cite{Klein12}. Here we will consider a far simpler example,
 a typed arithmetic language featuring numerals with predecessor
-and Booleans with if-then-else and test-for-zero, which comes from the \emph{Software Foundations} book series
-(\url{https://softwarefoundations.cis.upenn.edu/plf-current/Types.html}):
+and Booleans with if-then-else and test-for-zero, which comes from the \emph{Software Foundations} book series (\url{https://softwarefoundations.cis.upenn.edu/plf-current/Types.html}):
 \begin{lstlisting}
 Inductive tm : Type :=
  | ttrue : tm | tfalse : tm | tif : tm -> tm -> tm -> tm | tzero : tm | tsucc : tm -> tm
@@ -245,6 +246,7 @@ Conjecture subexp:  forall e e' t, step e e' -> has_type e' t -> has_type e t.
  intros e e' t HS HT.
  elpi dep_pbt height 2 (HS /\ HT) (e).
 \end{lstlisting}
+
 
 Another way to asses the fault detection capability of a PBT setup is via \emph{mutation analysis}~\cite{CavadaCM20}, whereby localized bugs are voluntarily inserted, with the view that they should caught (``killed'') by a ``good enough'' testing suite. Following on  an exercise if the aforementioned chapter of SF, we modify the typing relation by adding the following (nonsensical)  clause:
 
@@ -263,7 +265,7 @@ Definition progress (e :tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> P
 Conjecture progress_m1:  forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
- elpi dep_pbt 2 height (Ht) (e) .  
+ elpi dep_pbt height 2 (Ht) (e) .  
 \end{lstlisting}
 
 Whereas examples based on the \emph{Types} chapter of SF are
@@ -276,5 +278,9 @@ the specification had to be massaged non-insignificantly.
 %%% TeX-master: "main"
 %%% End:
 
-% LocalWords:  Bedwyr bipole elpi QuickCheck OCaml TODO coq xs nat
-% LocalWords:  tif ttrue tzero tsucc SUT
+% LocalWords:  Bedwyr bipole elpi QuickCheck OCaml TODO coq xs nat DM
+% LocalWords:  tif ttrue tzero tsucc SUT PBT SmallCheck QuickChick
+% LocalWords:  decidability shrinkers dep pbt fpc interp forall ness
+% LocalWords:  ord unfoldings pre relationally shrinker booleans typ
+% LocalWords:  tfalse tpred tiszero TBool TNat subexp SuccBool
+% LocalWords:  notstuck
