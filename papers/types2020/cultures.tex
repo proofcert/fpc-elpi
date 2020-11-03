@@ -14,7 +14,7 @@ approaches to type theory.  For example, type theories usually answer
 the question ``What is a proof?'' with the response ``a (dependently)
 typed $\lambda$-term''.  That is, when describing a type theory, one
 usually decides that a proof is a certain kind of $\lambda$-term
-within the system.  In contrast, the proof theory treats logical
+within the system.  In contrast,  proof theory treats logical
 propositions and proofs as separate.  For example, proof theory does
 not assume that there are terms within the logic that describe proofs.
 
@@ -30,8 +30,8 @@ not assume that there are terms within the logic that describe proofs.
 %% DM: I've tried to address your concerns by adding an additional
 %% paragraph and references (below).
 
-Gentzen's discovery that the key to treating classical and
-intuitionistic logics in the same proof system was the invention of
+Gentzen's discovered that the key to treating classical and
+intuitionistic logics in the same proof system was %the invention of
 the weakening and contraction structural rules on the right-side of
 sequents~\cite{gentzen35}.  This invention lead him away from natural
 deduction to multiple-conclusion sequent calculus, a very important
@@ -49,8 +49,8 @@ multiplicative disjunction $\lpar$ and its unit $\bot$.
 %\end{metanote}
 
 As is often observed, however, sequent calculus is too low-level to be
-used explicitly as capturing the ``essence of a proof''.  Recent
-developments in focused proof systems \cite{andreoli92jlc,liang09tcs},
+used explicitly as capturing the ``essence of a proof''.  
+Developments in focused proof systems \cite{andreoli92jlc,liang09tcs},
 makes it possible to extract from sequent calculus not only natural
 deduction proofs \cite{pimentel16lsfa}, but also proof nets
 \cite{chaudhuri08tcs}, and Herbrand-style expansion trees
@@ -123,24 +123,30 @@ used to prove ``substitution lemmas for free'' \cite{gacek12jar}.
 
 \subsection{\lP vs Coq}
 
-Given that \lP and Coq both result from a mixing of the
-$\lambda$-calculus with logic, it is important to understand their
-differences.  The confusion around the term \emph{higher-order
-abstract syntax} (HOAS), for example, helps to illustrate their
-differences.  In the functional programming setting, including the Coq
-system, the HOAS approach leads to encoding binding structures within
-terms using functions.  Such encodings are surprisingly complicated
-since they allow for \emph{exotic terms} \cite{despeyroux95tlca} and
-for structures on which induction is not possible
-\cite{roeckl01fossacs}.  In the logic programming setting,
-particularly \lP, HOAS is well supported since bindings are allowed
-with terms ($\lambda$-bindings), in formulas (quantifiers), and in
-proofs (eigenvariables).  For this reason, the term
-\emph{$\lambda$-tree syntax} was introduced to name this particular
-take on HOAS \cite{miller19jar}.  The Abella proof assistant
-\cite{baelde14jfr} was designed, in part, to provide inductive and
-co-inductive inference involving specifications using the
-$\lambda$-tree syntax approach.
+Given that \lP and Coq both result from combining the
+$\lambda$-calculus with logic, it is important to understand some of
+their their differences.  The confusion around the term
+\emph{higher-order abstract syntax} (HOAS), is a case in point.  In
+the functional programming setting, including the Coq system, the HOAS
+approach leads to encoding binding structures within terms using
+functions.  Such encodings are surprisingly complicated since they
+allow for \emph{exotic terms} \cite{despeyroux95tlca} and for
+structures on which induction is not possible \cite{roeckl01fossacs}.
+\begin{metanote}
+  AM: I find this a bit unbalanced. Exotic terms can be avoided with
+  Honsell's theory of context and/or Adam's PHOAS -- not that I like
+  it.. And of course there is Beluga and friends.  On the other hand
+  Coq users are happy with library-based approaches such as Autosubt or well-typed DB
+  that allows for sphisticated treatments of binders. I would say something more generic such as that mixing functions and HOAS is not immediate, may require additional machinery both in terms of type theories than of code generation, while in lp\dots
+\end{metanote}
+In the logic programming setting, particularly \lP, HOAS is well
+supported since bindings are allowed with terms ($\lambda$-bindings),
+in formulas (quantifiers), and in proofs (eigenvariables).  For this
+reason, the term \emph{$\lambda$-tree syntax} was introduced to name
+this particular take on HOAS \cite{miller19jar}.  The Abella proof
+assistant \cite{baelde14jfr} was designed, in part, to provide
+inductive and co-inductive inference involving specifications using
+the $\lambda$-tree syntax approach.
 
 Another difference between \lP and functional programming can be
 illustrated by considering how they are used in the specification of
@@ -159,6 +165,9 @@ provides a rather different approach to the specification of tactics
 
 
 While \lP is a typed language, it only uses simple, polymorphic types,
+\begin{metanote}
+AM:  simple are not poly: can we say ML-style polymorphism?
+\end{metanote}
 and these are more often used to indicate syntactic categories.  Any
 dependency information needs to be captured using predicates and
 quantifiers.

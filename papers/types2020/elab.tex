@@ -8,7 +8,11 @@ The trusted base of Coq is its kernel, which is a type-checking
 program that certifies that a dependently typed $\lambda$-term has a
 given type.  If type checking succeeds, the formula corresponding to
 that type is, in fact, accepted by Coq users as a theorem of
-intuitionistic logic.  The rest of the Coq system, especially its
+intuitionistic logic.
+\begin{metanote}
+  Small point: the Coq kernel can be soundly extended with axioms and will also validate classical tautologies
+\end{metanote}
+The rest of the Coq system, especially its
 tactic language, is designed to help a human user build
 proofs-as-$\lambda$-terms that can be checked by the kernel.
 
@@ -16,9 +20,9 @@ There are many theorem provers for intuitionistic logic
 \cite{raths07jar} for which a successful proof is not the kind of
 detailed $\lambda$-term required by the Coq kernel.  Often, such
 provers provide no information about the proofs they discover.  To the
-extent that some prove evidence is output after a successful run, such
-evidence is usually just a trace of some key aspects of a proof: some
-details are often not included in such a trace.  For example:
+extent that some  evidence is output after a successful run, such
+evidence is usually just a trace of some key aspects of a proof, where some
+details are often not included.  For example:
 \begin{enumerate}
 
 \item Substitution instances of quantifiers might not be recorded in a
@@ -60,7 +64,7 @@ Following the general outline that has been described in
   certificates using the FPC framework.
 
 \item Check proofs by executing the logic programming checker that is
-  parametrized by the particular FPC definition.
+  parameterized by the particular FPC definition.
 \end{enumerate}
 %
 It is also possible to pair two different proof certificates, defined
@@ -84,7 +88,7 @@ structures into terms the Coq kernel can check, we consider here
 examples take from the file \verb+coq_fpc.v+, which is part of the
 repository \url{https://github.com/proofcert/fpc-elpi/}.
 Figure~\ref{fig:debruijn} presents the specific FPC that defines the
-proof semantics of using the De Briujn notions for untyped
+proof semantics of using the De Bruijn notions for untyped
 $\lambda$-terms as proof evidence of a proof in intuitionistic
 propositional logic.  That FPC definition, along with a proof checker
 capable of synthesizing Coq proof terms during proof checker, makes it
@@ -107,6 +111,9 @@ Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q)
 \label{fig:debruijn}
 \end{figure}
 
+\begin{metanote}
+  AM: I think we need more: the FPC may go to the appendix, we may want to say that there is a tactic that proves these theorems etc. 
+\end{metanote}
 
 %\newpage
 
@@ -114,3 +121,5 @@ Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q)
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
+
+% LocalWords:  intuitionistic

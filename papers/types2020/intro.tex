@@ -5,7 +5,7 @@ Recently, C. Sacerdoti Coen and E. Tassi developed the Elpi
 implementation \cite{dunchev15lpar} of \lP \cite{miller12proghol} and
 more recently, Tassi has made Elpi available as the \texttt{coq-elpi} plugin to the Coq
 proof assistant \cite{tassi18coqpl} (\url{https://github.com/LPCIC/coq-elpi}).  This implementation of \lP
-extends earlier implementations in primarily two directions:  First,
+extends earlier ones in primarily two directions:  First,
 Elpi adds a notion of constraints and constraints handling rules, which makes it more expressive than
 the Teyjus implementation \cite{nadathur99cade} of \lP. Second, the
 plugin version of Elpi comes equipped with  a quotation and anti-quotation syntax for mixing
@@ -22,7 +22,7 @@ programmer from dealing with low-level aspects of bindings
 representation (e.g., De Bruijn indexes) while still having clean and
 effective ways to manipulate binding structures.
 
-Since relations (not functions) play a central role in \lP, Elpi is
+Since relations (not functions) are central in \lP, Elpi is
 capable to providing direct support for the many relations that have a
 role in proof assistants implementation and usage.  Such relations include typing (e.g.,
 $\Gamma\vdash M\colon\sigma$), evaluation (e.g., natural semantics
@@ -45,7 +45,8 @@ these examples, we shall illustrate that Elpi is useful not only
 because of its meta-programming features,
 % (e.g., a builtin treatment of bindings in syntax)
 but also because it soundly
-implements a higher-order intuitionistic logic.  The latter aspect of
+implements a higher-order intuitionistic logic.
+\todo{Explain better? Our kernels are deep embedding, aren't they? -am}The latter aspect of
 Elpi makes it possible to encode the proofs and proof theory of
 specific subsets of the Coq logic.
 
