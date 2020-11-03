@@ -1,0 +1,42 @@
+{\color{red}
+The notion of \emph{focused proof systems}~\cite{andreoli92jlc,liang09tcs}
+generalizes this view of proof construction by identifying the
+following two phases. % of proof construction.
+\begin{enumerate}
+\item The \emph{negative}%
+% \footnote{The terminology of negative and positive phases is a bit
+%   unfortunate: historically, these terms do not refer to positive or negative
+%   subformula occurrences but rather to certain semantic models used in
+%   the study of linear logic~\cite{girard87tcs}.}
+%
+  phase corresponds to  goal-reduction: in this phase,
+  inference rules that involve \emph{don't-care-non\-de\-ter\-min\-ism} are
+  applied.
+%
+  As a result, there is no need to consider backtracking over choices
+  made in building this phase.
+
+\item The \emph{positive} phase corresponding to  backchaining: in this phase, inference rules that involve
+  \emph{don't-know-non\-de\-ter\-min\-ism} are applied: here,
+  inference rules need to be supplied with information in order to
+  ensure that a completed proof can be built.
+%
+  That information can be items such as which term is needed to
+  instantiate a universally quantified formula and which disjunct of a
+  disjunctive goal formula should be proved.
+\end{enumerate}
+%
+Thus, when building a proof tree (in the sequent calculus) from the
+conclusion to its leaves, the negative phase corresponds to a simple
+computation that needs no external information, while the positive
+phase may need such external information to be supplied.
+%
+In the literature, it is common to refer to a repository of such
+external information as either an \emph{oracle} or a \emph{proof
+certificate}.
+}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:

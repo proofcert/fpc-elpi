@@ -1,5 +1,11 @@
 sig kernel.
 /* sigs */
+kind   goal         type.
+type   go   term -> term -> goal.
+type   bc   term -> term -> list term -> goal.
+type   check   cert -> goal -> o.
+/* end */
+/* interp */
 type   interp    term -> o.
 type   backchain    term -> term -> o.
 /* end */

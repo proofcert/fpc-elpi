@@ -2,8 +2,9 @@ sig fpcs.
 accum_sig kernel.
 
 /* resources */
-type   qheight   int -> cert.
-type   qsize     int -> int -> cert.
+type  qheight int -> cert.
+type  qsize    int -> int -> cert.
+type  <c>      cert ->  cert ->  cert. infixr <c>     5.
 /* end */
 
 /* max */
