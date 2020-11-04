@@ -8,7 +8,7 @@
 %   (AM): Start with the logical reconstruction of \texttt{check}, to and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). % In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
 % \end{metanote}
 
-\subsection{Focused proof systems with certificates}
+\subsection{Proof systems with certificates}
 \label{ssec:focused}
 \todo{Change title? }
 \todo{Use same names in Fig and 3: A for Atom, L for ListArgs etc.}
@@ -51,7 +51,8 @@
 % }
 % \qquad 
 \infer{\XXi\Gamma\vdash A : s}
-{(A,s) \in \mathcal{A}
+{%(A,s) \in \mathcal{A}
+  \mbox{call to Coq?}
 }
 % \qquad
 % \infer{\XXi;\Gamma\vdash \lambda x:A.\,t : \forall x : A.\,  G}
@@ -59,7 +60,7 @@
 % }
 \qquad
 \infer{\XXi_1\Gamma\vdash k\ l : A}
-      {\bc{\XXi_2}{\Gamma} l D A \quad k : D \in \Pscr_A\cup\Gamma\qquad \unfoldExpert{\XXi_1}{\XXi_2}} 
+      {\bc{\XXi_2}{\Gamma} l D A \quad k : D \in \Pscr_A\qquad \unfoldExpert{\XXi_1}{\XXi_2}} 
 \]
 \vskip -18pt
 \[
@@ -98,20 +99,21 @@ propositional connectives, nor equality for that matter. However, one of the bea
 Since we are only dealing with types that correspond to Horn clauses, and
 atomic types are inductively defined, we do not need a $\forall$ rule on the right, although the proof theory would gladly allow it. This means, at the term level, that we
 do not have variables in our grammar of terms. Terms are always
-applied to a (possibly empty) list of arguments, and as is usual in Pure Type
-Systems we have the same grammar for terms and types:
+applied to a (possibly empty) list of arguments% , and as is usual in Pure Type
+% Systems we have the same grammar for terms and types
+.
 %, as shown in figure~\ref{fig:terms}.
-\todo{Let's think about that: we need A at least, but A is also a metavariable for atoms}
-%\begin{figure}
-\begin{align*}
-t,u ::= & k\ l \;|\; \forall x : t.\, u \\
-l ::= & [] \;|\; (t\ ::\ l)
-\end{align*}
-% \caption{Grammar of terms}
-% \label{fig:terms}
-% \end{figure}
+% \todo{Let's think about that: we need A at least, but A is also a metavariable for atoms}
+% %\begin{figure}
+% \begin{align*}
+% t,u ::= & k\ l \;|\; \forall x : t.\, u \\
+% l ::= & [] \;|\; (t\ ::\ l)
+% \end{align*}
+% % \caption{Grammar of terms}
+% % \label{fig:terms}
+% % \end{figure}
 
-\todo{This does not see quite right: D vs A, consider say even}
+\todo{Lookup Coq rules for unfold rule}
 The proof system is parameterized by  external set of inductive definitions available in
 the (implicit) global context: we denote by $\Pscr_A$ the set of type declarations for the
 constructors of type $A$, of the form $k : D$ where $D$ is of the form
@@ -161,7 +163,7 @@ we get a term that can be used to continue backchaining. This
 application is obtained via meta-level substitution, in the style of HOAS. In this sense, our calculus uses \emph{implicit} substitutions, rather than explicit ones as in LJT and PTSC's tradition, the more since proof search in our application is cut-free. 
 % Syntax: one can think as if something of type \lsti{term -> term} were a
 % \lsti{term} with a hole in it for another \lsti{term}.
-\todo{Now safe-dest-app is hidden inside \texttt{definition}. Put the rest of the code in the appendix?}
+\todo{Reput safe-dest-app in code, a bit more details about the unfold case}
 The unfolding rule makes use of the Coq-Elpi primitives
 \lsti{coq.safe-dest-app} in order to obtain the head term of a (possibly
 nested) application, and \lsti{coq.env.indt} in order to access the global
@@ -234,9 +236,7 @@ than or equal to 4 while also being of size less than or equal to 10.
 
 \subsection{A prolog-like tactic}
 
-\begin{metanote}
-Keep this? Perhaps explain Ev = Term?
-\end{metanote}
+\todo{explain Ev = Term as an Elpi thing}
 
 Thanks to the Coq-Elpi interface, in particular to the ``main''
 proocedure \lsti{solve}, we can package the \lP's code for the checker
@@ -251,7 +251,7 @@ Elpi Accumulate lp:{{
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
 ...
-/* Other clauses for different fpc omitted */
+(* Other clauses for different fpc omitted *)
 }}.
 \end{lstlisting}
 The following example show how we can use the above tactic to do
