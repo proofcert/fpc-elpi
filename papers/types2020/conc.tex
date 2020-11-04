@@ -2,43 +2,49 @@
 
 \todo{sum up contribution}
 
-% \begin{metanote}
+There are many avenues of developments for this line of research.
+The code reported in Fig.~\ref{fig:augmented} is somewhat idealized in
+so far that we omitted a rule performing weak-head reduction (allowing
+to handle directly existential goals) and more importantly one that uses
+ Elpi's \emph{delay} mechanism. % This a distinguished feature of Elpi, whose
+% usef has been advocated in ~\cite{DunchevCT16,coen19mscs}.
+The
+use of constraints is of course for data generation is well
+developed~\cite{FioravantiPS15} and we could try to leverage it to
+improve PBT using partially instantiated terms: for example generating
+say lists with at least two elements as \texttt{[1,2|Tail]}, without
+recurring to needed narrowing as in in
+LazySmallCheck~\cite{smallcheck}. On the more practical side, it would be worthwhile to investigate \emph{random} generation, following the ideas in~\cite{pltredexconstraintlogic,blanco19ppdp}.
+
+Another obvious limitation of our PBT tactic is that is does not 
+ handle any computation within an inductive relation. We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
+% Mention \emph{Harpoon}, Beluga's new tactic language?
+
+ Finally it makes sense to tie together the two threads of this paper
+ and provide a way checking and elaborating proof evidence for
+ intutionistic logic \emph{with} (inductively) defined atoms. This
+ can go as far as FPC for inductive proofs~\cite{blanco15wof}.
+
+ \noindent
+ The source files mentioned in this paper are available at \url{https://github.com/proofcert/fpc-elpi}.
+ % \begin{metanote}
 %   Decided against a related work section: most is already discussed in the intro, the rest can be mentioned in passing --am
 % \end{metanote}
 % \subsection{Related work}
 % \label{ssec:rel}
 
 % \begin{itemize}
-% \item Brief discussion/comparison with \texttt{auto}
+% \item Brief discussion/comparison with \texttt{auto} [done]
 % \item Mention other papers by Enrico as applications of coq-elpi~\cite{coen19mscs,tassi19itp}\dots [done]
 % \item Say we \textbf{do} not talk about Coq metaprogramming (Ltac, Mtac), do say that doing our to application in MetaCoq~\cite{sozeau2020metacoq} would be a disaster (reimplement unfication, backtracking, binders) [done]
 % \end{itemize}
 
 % \subsection{Future work}
 % \label{ssec:fut}
-\todo{finish future work}
-There are many avenues of developments for this line of research.
-The code reported in Fig.~\ref{fig:augmented} is somewhat idealized in
-so far that we omitted a rule performing weak-head reduction (allowing
-to handle directly existential goals) and more importantly that used
-the \emph{delay} mechanism. This a distinguished feature of Elpi, whose
-usefulness has been advocated in ~\cite{DunchevCT16,coen19mscs}.  The
-use of constraints for data generation is well
-developed~\cite{FioravantiPS15} and we could try to leverage to
-improve PBT using partially instantiated terms: for example generating
-say lists with at least two elements as \texttt{[1,2|Tail]}, without
-recurring to needed narrowing as in in
-LazySmallCheck~\cite{smallcheck}.
+%\todo{finish future work}
 
-
-
-Extending our tactic to handle computations (\texttt{simpl}) and/or to
-return the partial proof state, unsolved goals in particular. Mention
-\emph{Harpoon}, Beluga's new tactic language?
-
-Extending the LJF kernel to handle defined atoms
-
-\todo{Link to the repo. Use \url{https://github.com/proofcert/fpc-elpi}, make it public andmove papers to parsifal}
+ % \todo{Link to the repo. Use \url{https://github.com/proofcert/fpc-elpi}, make it public andmove papers to parsifal}
+ 
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
