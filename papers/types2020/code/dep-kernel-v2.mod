@@ -49,18 +49,18 @@ backchain D A :- is_uni D D',  backchain (D' X) A.
 % Checker %
 %%%%%%%%%%%
 /* check */
-check _ (go (sort S) Term):-
-  coq.typecheck Term (sort S) _. 
-check Cert (go Atom Term) :-
-  definition Atom Kn Clauses,
-  unfoldE Kn Cert Cert' K,
+check _ (go (sort S) A):-
+  coq.typecheck A (sort S) _. 
+check Cert1 (go A Tm) :-
+  definition A Kn Clauses,
+  unfoldE Kn Cert1 Cert2 K,
   std.lookup {std.zip Kn Clauses} K Clause, 
-  check Cert' (bc Clause Atom ListArgs),
-  Term = (app [global (indc K)|ListArgs]).
-check Cert (bc (prod _ Ty1 Ty2) G [Tm|ArgsList]) :-
+  check Cert2 (bc D A L),
+  Tm = (app [global (indc K)|L]).
+check Cert (bc (prod _ B D) G [Tm|L]) :-
   prodE Cert Cert1 Cert2,
-  check Cert1 (bc (Ty2 Tm) G ArgsList),
-  check Cert2 (go Ty1 Tm).
+  check Cert1 (bc (D Tm) G L),
+  check Cert2 (go B Tm).
 check Cert (bc A A []) :-
 	ttE Cert .
 /* end */
