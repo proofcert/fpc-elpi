@@ -1,3 +1,58 @@
+%% \begin{metanote}
+%%   This paragraph seem to identify proof and type theory with sequents
+%%   and nat ded and while I agree with the gist (although people such as
+%%   Frank would argue that sequents are a way of organizing proof search
+%%   for nat ded), we're not gonna make a lot of friends at types and
+%%   more importantly is a big hammer to nail the point that logic
+%%   programming is helpful with Coq --am
+%% \end{metanote}
+
+%% DM: I've tried to address your concerns by adding an additional
+%% paragraph and references (below).
+
+
+% DM I don't have a reference but I added more details.
+%\begin{metanote}
+%  `` partial fashion.'' Isn't that a bit vague? Some references? -am
+%\end{metanote}
+
+
+%% DM I no longer think this comment is useful for this paper, so I
+%% delete it instead of trying to fix it.
+
+%% Proof theory also has rather immediate and natural treatments for
+%% co-induction (as well as induction: see
+%% \cite{baelde12tocl,momigliano12jal}) whereas the treatment of
+%% coinduction within type theory remains more challenging and is well
+%% developed only for various syntactic conditions (see, for example,
+%% \cite{bertot08entcs}).
+%% \begin{metanote}
+%%   The criticism applies to Coq, less to type theory, see co-patterns --am
+%% \end{metanote}
+
+
+%% The following paragraph seems out-of-place so I delete it now.
+
+%% In this paper, we shall use two different proof systems.  The first
+%% logic is first-order intuitionistic logic.  Here, predicates
+%% are not inductively defined and quantification will be limited to
+%% range over first-order term.  Actually, we shall examine only the Horn
+%% clause fragment of that logic.
+%% %
+%% The second logic will allow for inductively defined predicates using a
+%% fixed point notation.   Given again our restriction to essentially
+%% Horn clause specifications, it is possible to view intuitionistic
+%% reasoning with such specification as if they are actually
+%% specification in $\mu$MALL, an extension of multiplicative additive
+%% linear logic with the least and greatest fixed point operators
+%% \cite{baelde12tocl,baelde07lpar,heath19jar}.
+
+
+\begin{metanote}
+AM:  simple are not poly: can we say ML-style polymorphism?
+\end{metanote}
+
+
 {\color{red}
 The notion of \emph{focused proof systems}~\cite{andreoli92jlc,liang09tcs}
 generalizes this view of proof construction by identifying the
