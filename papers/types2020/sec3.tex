@@ -70,15 +70,16 @@
   \infer{\bc {\XXi}{} {[]} A A}{\trueExpert{\XXi}}{}\qquad
 %  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
   \infer{\bc{\XXi}{}{(t\ ::\ l)} {\forall x:B.\, D} A}
-  {\XXi_1\vdash t : A\qquad \bc{\XXi_2}{}l {B[t/x]} A\qquad\prodExpert{\XXi}{\XXi_1}{\XXi_2}}{}
+  {\XXi_1\vdash t : B\qquad \bc{\XXi_2}{}l {D[t/x]} A\qquad\prodExpert{\XXi}{\XXi_1}{\XXi_2}}{}
 \]
 %\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
-\caption{dep kernel.}
+\caption{Specification of the checking of a proof certificate and the
+  synthesis of a dependently typed $\lambda$-term.}
 \label{fig:augmented}
 \end{figure}
 \begin{figure}
-\lstinputlisting[linerange={sigs-end}]{code/dep-kernel.sig}
-\lstinputlisting[linerange={check-end}]{code/dep-kernel-v2.mod}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={sigs-end}]{code/dep-kernel.sig}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={check-end}]{code/dep-kernel-v2.mod}
 \caption{Implementation of a  dependent kernel for Coq terms.}
 \label{fig:kernel}
 \end{figure}
@@ -230,8 +231,8 @@ unfoldings in a proof.
 %proof is 5 or less.
 
 \begin{figure}[t]
-\lstinputlisting[linerange={resources-end}]{code/fpcs.sig}
-\lstinputlisting[linerange={resources-end}]{code/fpcs.mod}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={resources-end}]{code/fpcs.sig}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={resources-end}]{code/fpcs.mod}
 \caption{Sample FPCs}
 \label{fig:resources}
 \end{figure}
