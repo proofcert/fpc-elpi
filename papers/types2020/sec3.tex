@@ -12,17 +12,11 @@
 \subsection{Proof systems with certificates}
 \label{ssec:focused}
 \todo{Change title? }
-\todo{Use same names in Fig and 3: A for Atom, L for ListArgs etc.}
-
-
 
 % The proof search approach to encoding Horn clause computation
 % results in the structuring of proofs with repeated
 % switching between a \emph{goal-reduction} phase and a
 % \emph{backchaining} phase~\cite{miller91apal}.
-
-%
-
 
 %\subsection{Certificate checking with expert predicates}
 %\subsection{Adding certificates and experts to a proof system}
@@ -171,10 +165,10 @@ inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ correspon
 
 Coq terms are accessed through the Coq-Elpi API, and their representation
 in \lP takes advantage of the native \lP constructs such as lists and binders.
-The following is a list of some of signatures of the notions that we use:
+The following is a list of some of the signatures of the notions that we use:
 \begin{lstlisting}
   kind term   type.   % reification of Coq terms
-  kind gref    type     % reification of refernces to global terms
+  kind gref   type     % reification of refernces to global terms
   type global gref -> term.
   type indt   inductive -> gref.  % reification of inductive types
   type indc   constructor -> gref. % reification of their constructors 
@@ -182,21 +176,25 @@ The following is a list of some of signatures of the notions that we use:
   type prod   name -> term -> (term -> term) -> term.
 \end{lstlisting}
 
-Note that \lsti{prod} encodes dependent products taking a name for pretty printing,  a term and a \lP function from
-terms to terms, namely $\forall x : A, B$ is encoded by \texttt{prod ``x'' A (x\ B x)};
-when, in the implementation of the product-left rule, we
-apply $B$ to the variable \lsti{Tm},
-we get a term that can be used to continue backchaining. This
-application is obtained via meta-level substitution, in the style of HOAS. In this sense, our calculus uses \emph{implicit} substitutions, rather than explicit ones as in LJT and PTSC's tradition, the more since proof search in our application is cut-free. 
+Note that \lsti{prod} encodes dependent products taking a name for pretty
+printing, a term and a \lP function from terms to terms, namely $\forall x :
+A, B$ is encoded by \texttt{prod ``x'' A (x\textbackslash{} B x)}; when, in the
+implementation of the product-left rule, we apply $B$ to the variable
+\lsti{Tm}, we get a term that can be used to continue backchaining. This
+application is obtained via meta-level substitution, in the style of HOAS. In
+this sense, our calculus uses \emph{implicit} substitutions, rather than
+explicit ones as in LJT and PTSC's tradition, the more since proof search in
+our application is cut-free.
 % Syntax: one can think as if something of type \lsti{term -> term} were a
 % \lsti{term} with a hole in it for another \lsti{term}.
-\todo{Reput safe-dest-app in code, a bit more details about the unfold case}
 The unfolding rule makes use of the Coq-Elpi primitives
 \lsti{coq.safe-dest-app} in order to obtain the head term of a (possibly
 nested) application, and \lsti{coq.env.indt} in order to access the global
 environment of inductive definitions and query for information about them.
-
-
+The \lsti{unfold_expert} predicate, then, has the role of selecting which
+constructor to introduce for the inductive type. The kernel will successively
+obtain the type of the selected constructor, and initiate the backchaining
+phase on it.
 
 \smallskip
 In figure~\ref{fig:augmented}  each
@@ -206,6 +204,7 @@ certificates ($\Xi'$, $\Xi_1$, $\Xi_2$) with extracted information from
 These notions are taken from the general setting of \emph{foundational
   proof certificates}~\cite{chihani17jar}.
 %
+\todo{MM: Talk about randomized FPC?}
 In our case here, an FPC is a collection of \lP clauses that
 provide the remaining details not supplied in Figure~\ref{fig:kernel}:
 that is, the exact set of constructors for the  type of certificates as
