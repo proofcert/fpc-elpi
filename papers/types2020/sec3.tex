@@ -31,7 +31,7 @@
 \begin{footnotesize}
 \begin{figure}[t]
   %
-  \renewcommand{\Gamma}{}
+%  \renewcommand{\Gamma}{}
     \newcommand{\bc}[5]{#1#2\vdash #3 : #4 \Downarrow #5}
 \[
 % \infer{\XXi\vdash t = t}
@@ -50,24 +50,24 @@
 % {\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
 % }
 % \qquad 
-\infer{\XXi\Gamma\vdash A : s}
+\infer{\XXi\vdash A : s}
 {%(A,s) \in \mathcal{A}
-  \mbox{call to Coq?}
+  {E[] \vdash_{CIC} A  : s}
 }
 % \qquad
 % \infer{\XXi;\Gamma\vdash \lambda x:A.\,t : \forall x : A.\,  G}
 % {\XXi;\Gamma, x : A\vdash t : G%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
 % }
 \qquad
-\infer{\XXi_1\Gamma\vdash k\ l : A}
-      {\bc{\XXi_2}{\Gamma} l D A \quad k : D \in \Pscr_A\qquad \unfoldExpert{\XXi_1}{\XXi_2}} 
+\infer{\XXi_1\vdash k\ l : A}
+      {\mathrm{Ind}[p] \ (\Gamma_I := \Gamma_C) \in E\quad (\mathit{head} \ A : T)\in \Gamma_I\quad  k : D \in \Gamma_C\quad \bc{\XXi_2}{} l D A \quad\unfoldExpert{\XXi_1}{\XXi_2}} 
 \]
 \vskip -18pt
 \[
-  \infer{\bc {\XXi}{\Gamma} {[]} A A}{\trueExpert{\XXi}}{}\qquad
+  \infer{\bc {\XXi}{} {[]} A A}{\trueExpert{\XXi}}{}\qquad
 %  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
-  \infer{\bc{\XXi}{\Gamma}{(t\ ::\ l)} {\forall x:B.\, D} A}
-  {\XXi_1;\Gamma\vdash t : A\qquad \bc{\XXi_2}{\Gamma}l {B[t/x]} A\qquad\prodExpert{\XXi}{\XXi_1}{\XXi_2}}{}
+  \infer{\bc{\XXi}{}{(t\ ::\ l)} {\forall x:B.\, D} A}
+  {\XXi_1\vdash t : A\qquad \bc{\XXi_2}{}l {B[t/x]} A\qquad\prodExpert{\XXi}{\XXi_1}{\XXi_2}}{}
 \]
 %\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
 \caption{dep kernel.}
@@ -89,19 +89,41 @@ proof search in Pure Type Systems introduced in \cite{LengrandDM06}, based in
 Herbelin \cite{Herbelin94}). Similarly to that calculus, we have a term
 language that includes terms and lists of terms, and two distinct typing
 judgments for the two categories. In our case, where proof search steps are
-viewed as computation, the term judgment corresponds to a goal-reduction
-step while the list judgment corresponds to a backchaining step. This coincides
+viewed as computation, the term judgment $\XXi\vdash t \colon A$ corresponds to a goal-reduction
+step while the judgment $\XXi\vdash l \colon D \Downarrow A$ corresponds to a backchaining step. This coincides
 with the idea behind the \emph{spine calculus}~\cite{Cervesato97tr}.
 
-It may be at first surprising that there are no introduction rules for
-propositional connectives, nor equality for that matter. However, one of the beauty of the Calculus of Inductive Construction is that they are in fact defined inductively and therefore the \emph{unfold} rule will handle those; this also simplifies proof-terms.
 
-Since we are only dealing with types that correspond to Horn clauses, and
-atomic types are inductively defined, we do not need a $\forall$ rule on the right, although the proof theory would gladly allow it. This means, at the term level, that we
-do not have variables in our grammar of terms. Terms are always
-applied to a (possibly empty) list of arguments% , and as is usual in Pure Type
+The proof system is parameterized by Coq' global environment $E$, which
+here can be thought to consist of a set of inductive definitions,
+which following Coq's reference manual we denote as
+$\mathrm{Ind}[p]  (\Gamma_I := \Gamma_C)$.  The first rule delegates
+to Coq's type checking enforcing the well-sortedness of such types. We
+do not have a \emph{local context} since we are only dealing with types
+that correspond to Horn clauses, and atomic types are inductively
+defined. In fact, we do not have a $\forall$ rule on the right,
+although the proof theory would gladly allow it. This means, at the
+term level, that we do not have variables in our grammar of
+terms. Terms are always applied to a (possibly empty) list of
+arguments.
+
+The \emph{unfold} rule is the equivalent in our simplified setting of
+a \emph{decide} rule in a explicitly focused system. From a logic
+programming viewpoint given an atom, it selects a clause on which to
+back-chain on: we look-up the costructors from an \lsti{Inductive}
+definition from the global enviroment, one that matches the atom we
+atom we wish to bachchain on and then call the latter judgment. The rules for backchaining are standard.
+
+It may be at first surprising that there are no
+introduction rules for propositional connectives, nor equality for
+that matter. However, one of the beauty of the Calculus of Inductive
+Construction is that they are in fact defined inductively and
+therefore the \emph{unfold} rule will handle those; this also
+simplifies proof-terms.
+
+  % , and as is usual in Pure Type
 % Systems we have the same grammar for terms and types
-.
+%
 %, as shown in figure~\ref{fig:terms}.
 % \todo{Let's think about that: we need A at least, but A is also a metavariable for atoms}
 % %\begin{figure}
@@ -113,12 +135,13 @@ applied to a (possibly empty) list of arguments% , and as is usual in Pure Type
 % % \label{fig:terms}
 % % \end{figure}
 
-\todo{Lookup Coq rules for unfold rule}
-The proof system is parameterized by  external set of inductive definitions available in
-the (implicit) global context: we denote by $\Pscr_A$ the set of type declarations for the
-constructors of type $A$, of the form $k : D$ where $D$ is of the form
-$\forall x_1 : t_1.\, \dots \forall x_n : t_n.\, D\ u_1 \dots u_m$. We denote
-by $\mathcal{A}$ the set of arity declaration for the inductive types.
+
+% we denote by $\Pscr_A$ the
+% set of type declarations for the constructors of type $A$, of the form
+% $k : D$ where $D$ is of the form
+% $\forall x_1 : t_1.\, \dots \forall x_n : t_n.\, D\ u_1 \dots u_m$. We
+% denote by $\mathcal{A}$ the set of arity declaration for the inductive
+% types.
 
 %
 %
@@ -285,4 +308,4 @@ more customable that the one offered by the \lsti{auto}'s hard-wired
 %%% End:
 
 % LocalWords:  backchaining disjunct LJT dep qheight qsize orE someE
-% LocalWords:  Elpi modularity Herbelin bc PTSC's dprolog
+% LocalWords:  Elpi modularity Herbelin bc PTSC's dprolog CIC
