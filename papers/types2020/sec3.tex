@@ -4,7 +4,7 @@
 \label{sec:three}
   \newcommand{\XXi}{{\color{blue}{\Xi}}}
 
-\todo{Anything here?}
+\todo{Right now there is no intro to FPC}
 % \begin{metanote}
 %   (AM): Start with the logical reconstruction of \texttt{check}, to and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). % In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
 % \end{metanote}
@@ -12,7 +12,6 @@
 \subsection{Proof systems with certificates}
 \label{ssec:focused}
 \todo{Change title? }
-\todo{Use same names in Fig and 3: A for Atom, L for ListArgs etc.}
 
 
 
@@ -94,14 +93,14 @@ Herbelin \cite{Herbelin94}). Similarly to that calculus, we have a term
 language that includes terms and lists of terms, and two distinct typing
 judgments for the two categories. In our case, where proof search steps are
 viewed as computation, the term judgment $\XXi\vdash t \colon A$ corresponds to a goal-reduction
-step while the judgment $\XXi\vdash l \colon D \Downarrow A$ corresponds to a backchaining step. This coincides
+step while the judgment $\XXi \Downarrow  l \colon D\vdash A$ corresponds to a backchaining step. This coincides
 with the idea behind the \emph{spine calculus}~\cite{Cervesato97tr}.
 
 
 The proof system is parameterized by Coq' global environment $E$, which
 here can be thought to consist of a set of inductive definitions,
-which following Coq's reference manual we denote as
-$\mathrm{Ind}[p]  (\Gamma_I := \Gamma_C)$.  The first rule delegates
+which following Coq's reference manual we denote with
+$\mathrm{Ind}[p]  (\Gamma_I := \Gamma_C)$.  One  rule delegates
 to Coq's type checking enforcing the well-sortedness of such types. We
 do not have a \emph{local context} since we are only dealing with types
 that correspond to Horn clauses, and atomic types are inductively
@@ -112,18 +111,17 @@ terms. Terms are always applied to a (possibly empty) list of
 arguments.
 
 The \emph{unfold} rule is the equivalent in our simplified setting of
-a \emph{decide} rule in a explicitly focused system. From a logic
-programming viewpoint given an atom, it selects a clause on which to
+a \emph{decide} rule in an explicitly focused system. From a logic
+programming viewpoint, given an atom, the rule selects a clause on which to
 back-chain on: we look-up the costructors from an \lsti{Inductive}
-definition from the global enviroment, one that matches the atom we
-atom we wish to bachchain on and then call the latter judgment. The rules for backchaining are standard.
+definition from the global enviroment, one that matches the atom we wish to bachchain on and then call the latter judgment. The rules for backchaining are standard, corresponding to the \emph{init} and $\forall$-left rules.
 
 It may be at first surprising that there are no
 introduction rules for propositional connectives, nor equality for
 that matter. However, one of the beauty of the Calculus of Inductive
 Construction is that they are in fact defined inductively and
 therefore the \emph{unfold} rule will handle those; this also
-simplifies proof-terms.
+simplifies the syntax of proof-terms.
 
   % , and as is usual in Pure Type
 % Systems we have the same grammar for terms and types
@@ -160,7 +158,7 @@ simplifies proof-terms.
 
 Figure~\ref{fig:kernel} contains the Elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ corresponds to
-\lsti{check $\XXi$ (go A T)} and $\XXi\vdash l \colon D \Downarrow A$ corresponds to
+\lsti{check $\XXi$ (go A T)} and $\XXi \Downarrow  l \colon D\vdash A$ corresponds to
 \lsti{check $\XXi$ (bc D A L)}.
 
 % here the infix
@@ -173,17 +171,17 @@ Coq terms are accessed through the Coq-Elpi API, and their representation
 in \lP takes advantage of the native \lP constructs such as lists and binders.
 The following is a list of some of signatures of the notions that we use:
 \begin{lstlisting}
-  kind term   type.   % reification of Coq terms
-  kind gref    type     % reification of refernces to global terms
-  type global gref -> term.
-  type indt   inductive -> gref.  % reification of inductive types
-  type indc   constructor -> gref. % reification of their constructors 
-  type app    list term -> term.  % reification of nary application
-  type prod   name -> term -> (term -> term) -> term.
+  kind term   type.                                   % reification of Coq terms
+  kind gref    type                                 % reification of refernces to global terms
+  type global gref -> term.                      % coercion to term
+  type indt   inductive -> gref.                 % reification of inductive types
+  type indc   constructor -> gref.             % reification of their constructors 
+  type app    list term -> term.               % reification of nary application
+  type prod   name -> term -> (term -> term) -> term. % reification of dependent product
 \end{lstlisting}
 
 Note that \lsti{prod} encodes dependent products taking a name for pretty printing,  a term and a \lP function from
-terms to terms, namely $\forall x : A, B$ is encoded by \texttt{prod ``x'' A (x\ B x)};
+terms to terms: namely $\forall x : A, B$ is encoded by \texttt{prod ``x'' A (x\ B x)};
 when, in the implementation of the product-left rule, we
 apply $B$ to the variable \lsti{Tm},
 we get a term that can be used to continue backchaining. This
@@ -196,10 +194,7 @@ The unfolding rule makes use of the Coq-Elpi primitives
 nested) application, and \lsti{coq.env.indt} in order to access the global
 environment of inductive definitions and query for information about them.
 
-
-
-\smallskip
-In figure~\ref{fig:augmented}  each
+In Figure~\ref{fig:augmented}  each
 inference rule is augmented with an additional premise involving an
 \emph{expert predicate}, a certificate $\Xi$, and possibly continuations of
 certificates ($\Xi'$, $\Xi_1$, $\Xi_2$) with extracted information from
@@ -207,11 +202,11 @@ These notions are taken from the general setting of \emph{foundational
   proof certificates}~\cite{chihani17jar}.
 %
 In our case here, an FPC is a collection of \lP clauses that
-provide the remaining details not supplied in Figure~\ref{fig:kernel}:
+provide the remaining details not supplied in Figure~\ref{fig:augmented} and~\ref{fig:kernel}:
 that is, the exact set of constructors for the  type of certificates as
 well as the specification of the expert predicates listed \emph{ibidem}.
 %
-The top of Figure~\ref{fig:resources} displays two such FPCs,
+The top of Figure~\ref{fig:resources} displays two FPCs,
 both of which can be used to describe proofs where we bound
 the dimension of  a proof.
 %
@@ -302,9 +297,9 @@ Coq's \lsti{auto}: it currently lacks the latter's capability of
 solving goals by \lsti{reflexivity} as well as the modularity of using
 \lsti{Hints} as introduction rules; on the bright side, it is not
 restricted to depth-first search, since it follows the dictate of the
-given FPC. For example the FPC can provide a \emph{trace} that may be
-more customable that the one offered by the \lsti{auto}'s hard-wired
-\lsti{Debug} facility.
+given FPC, for example iterative-deepening. Furthermore, the FPC can
+provide a \emph{trace} that may be more customable that the one
+offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
 %
 %%% Local Variables:
 %%% mode: latex
