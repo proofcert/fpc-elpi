@@ -9,19 +9,19 @@ to handle directly existential goals) and more importantly one that uses
  Elpi's \emph{delay} mechanism. % This a distinguished feature of Elpi, whose
 % usef has been advocated in ~\cite{DunchevCT16,coen19mscs}.
 The
-use of constraints is of course for data generation is well
+use of constraints for data generation is well
 developed~\cite{FioravantiPS15} and we could try to leverage it to
-improve PBT using partially instantiated terms: for example generating
+improve our PBT tactic so that it can use partially instantiated terms: for example generating
 say lists with at least two elements as \texttt{[1,2|Tail]}, without
-recurring to needed narrowing as in in
+recurring to needed narrowing as in 
 LazySmallCheck~\cite{smallcheck}. On the more practical side, it would be worthwhile to investigate \emph{random} generation, following the ideas in~\cite{pltredexconstraintlogic,blanco19ppdp}.
 
-Another obvious limitation of our PBT tactic is that is does not 
- handle any computation within an inductive relation. We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
+Another obvious limitation of our PBT tactic is that it does not 
+ handle any computation (conversion) within an inductive relation. We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
 % Mention \emph{Harpoon}, Beluga's new tactic language?
 
  Finally it makes sense to tie together the two threads of this paper
- and provide a way checking and elaborating proof evidence for
+ and provide a way of checking and elaborating proof evidence for
  intutionistic logic \emph{with} (inductively) defined atoms. This
  can go as far as FPC for inductive proofs~\cite{blanco15wof}.
 
