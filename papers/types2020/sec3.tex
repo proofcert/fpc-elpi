@@ -2,7 +2,9 @@
 \newpage
 \section{Proof theory and proof certificates}
 \label{sec:three}
-  \newcommand{\XXi}{{\color{blue}{\Xi}}}
+
+\newcommand{\XXi}{{\color{blue}{\Xi}}}
+\newcommand{\bc}[5]{#1#2\Downarrow #3 : #4 \vdash #5}
 
 \todo{Anything here?}
 % \begin{metanote}
@@ -14,15 +16,10 @@
 \todo{Change title? }
 \todo{Use same names in Fig and 3: A for Atom, L for ListArgs etc.}
 
-
-
 % The proof search approach to encoding Horn clause computation
 % results in the structuring of proofs with repeated
 % switching between a \emph{goal-reduction} phase and a
 % \emph{backchaining} phase~\cite{miller91apal}.
-
-%
-
 
 %\subsection{Certificate checking with expert predicates}
 %\subsection{Adding certificates and experts to a proof system}
@@ -30,60 +27,46 @@
 
 % \todo{Figure now uses Dale kernel-v2 --- needs further abstraction and explanation, see appendix}
 
-%\begin{footnotesize} % No effect on typesetting
 \begin{figure}[t]
-  %
-%  \renewcommand{\Gamma}{}
-    \newcommand{\bc}[5]{#1#2\Downarrow #3 : #4 \vdash #5}
 \[
-% \infer{\XXi\vdash t = t}
-% {%\eqExpert{\XXi}
-% }
-% \qquad
-% \infer{\XXi\vdash \true}
-% {%\trueExpert{\XXi}
-% }
-% \qquad
-% \infer{\XXi\vdash G_1\vee G_2}
-% {\XXi\vdash G_i%\qquad \orExpert{\XXi}{\XXi'}{i}
-% }
-% \qquad
-% \infer{\XXi\vdash \exists x. G}
-% {\XXi\vdash G[t/x]%\qquad \someExpert{\XXi}{\XXi'}{t}
-% }
-% \qquad 
-% \qquad
-% \infer{\XXi;\Gamma\vdash \lambda x:A.\,t : \forall x : A.\,  G}
-% {\XXi;\Gamma, x : A\vdash t : G%\quad \andExpert{\XXi}{\XXi_1}{\XXi_2}
-% }
-%\qquad
 \infer{\XXi_1\vdash k\ l : A}
-      {\mathrm{Ind}[p] \ (\Gamma_I := \Gamma_C) \in E\quad (\mathit{head} \ A : T)\in \Gamma_I\quad  k : D \in \Gamma_C\quad \bc{\XXi_2}{} l D A \quad\unfoldExpert{\XXi_1}{\XXi_2}} 
+      { \mathrm{Ind}[p] \ (\Gamma_I := \Gamma_C) \in E\quad 
+       (\mathit{head} \ A : T)\in \Gamma_I\quad  
+       k : D \in \Gamma_C\quad 
+       \bc{\XXi_2}{} l D A \quad\unfoldExpert{\XXi_1}{\XXi_2}} 
 \]
 \vskip -18pt
 \[
-\infer{\XXi\vdash  s : A}
-{%(A,s) \in \mathcal{A}
-  {E[] \vdash_{CIC} s : A}% The order should be s : A, not A : s ?
-}
-\qquad
-  \infer{\bc {\XXi}{} {[]} A A}{\trueExpert{\XXi}}{}\qquad
-%  \infer{\bc{\forall x.\, D} A}{\bc{D[t/x]} A}{}\qquad
-  \infer{\bc{\XXi}{}{(t\ ::\ l)} {\forall x:B.\, D} A}
-  {\XXi_1\vdash t : B\qquad \bc{\XXi_2}{}l {D[t/x]} A\qquad\prodExpert{\XXi}{\XXi_1}{\XXi_2}}{}
+  \infer{\XXi\vdash  s : A}{{E[] \vdash_{CIC} s : A}}% The order should be s : A, not A : s ?
+  \qquad
+  \infer{\bc{\XXi}{}{[]} A A}{\trueExpert{\XXi}}
+  \qquad
+  \infer{\bc{\XXi}{}{(t\ ::\ l)}{\forall x:B.\, D} A}
+        {\XXi_1\vdash t : B\qquad
+         \bc{\XXi_2}{}l {D[t/x]} A\qquad
+         \prodExpert{\XXi}{\XXi_1}{\XXi_2}}
 \]
-%\lstinputlisting[linerange={interp-end}]{code/dep-kernel.mod}
 \caption{Specification of the checking of a proof certificate and the
   synthesis of a dependently typed $\lambda$-term.}
 \label{fig:augmented}
 \end{figure}
+
+\[
+  \infer{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
+  \qquad
+  \infer{\Downarrow A\vdash A}{}
+  \qquad
+  \infer{\Downarrow\forall x. B(x)\supset D(x)\vdash A}
+        {\vdash B(t)\qquad \Downarrow D(t)\vdash A}
+\]
+
 \begin{figure}
 \lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={sigs-end}]{code/dep-kernel.sig}
 \lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={check-end}]{code/dep-kernel-v2.mod}
 \caption{Implementation of a  dependent kernel for Coq terms.}
 \label{fig:kernel}
 \end{figure}
-%\end{footnotesize}
+
 
 Figure~\ref{fig:augmented} contains an implicitly focused proof system  for a small fragment of the Calculus of Inductive Constructions that corresponds to Horn logic programming over pure \lsti{Inductive} definitions.
 %
