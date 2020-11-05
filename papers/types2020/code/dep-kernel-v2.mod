@@ -23,10 +23,6 @@ atomic A :- not (non_atomic A).
 is_imp (prod _  Ty (x\D))   Ty D.
 is_uni (prod _ _Ty (x\D x)) D.
 
-definition Atom Kn Clauses :- 
-  coq.safe-dest-app Atom (global (indt Prog)) _Args,
-  coq.env.indt Prog _ _ _ _Type Kn Clauses.
-
 %%%%%%%%%%%%%%%
 % Interpreter %
 %%%%%%%%%%%%%%%
@@ -52,7 +48,8 @@ backchain D A :- is_uni D D',  backchain (D' X) A.
 check _ (go (sort S) A):-
   coq.typecheck A (sort S) _. 
 check Cert1 (go A Tm) :-
-  definition A Kn Clauses,
+  coq.safe-dest-app Atom (global (indt Prog)) _,
+  coq.env.indt Prog _ _ _ _ Kn Clauses.
   unfoldE Kn Cert1 Cert2 K,
   std.lookup {std.zip Kn Clauses} K Clause, 
   check Cert2 (bc D A L),
