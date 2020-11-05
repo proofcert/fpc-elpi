@@ -251,8 +251,6 @@ than or equal to 4 while also being of size less than or equal to 10.
 
 \subsection{A prolog-like tactic}
 
-\todo{explain Ev = Term as an Elpi thing}
-
 Thanks to the Coq-Elpi interface, in particular to the ``main''
 proocedure \lsti{solve}, we can package the \lP's code for the checker
 as a tactic that can be called as any other tactic in a Coq script.
@@ -269,7 +267,19 @@ Elpi Accumulate lp:{{
 (* Other clauses for different fpc omitted *)
 }}.
 \end{lstlisting}
-The following example show how we can use the above tactic to do
+
+The glue code between Coq-Elpi and the implementation of our calculus is
+straightforward: the goal is given to us as a quadruple of a context, an
+evar, a type and a list of extra information. In additon, the certificate is
+supplied by the user when calling the tactic (it simply is an integer in this
+case). We just need to call \lsti{check} on the goal's type, together with
+the certificate, in order to obtain a reconstructed proof term. We avoid
+calling the reconstruction directly on the evar because Coq-Elpi ensures that
+evars manipulated by \lP are well-typed at all times, and we cannot guarantee
+that since we work with partially reconstructed term; getting around this is
+simply a matter of assigning the reconstructed term to the evar right
+afterwards.
+The following example shows how we can use the above tactic to do
 FPC-driven logic programming in Coq and return a Coq proof-term:
 \begin{lstlisting}
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
