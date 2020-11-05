@@ -53,11 +53,14 @@
 \[
   \infer{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
   \qquad
-  \infer{\Downarrow A\vdash A}{}
+  \infer{\Pscr\Downarrow A\vdash A}{}
   \qquad
-  \infer{\Downarrow\forall x. B(x)\supset D(x)\vdash A}
-        {\vdash B(t)\qquad \Downarrow D(t)\vdash A}
+  \infer{\Pscr\Downarrow\forall x. B(x)\supset D(x)\vdash A}
+        {\vdash B(t)\qquad \Pscr\Downarrow D(t)\vdash A}
 \]
+Here, $\Pscr$ is a collection of Horn clauses, i.e., formulas of the
+form $\forall \bar x_1. A_1\supset \forall \bar x_2. A_2\supset
+\forall \bar x_n. A_n\supset A_0$. 
 
 \begin{figure}
 \lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={sigs-end}]{code/dep-kernel.sig}
