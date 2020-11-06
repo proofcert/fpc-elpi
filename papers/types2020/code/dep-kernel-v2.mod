@@ -56,9 +56,9 @@ check Cert (go A Tm) :-
   std.lookup {std.zip Kn Clauses} K Clause, 
   check Cert' (bc D A L),
   Tm = (app [global (indc K)|L]).
-check Cert (bc (prod _ B D) G [Tm|L]) :-
+check Cert (bc (prod _ B D) A [Tm|L]) :-
   prodE Cert Cert1 Cert2,
-  check Cert1 (bc (D Tm) G L),
+  check Cert1 (bc (D Tm) A L),
   check Cert2 (go B Tm).
 check Cert (bc A A []) :- initialE Cert.
 /* end */

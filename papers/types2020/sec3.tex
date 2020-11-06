@@ -5,7 +5,7 @@ In this section, we introduce the main ideas from \emph{focused proof
   system}, \emph{foundational proof certificates}, and the
 \emph{Coq-Elpi} plugin.
 
-\subsection{Proof for the Horn fragment}
+\subsection{Proofs for the Horn fragment}
 \label{ssec:focused}
 
 % \todo{Figure now uses Dale kernel-v2 --- needs further abstraction
@@ -58,7 +58,8 @@ Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 \]
 \vskip -18pt
 \[
-  \infer{\XXi\vdash  s : A}{{E[] \vdash_{CIC} s : A}}% The order should be s : A, not A : s ?
+  \infer{\XXi\vdash  A : s}{{E[] \vdash_{CIC} A : s}}% The order should be s : A, not A : s ?
+  %% we are checking nat : Set, for example, so A : s --AM
   \qquad
   \infer{\bc{\XXi}{}{[]} A A}{\initLExpert{\XXi}}
   \qquad
@@ -85,17 +86,18 @@ the Coq proof system.
 \begin{enumerate}
   \item Instead of having separate connectives for $\forall$ and
     $\supset$, we have the dependent product connective $(x:A)D$. 
-  \item We have incorporated both \emph{proof certificates} (using the
+  \item We have incorporated both \emph{proof certificates}~\cite{chihani17jar} (using the
     schematic variable $\XXi$) along with expert predicates
-    (predicates with the $e$ subscript).
+    (predicates with the $e$ subscript). We explain this in Section~\ref{ssec:cert}.
   \item The inference rules are also annotated by terms structures that
     can be give directly to the Coq kernel for checking.
   \item We have added various premises which are responsible to
     pulling information across the Elpi API with Coq.
 \end{enumerate}
-The proof system described in Figure~\ref{fig:kernel} corresponds to
-the Calculus of Inductive Constructions in which all inductive
-definitions are limited to the Horn clause.
+The proof system described in Figure~\ref{fig:augmented} (and
+implemented in Figure~\ref{fig:kernel}) corresponds to the Calculus
+of Inductive Constructions in which all inductive definitions are
+limited to the Horn clause.
 %
 This proof system is inspired by the calculus for proof search in
 Pure Type Systems introduced in \cite{LengrandDM06}, based in turn on
@@ -103,6 +105,9 @@ ideas stemming from focusing (in particular, the LJT calculus of
 Herbelin \cite{Herbelin94}). Similar to that calculus, we have a
 term language that includes terms and lists of terms, and two distinct
 typing judgments for the two categories.
+\begin{metanote}
+  This is repeated in 3.2 and isn't too early to talk about code here? -am
+\end{metanote}
 %
 In our case, the \lP goal formula \lsti{(check Xi (go B T))}
 corresponds to $\XXi\vdash B \colon T$ and the formula
@@ -110,32 +115,34 @@ corresponds to $\XXi\vdash B \colon T$ and the formula
 \lsti{(check Xi (bc D B L))} corresponds to $\XXi\Downarrow L\colon
 D\vdash B$.
 %
-This style of encode coincides with the idea behind the \emph{spine
+This style of  proof terms coincides with the idea behind the \emph{spine
   calculus}~\cite{Cervesato97tr}.  The main novelty of our proof
 system here is that proof terms and proof certificates are used
 simultaneously in all inference rules.
 
 The proof system is parameterized by Coq's global environment $E$, which
-here can be thought to consist of a set of inductive definitions,
-which following Coq's reference manual we denote with
+here we take as a set of inductive definitions,
+which, following Coq's reference manual, we denote with
 $\mathrm{Ind}[p]  (\Gamma_I := \Gamma_C)$.  One  rule delegates
-to Coq's type checking enforcing the well-sortedness of such types. We
+to Coq's type checking the enforcement of the well-sortedness of such types. We
 do not have a \emph{local context} since we are only dealing with types
 that correspond to Horn clauses, and atomic types are inductively
 defined. In fact, we do not have a $\forall$ rule on the right,
-although the proof theory would gladly allow it. This means, at the
-term level, that we do not have variables in our grammar of
+although the proof theory would gladly allow it. This means at the
+term level that we do not have variables in our grammar of
 terms. Terms are always applied to a (possibly empty) list of
 arguments.
-
+\begin{metanote}
+  Should we call ``unfold'' \emph{decide} (left) and be done with it? AM
+\end{metanote}
 The \emph{unfold} rule is the equivalent in our simplified setting of
 a \emph{decide} rule in an explicitly focused system
-\cite{liang09tcs}.  From a logic programming viewpoint, given an atom,
-the rule selects a clause on which to back-chain on: we look-up the
+\cite{liang09tcs}.  As in the previous proof system for Horn logic,  given an atom,
+the rule selects a clause on which to back-chain on: we lookup the
 constructors from an \lsti{Inductive} definition from the global
 environment, one that matches the atom we wish to backchain on and then
 call the latter judgment. The rules for backchaining are standard,
-corresponding to the \emph{init} and the left introduction rules for
+corresponding to the \emph{init} and the (conflation of the) left introduction rules for
 $\forall$ and $\supset$.
 
 It may be at first surprising that there are no
@@ -146,7 +153,7 @@ therefore the \emph{unfold} rule will handle those; this also
 simplifies the syntax of proof-terms.
 
 \subsection{Proof certificate checking}
-
+\label{ssec:cert}
 Figure~\ref{fig:kernel} contains the Elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ corresponds to
 \lsti{check $\XXi$ (go A T)} and $\XXi \Downarrow  l \colon D\vdash A$ corresponds to
@@ -172,9 +179,9 @@ type prod   name -> term -> (term -> term) -> term. % reification of dependent p
 \end{lstlisting}
 
 Note that \lsti{prod} encodes dependent products taking a name for pretty
-printing, a term and a \lP function from terms to terms: namely $\forall x :
-A, B$ is encoded by \texttt{prod ``x'' A (x\textbackslash{} B x)}; when, in the
-implementation of the product-left rule, we apply $B$ to the variable
+printing, a term and a \lP function from terms to terms: namely $(x :
+B) D$ is encoded by \texttt{prod ``x'' B (x\textbackslash{} D x)}; when, in the
+implementation of the product-left rule, we apply $D$ to the logic variable
 \lsti{Tm}, we get a term that can be used to continue backchaining. This
 application is obtained via meta-level substitution, in the style of HOAS. In
 this sense, our calculus uses \emph{implicit} substitutions, rather than
@@ -186,11 +193,14 @@ The unfolding rule makes use of the Coq-Elpi primitives
 \lsti{coq.safe-dest-app} in order to obtain the head term of a (possibly
 nested) application, and \lsti{coq.env.indt} in order to access the global
 environment of inductive definitions and query for information about them.
-The \lsti{unfold_expert} predicate, then, has the role of selecting which
+The \lsti{unfoldE} predicate,  has, among others, the role of selecting which
 constructor to introduce for the inductive type. The kernel will successively
 obtain the type of the selected constructor, and initiate the backchaining
 phase on it.
 
+\begin{metanote}
+  I still don't like this transition -am
+\end{metanote}
 In Figure~\ref{fig:augmented}  each
 inference rule is augmented with an additional premise involving an
 \emph{expert predicate}, a certificate $\Xi$, and possibly continuations of
@@ -198,7 +208,7 @@ certificates ($\Xi'$, $\Xi_1$, $\Xi_2$) with extracted information from
 These notions are taken from the general setting of \emph{foundational
   proof certificates}~\cite{chihani17jar}.
 %
-\todo{MM: Talk about randomized FPC?}
+%%\todo{MM: Talk about randomized FPC? They mentioned afterwards -am}
 In our case here, an FPC is a collection of \lP clauses that
 provide the remaining details not supplied in Figure~\ref{fig:augmented} and~\ref{fig:kernel}:
 that is, the exact set of constructors for the  type of certificates as
@@ -208,7 +218,7 @@ The top of Figure~\ref{fig:resources} displays two FPCs,
 both of which can be used to describe proofs where we bound
 the dimension of  a proof.
 %
-For example, the first FPC dictates that the query \mbox{\lsti{(check (qheight 5) B)}} is
+For example, the first FPC dictates that the query \mbox{\lsti{(check (qheight 5) A)}} is
 provable in  the kernel using the clauses in Figures~\ref{fig:kernel}
 and~\ref{fig:resources} if and only if the height of that proof is 5
 or less.
@@ -244,8 +254,8 @@ The pairing experts for the certificate \lsti{Cert1 <c> Cert2} simply
 request that the corresponding experts also succeed for both
 \lsti{Cert1} and \lsti{Cert2} 
 %
-Thus, the query \lsti{check ((qheight 4) <c> (qsize 10)) B}
-will succeed if there is a proof of \lsti{B} that has a height less
+Thus, the query \lsti{check ((qheight 4) <c> (qsize 10)) A}
+will succeed if there is a proof of \lsti{A} that has a height less
 than or equal to 4 while also being of size less than or equal to 10.
 
 % Various  additional examples and experiments using the pairing of FPCs
@@ -254,7 +264,7 @@ than or equal to 4 while also being of size less than or equal to 10.
 % integers, only (user-defined) small integers could be produced.
 
 
-\subsection{A prolog-like tactic}
+\subsection{A Prolog-like tactic}
 
 Thanks to the Coq-Elpi interface, in particular to the ``main''
 procedure \lsti{solve}, we can package the \lP's code for the checker
@@ -273,19 +283,21 @@ Elpi Accumulate lp:{{
 }}.
 \end{lstlisting}
 
-The glue code between Coq-Elpi and the implementation of our calculus is
-straightforward: the goal is given to us as a quadruple of a context, an
-evar, a type and a list of extra information. In addition, the certificate is
-supplied by the user when calling the tactic (it simply is an integer in this
-case). We just need to call \lsti{check} on the goal's type, together with
-the certificate, in order to obtain a reconstructed proof term. We avoid
-calling the reconstruction directly on the evar because Coq-Elpi ensures that
-evars manipulated by \lP are well-typed at all times, and we cannot guarantee
-that since we work with partially reconstructed term; getting around this is
-simply a matter of assigning the reconstructed term to the evar right
-afterwards.
-The following example shows how we can use the above tactic to do
-FPC-driven logic programming in Coq and return a Coq proof-term:
+The glue code between Coq-Elpi and the implementation of our calculus
+is straightforward: the goal is given to us as a quadruple of a (here
+inactive) context, an \emph{evar}, a type (goal) and a list of extra
+information. In addition, we supply the certificate  when calling the tactic (it simply is an integer and a string to
+identify the ``resource'' FPC we will use in this case). We just need
+to call \lsti{check} on the goal, together with the
+certificate, in order to obtain a reconstructed proof term. We do not
+call the reconstruction directly on the evar because Coq-Elpi
+ensures that evars manipulated by \lP are well-typed at all times; since
+we cannot guarantee that, as we work with partially reconstructed
+term, we  get  around this by an explicit unification.
+
+The following
+example shows how we can use the above tactic to do FPC-driven logic
+programming in Coq and return a Coq proof-term:
 \begin{lstlisting}
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 | i_n : is_nat x -> insert x [] [x]
@@ -313,9 +325,12 @@ offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
 \label{ssec:beyond}
 
 If we do not restrict our attention to only Horn clauses then there is
-no problem will presenting a focused proof system for all of
+no problem  presenting a focused proof system for all of
 first-order intuitionistic logic using the connectives $\forall$ and
 $\supset$.  The following rules extend those given earlier.
+\begin{metanote}
+  Why repeat the previous rules? am
+\end{metanote}
 \[
   \infer[decide]{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
   \qquad
@@ -385,4 +400,5 @@ remaining less than 90 lines of Elpi code.
 % LocalWords:  Elpi modularity Herbelin bc PTSC's dprolog CIC init lp
 % LocalWords:  Andreoli's basicstyle lprolog sigs Coq's sortedness Ev
 % LocalWords:  backchain gref indt indc coq dest unfoldings str fpc
-% LocalWords:  evar nat forall ys elpi Qed lc args ljf
+% LocalWords:  evar nat forall ys elpi Qed lc args ljf HOAS unfoldE
+% LocalWords:  FPCs Prolog evars untyped
