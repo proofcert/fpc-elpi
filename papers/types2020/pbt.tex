@@ -1,22 +1,27 @@
 \section{Revisiting property-based testing for Coq}
 
 We have presented in a previous paper~\cite{blanco19ppdp} a
-proof-theoretical reconstruction of property-based testing (PBT) of
+proof-theoretical reconstruction of property-based testing (PBT) \cite{fink97sen}of
 relational specifications, adopting techniques from foundational proof
 certificates to account for several features of this testing
 paradigm: from various \emph{generation} strategies, to
 \emph{shrinking} and fault localization.
 
-Given the connection that \textsf{coq-elpi} offers between logic
+Given the connection that Coq-Elpi offers between logic
 programming and the internals of Coq, it is natural to extend the
 FPC-driven logic programming interpreter of the previous section to
 perform PBT over \lstinline{Inductive} types.
 
-While nothing prevents us from porting all the features we discussed
-in~\cite{blanco19ppdp}, for the sake of this paper we will implement
-only FPC corresponding to different flavors \emph{exhaustive}
-generation, as adopted, e.g., in SmallCheck~\cite{smallcheck} and
-$\alpha$Check~\cite{cheney_momigliano_2017}, and their combination. Note however that it would take additional two lines of code to the \lsti{unfold} expert to implement a form of random data generation in the sense of randomized backtracking~\cite{pltredexconstraintlogic}.
+While nothing prevents us from porting all the PBT features we have
+accounted for in~\cite{blanco19ppdp}, for the sake of this paper we
+will implement only FPC corresponding to different flavors
+\emph{exhaustive} generation, as adopted, e.g., in
+SmallCheck~\cite{smallcheck} and
+$\alpha$Check~\cite{cheney_momigliano_2017}, and their
+combination. Note however that it would take  no more than two lines of
+code in the \lsti{unfoldE} expert to implement a form of random data
+generation in the sense of randomized
+backtracking~\cite{pltredexconstraintlogic}.
 
 Of course, Coq already features \textsf{QuickChick}~\cite{QChick}
 (\url{https://softwarefoundations.cis.upenn.edu/qc-current}), which is
@@ -25,16 +30,15 @@ perspective: being a clone of Haskell's QuickCheck, it emphasizes
 testing executable (read \emph{decidable)} specifications with random
 generators. While current research~\cite{LampropoulosPP18} aims to
 increase automation, it is fair to say that testing with
-~\cite{QChick}, in particular of relational specifications, is still
-very labor intensive. We do not intend to compete with
-\textsf{QuickChick}, but we shall see that we can test immediately
+\textsf{QuickChick}, in particular of relational specifications, is
+still very labor intensive. We do not intend to compete with
+\textsf{QuickChick} at this stage, but we shall see that we can test immediately
 \lsti{Inductive} definitions that corresponds to pure Horn
 programs. We can do that without having to provide a decidability
 proof for those definitions. Furthermore, we are not committed to a
-fixed random generation strategy, which in gnereal requires additional
+fixed random generation strategy, which in general requires additional
 work in the configuration of generators and shrinkers.
 
-\todo{Drop the subsections?}
 \subsection{PBT as proof reconstruction}
 \label{ssec:pbt-lp}
 
@@ -51,24 +55,24 @@ If we view  a property as a many-sorted logical formula:
 %typing predicate and
   where the $A_i$ and $B$ are  predicates defined
 using Horn clause specifications, a counter-example to this conjecture
-consists of a witness to the negated formula
+consists of a witness of the negated formula
 \[
   \exists x_1 \colon \tau_1\dots x_n \colon \tau_n [A_1\land\dots\land A_m\wedge \neg B]
   \tag{**}\label{eq:full}
 \]
 %\(\exists x [(\tau(x)\land P(x)) \land \neg Q(x)]\).
 
-In our Coq current setting $A_i$ and $B$ will be \lsti{Inductive}
+In our Coq  setting $A_i$ and $B$ will be \lsti{Inductive}
 propositions, while the $\tau_j$ are honest-to-goodness datatypes. We
 will treat the two quite differently, in so far as elements of those
-types will be \emph{generated}, while predicates will only be
+datatypes will be \emph{generated}, while predicates will only be
 \emph{checked}. This distinction is reminiscent of bi-directional
 type-checking and  plays also a part in interpreting the
 negation sign.
 %
 When using a focused proof system for logic extended with fixed
 points~\cite{baelde12tocl}, negation corresponds to the usual
-intutionistic interpretation, which is  what Coq supports.  % proofs of formulas such as
+intuitionistic interpretation, which is  what Coq supports.  % proofs of formulas such as
 % \[
 %   \exists x [(\tau(x)\wedge P(x)) \wedge \neg Q(x)]
 %   \tag{*}\label{eq:full}
@@ -79,7 +83,7 @@ intutionistic interpretation, which is  what Coq supports.  % proofs of formulas
 % In particular, the positive phase corresponds to the \emph{generation} phase
 % and the negative phase corresponds to the \emph{testing} phase.
 % %
-
+%
 % Instead of giving a full focused proof system of a logic including
 % fixed points (since, as we will argue, that proof system will not, in
 % fact, be needed to account for PBT ), we offer the following analogy.
@@ -146,7 +150,7 @@ after \lsti|intro| has been used to introduce the relevant hypotheses,
 % % represent the typing information for the data variables that the
 % % specifications use.
 % Within the tactic
-the user therefore
+the user 
 specifies which variables of the environment should be used for
 generating data and which for executing the specification. In addition
 to this, the user should specify all the certificate information that
@@ -197,7 +201,7 @@ Abort.
 \end{lstlisting}
 In this query the tactic tests the hypotheses \lsti{Ho} and \lsti{Hi}
 against data \lsti{x,xs} generated exhaustively up to height
-at most $5$  out of the library \lsti{Inductive} definitions of
+at most $5$  form the library \lsti{Inductive} definitions of
 \lsti{nat} and \lsti{list}. We do not generate values for \lsti{rs},
 since by mode information we know that it will be computed.
 %
@@ -229,8 +233,8 @@ derivation of the former does not (yet) work for this kind of specification.
 For a more significant case study, let us turn to the semantics of
 programming languages, where PBT has been used extensively and
 successfully~\cite{Klein12}. Here we will consider a far simpler example,
-a typed arithmetic language featuring numerals with predecessor
-and Booleans with if-then-else and test-for-zero, which comes from the \emph{Software Foundations} book series (\url{https://softwarefoundations.cis.upenn.edu/plf-current/Types.html}):
+a typed arithmetic language featuring numerals with predecessor  and test-for-zero, 
+and Booleans with if-then-else, which comes from the \emph{Software Foundations} book series (\url{https://softwarefoundations.cis.upenn.edu/plf-current/Types.html}):
 \begin{lstlisting}
 Inductive tm : Type :=
  | ttrue : tm | tfalse : tm | tif : tm -> tm -> tm -> tm | tzero : tm | tsucc : tm -> tm
@@ -245,10 +249,11 @@ While it is obvious that \emph{subject expansion} fails for this calculus, it is
 Conjecture subexp:  forall e e' t, step e e' -> has_type e' t -> has_type e t. 
  intros e e' t HS HT.
  elpi dep_pbt height 2 (HS /\ HT) (e).
+ Abort.
 \end{lstlisting}
 
 
-Another way to asses the fault detection capability of a PBT setup is via \emph{mutation analysis}~\cite{CavadaCM20}, whereby localized bugs are voluntarily inserted, with the view that they should caught (``killed'') by a ``good enough'' testing suite. Following on  an exercise if the aforementioned chapter of SF, we modify the typing relation by adding the following (nonsensical)  clause:
+Another way to asses the fault detection capability of a PBT setup is via \emph{mutation analysis}~\cite{CavadaCM20}, whereby localized bugs are voluntarily inserted, with the view that they should caught (``killed'') by a ``good enough'' testing suite. Following on  an exercise in the aforementioned chapter of SF, we modify the typing relation by adding the following (nonsensical)  clause:
 
 \begin{lstlisting}
 Module M1.
@@ -265,7 +270,8 @@ Definition progress (e :tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> P
 Conjecture progress_m1:  forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
- elpi dep_pbt height 2 (Ht) (e) .  
+ elpi dep_pbt height 2 (Ht) (e) .
+ Abort.
 \end{lstlisting}
 
 Whereas examples based on the \emph{Types} chapter of SF are
@@ -283,4 +289,4 @@ the specification had to be massaged non-insignificantly.
 % LocalWords:  decidability shrinkers dep pbt fpc interp forall ness
 % LocalWords:  ord unfoldings pre relationally shrinker booleans typ
 % LocalWords:  tfalse tpred tiszero TBool TNat subexp SuccBool
-% LocalWords:  notstuck
+% LocalWords:  notstuck unfoldE
