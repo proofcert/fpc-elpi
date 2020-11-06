@@ -1,24 +1,15 @@
 \section{Proof theory and proof certificates}
 \label{sec:three}
 
-%\todo{Right now there is no intro to FPC}
-% \begin{metanote}
-%   (AM): Start with the logical reconstruction of \texttt{check}, to and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). % In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
-% \end{metanote}
+In this section, we introduce the main ideas from \emph{focused proof
+  system}, \emph{foundational proof certificates}, and the
+\emph{Coq-Elpi} plugin.
 
 \subsection{Proof for the Horn fragment}
 \label{ssec:focused}
 
-% The proof search approach to encoding Horn clause computation
-% results in the structuring of proofs with repeated
-% switching between a \emph{goal-reduction} phase and a
-% \emph{backchaining} phase~\cite{miller91apal}.
-
-%\subsection{Certificate checking with expert predicates}
-%\subsection{Adding certificates and experts to a proof system}
-%\label{ssec:fpc}
-
-% \todo{Figure now uses Dale kernel-v2 --- needs further abstraction and explanation, see appendix}
+% \todo{Figure now uses Dale kernel-v2 --- needs further abstraction
+% and explanation, see appendix} 
 
 A \emph{Horn clause} is a formula of the form $\forall \bar
 x_1. A_1\supset \forall \bar x_2. A_2\supset \forall \bar
@@ -30,7 +21,8 @@ intuitionistic logic when one is attempting to prove that a given
 atomic formula $A$ is provable from a give set $\Pscr$ of Horn
 clauses. 
 \[
-  \infer[decide]{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
+  \infer[decide]{\Pscr\vdash A}
+                {D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
   \qquad
   \infer[init]{\Pscr\Downarrow A\vdash A}{}
 \]
@@ -47,7 +39,7 @@ sequent (the conclusion) of a proof.  The sequent $\Pscr\Downarrow
 D\vdash A$ is a \emph{focused} sequent in which the formula $D$ is the
 \emph{focus} of the sequent.  The two left introduction rules and the
 initial rule can only be applied to the focused formula.  This latter
-point is in constrast to Gentzen's sequent calculus where these rules
+point is in contrast to Gentzen's sequent calculus where these rules
 can involve \emph{any} formula on the left of the $\vdash$.  The fact
 that this proof system is complete for both classical and
 intuitionistic logic (when restricted to the Horn clause fragment)
@@ -87,7 +79,7 @@ Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 \label{fig:kernel}
 \end{figure}
 
-Figure~\ref{fig:augmented} contains these proof rules and extends it
+Figure~\ref{fig:augmented} contains these proof rules and extends them
 in the following fours ways so that it more appropriately fits into
 the Coq proof system.
 \begin{enumerate}
@@ -96,25 +88,30 @@ the Coq proof system.
   \item We have incorporated both \emph{proof certificates} (using the
     schematic variable $\XXi$) along with expert predicates
     (predicates with the $e$ subscript).
-  \item The inference rules are also anotated by terms structures that
+  \item The inference rules are also annotated by terms structures that
     can be give directly to the Coq kernel for checking.
   \item We have added various premises which are responsible to
     pulling information across the Elpi API with Coq.
 \end{enumerate}
 The proof system described in Figure~\ref{fig:kernel} corresponds to
-the Calculus of Inductive Constructions restricted to the Horn clause
-fragment of pure \lsti{Inductive} definitions.
+the Calculus of Inductive Constructions in which all inductive
+definitions are limited to the Horn clause.
+%
 This proof system is inspired by the calculus for proof search in
 Pure Type Systems introduced in \cite{LengrandDM06}, based in turn on
 ideas stemming from focusing (in particular, the LJT calculus of
-Herbelin \cite{Herbelin94}). Similarly to that calculus, we have a
+Herbelin \cite{Herbelin94}). Similar to that calculus, we have a
 term language that includes terms and lists of terms, and two distinct
-typing judgments for the two categories. In our case, where proof
-search steps are viewed as computation, the term judgment $\XXi\vdash
-t \colon A$ corresponds to a goal-reduction step while the judgment
-$\XXi \Downarrow l \colon D\vdash A$ corresponds to a backchaining
-step. This coincides with the idea behind the \emph{spine
-  calculus}~\cite{Cervesato97tr}.  The main novelity of our proof
+typing judgments for the two categories.
+%
+In our case, the \lP goal formula \lsti{(check Xi (go B T))}
+corresponds to $\XXi\vdash B \colon T$ and the formula
+%
+\lsti{(check Xi (bc D B L))} corresponds to $\XXi\Downarrow L\colon
+D\vdash B$.
+%
+This style of encode coincides with the idea behind the \emph{spine
+  calculus}~\cite{Cervesato97tr}.  The main novelty of our proof
 system here is that proof terms and proof certificates are used
 simultaneously in all inference rules.
 
@@ -132,13 +129,14 @@ terms. Terms are always applied to a (possibly empty) list of
 arguments.
 
 The \emph{unfold} rule is the equivalent in our simplified setting of
-a \emph{decide} rule in an explicitly focused system. From a logic
-programming viewpoint, given an atom, the rule selects a clause on
-which to back-chain on: we look-up the costructors from an
-\lsti{Inductive} definition from the global enviroment, one that
-matches the atom we wish to bachchain on and then call the latter
-judgment. The rules for backchaining are standard, corresponding to
-the \emph{init} and $\forall$-left rules.
+a \emph{decide} rule in an explicitly focused system
+\cite{liang09tcs}.  From a logic programming viewpoint, given an atom,
+the rule selects a clause on which to back-chain on: we look-up the
+constructors from an \lsti{Inductive} definition from the global
+environment, one that matches the atom we wish to backchain on and then
+call the latter judgment. The rules for backchaining are standard,
+corresponding to the \emph{init} and the left introduction rules for
+$\forall$ and $\supset$.
 
 It may be at first surprising that there are no
 introduction rules for propositional connectives, nor equality for
@@ -193,7 +191,7 @@ constructor to introduce for the inductive type. The kernel will successively
 obtain the type of the selected constructor, and initiate the backchaining
 phase on it.
 
-In figure~\ref{fig:augmented}  each
+In Figure~\ref{fig:augmented}  each
 inference rule is augmented with an additional premise involving an
 \emph{expert predicate}, a certificate $\Xi$, and possibly continuations of
 certificates ($\Xi'$, $\Xi_1$, $\Xi_2$) with extracted information from
@@ -259,7 +257,7 @@ than or equal to 4 while also being of size less than or equal to 10.
 \subsection{A prolog-like tactic}
 
 Thanks to the Coq-Elpi interface, in particular to the ``main''
-proocedure \lsti{solve}, we can package the \lP's code for the checker
+procedure \lsti{solve}, we can package the \lP's code for the checker
 as a tactic that can be called as any other tactic in a Coq script.
 
 \begin{lstlisting}[deletekeywords={goal}]
@@ -277,7 +275,7 @@ Elpi Accumulate lp:{{
 
 The glue code between Coq-Elpi and the implementation of our calculus is
 straightforward: the goal is given to us as a quadruple of a context, an
-evar, a type and a list of extra information. In additon, the certificate is
+evar, a type and a list of extra information. In addition, the certificate is
 supplied by the user when calling the tactic (it simply is an integer in this
 case). We just need to call \lsti{check} on the goal's type, together with
 the certificate, in order to obtain a reconstructed proof term. We avoid
@@ -308,7 +306,7 @@ solving goals by \lsti{reflexivity} as well as the modularity of using
 \lsti{Hints} as introduction rules; on the bright side, it is not
 restricted to depth-first search, since it follows the dictate of the
 given FPC, for example iterative-deepening. Furthermore, the FPC can
-provide a \emph{trace} that may be more customable that the one
+provide a \emph{trace} that may be more customized than the one
 offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
 
 \subsection{Moving beyond Horn clauses}
@@ -343,28 +341,33 @@ certificates, this richer notion of proof system can provide for
 richer proof certificates.  The main differences with what we have
 seen before is that the left-hand sides of sequents can now grow
 during the proof checking process.  As a result, an indexing mechanism
-is invoked so that it is possible for the decide expert to properly
+is used so that it is possible for the decide expert to properly
 select locally added assumptions instead of just those assumptions
 accepted globally.
 
-
-*** To illustrate this approach to elaborating externally provided proof
-structures into terms the Coq kernel can check, we consider here
-examples take from the file \verb+coq_fpc.v+, which is part of the
-repository \url{https://github.com/proofcert/fpc-elpi/}.
-Figure~\ref{fig:debruijn} presents the specific FPC that defines the
-proof semantics of using the De Bruijn notions for untyped
-$\lambda$-terms as proof evidence of a proof in intuitionistic
-propositional logic.  That FPC definition, along with a proof checker
-capable of synthesizing Coq proof terms during proof checker, makes it
-possible to use the term denoting the untyped $\lambda$-term
-$\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$.
-
+To illustrate a proof certificate format that uses this richer logic
+and proof system, consider the simple \lP code in
+Figure~\ref{fig:debruijn}.  Using the constants provided in that
+figure, the untyped $\lambda$-term
+$\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$ can be
+encoded as the following Elpi term of type \lsti{deb}.
+%
 \begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
 (lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
                                                     [lambda (apply 1 [])])])]))
 \end{lstlisting}
-
+Using the constructor \lsti{lc} and \lsti{args}, terms in De Bruijn
+syntax (terms of type \lsti{deb}) are incorporated into proof
+certificates (terms of type \lsti{cert}) along with other integer
+arguments that are needed to compute offsets to address bound
+variables.  
+%
+This FPC can be interpreted by the proof certificate checker in the
+file \verb+ljf-dep.mod+ of the repository
+\url{https://github.com/proofcert/fpc-elpi/}.  We note that this proof
+certificate checker is also able to simultaneously synthesize a Coq
+proof term while checking (see Section~\ref{sec:elab}) all the while
+remaining less than 90 lines of Elpi code.
 
 \begin{figure}
 \lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
@@ -373,12 +376,13 @@ $\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$.
 \label{fig:debruijn}
 \end{figure}
 
-
-
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
 
 % LocalWords:  backchaining disjunct LJT dep qheight qsize orE someE
-% LocalWords:  Elpi modularity Herbelin bc PTSC's dprolog CIC
+% LocalWords:  Elpi modularity Herbelin bc PTSC's dprolog CIC init lp
+% LocalWords:  Andreoli's basicstyle lprolog sigs Coq's sortedness Ev
+% LocalWords:  backchain gref indt indc coq dest unfoldings str fpc
+% LocalWords:  evar nat forall ys elpi Qed lc args ljf
