@@ -1,6 +1,13 @@
 \section{Conclusion and future work}
 
-\todo{sum up contribution}
+This paper follows on a line of research  starting in the late 80 and gaining more steam in the last five years that advocates the usefulness of proof theory and higher-order logic programming  for the many tasks around the development, enrichment and even formal verification of proof assistants. The development of the Elpi-Coq plug-in  has made this connection tighter.
+
+We have presented two application of this synergy: one geared towards
+providing a flexible approach to connecting external provers of
+first-order intuitionistic logic to Coq; the other supporting an out-of-the-box way to do property-based testing for pure inductive relations.
+%
+
+%\todo{sum up contribution}
 
 There are many avenues of developments for this line of research.
 The code reported in Fig.~\ref{fig:augmented} is somewhat idealized in
@@ -22,7 +29,7 @@ Another obvious limitation of our PBT tactic is that it does not
 
  Finally it makes sense to tie together the two threads of this paper
  and provide a way of checking and elaborating proof evidence for
- intutionistic logic \emph{with} (inductively) defined atoms. This
+ intuitionistic logic \emph{with} (inductively) defined atoms. This
  can go as far as FPC for inductive proofs~\cite{blanco15wof}.
 
  \smallskip
@@ -50,4 +57,4 @@ Another obvious limitation of our PBT tactic is that it does not
 %%% TeX-master: "main"
 %%% End:
 
-% LocalWords:  Elpi simp LJF
+% LocalWords:  Elpi simp LJF PBT LazySmallCheck Ltac
