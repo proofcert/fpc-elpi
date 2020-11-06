@@ -34,8 +34,11 @@ interp {{lp:G1 /\ lp:G2}} :- interp G1, interp G2.
 interp {{lp:G1 \/ lp:G2}} :- interp G1; interp G2.
 interp {{lp:T = lp:T}}.
 interp {{ex (lp:G)}} :- interp (G X).
-interp Atom :- atomic Atom, definition Atom _ Clauses, 
-               std.mem Clauses D, backchain D Atom.
+interp Atom :-
+  atomic Atom,
+  coq.safe-dest-app Atom (global (indt Prog)) _,
+  coq.env.indt Prog _ _ _ _ _ Clauses,
+  std.mem Clauses D, backchain D Atom.
 backchain A A :- atomic A.
 backchain D A :- is_imp D A D', !, backchain D' A, interp Ty.
 backchain D A :- is_uni D D',  backchain (D' X) A.
