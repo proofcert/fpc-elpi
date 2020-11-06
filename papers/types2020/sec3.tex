@@ -345,8 +345,6 @@ is used so that it is possible for the decide expert to properly
 select locally added assumptions instead of just those assumptions
 accepted globally.
 
-\newpage
-
 To illustrate a proof certificate format that uses this richer logic
 and proof system, consider the simple \lP code in
 Figure~\ref{fig:debruijn}.  Using the constants provided in that
@@ -358,33 +356,18 @@ encoded as the following Elpi term of type \lsti{deb}.
 (lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
                                                     [lambda (apply 1 [])])])]))
 \end{lstlisting}
-
-
-
-
- presents the specific FPC that defines the
-proof semantics of using the De Bruijn notions for untyped
-$\lambda$-terms as proof evidence of a proof in intuitionistic
-propositional logic.
-
-
-This FPC can be interpreted by the proof
-certificate checker in the file \verb+ljf-dep.mod+ of the repository
-\url{https://github.com/proofcert/fpc-elpi/}.
-We note that this proof certificate checker is also able to
-simulataneously synthesize a Coq proof term while checking (see
-Section~\ref{}) all the while remaining less than 90 lines of Elpi
-code. 
-
-
-
-
-
-
-  That FPC definition, along with a proof checker
-capable of synthesizing Coq proof terms during proof checker, makes it
-possible to use the term denoting the 
-
+Using the constructor \lsti{lc} and \lsti{args}, terms in De Bruijn
+syntax (terms of type \lsti{deb}) are incorporated into proof
+certificates (terms of type \lsti{cert}) along with other integer
+arguments that are needed to compute offsets to address bound
+variables.  
+%
+This FPC can be interpreted by the proof certificate checker in the
+file \verb+ljf-dep.mod+ of the repository
+\url{https://github.com/proofcert/fpc-elpi/}.  We note that this proof
+certificate checker is also able to simultaneously synthesize a Coq
+proof term while checking (see Section~\ref{sec:elab}) all the while
+remaining less than 90 lines of Elpi code.
 
 \begin{figure}
 \lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
@@ -392,9 +375,6 @@ possible to use the term denoting the
 \caption{The FPC definition of De Bruijn notation as proof evidence.}
 \label{fig:debruijn}
 \end{figure}
-
-\newpage
-
 
 %%% Local Variables:
 %%% mode: latex
@@ -405,4 +385,4 @@ possible to use the term denoting the
 % LocalWords:  Elpi modularity Herbelin bc PTSC's dprolog CIC init lp
 % LocalWords:  Andreoli's basicstyle lprolog sigs Coq's sortedness Ev
 % LocalWords:  backchain gref indt indc coq dest unfoldings str fpc
-% LocalWords:  evar nat forall ys elpi Qed
+% LocalWords:  evar nat forall ys elpi Qed lc args ljf

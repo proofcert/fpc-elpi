@@ -1,5 +1,5 @@
-\section{Elaboration of external proof certificates for the Coq
-  kernel}
+\section{Elaboration of external proof certificates for the Coq kernel}
+\label{sec:elab}
 
 The trusted base of Coq is its kernel, which is a type-checking
 program that certifies that a dependently typed $\lambda$-term has a
@@ -96,12 +96,14 @@ elaborated to be a fully typed and functional expression.  Proof
 checking using the FPC in Figure~\ref{fig:debruijn} and (an extension
 of) the proof Figure~\ref{fig:kernel}.
 
+***
+presents the  specific FPC that defines the proof semantics of using
+the De Bruijn notions for untyped $\lambda$-terms as proof evidence of
+a proof in intuitionistic propositional logic.
 
 \begin{metanote}
   AM: I think we need more: the FPC may go to the appendix, we may want to say that there is a tactic that proves these theorems etc. 
 \end{metanote}
-
-%\newpage
 
 %%% Local Variables:
 %%% mode: latex
