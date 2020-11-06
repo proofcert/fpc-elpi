@@ -59,7 +59,7 @@ check Cert (bc (prod _ B D) G [Tm|L]) :-
   check Cert1 (bc (D Tm) G L),
   check Cert2 (go B Tm).
 check Cert (bc A A []) :-
-	ttE Cert .
+	initialE Cert .
 /* end */
 % check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
 % 	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).

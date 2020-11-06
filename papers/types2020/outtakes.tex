@@ -1,3 +1,40 @@
+
+  % , and as is usual in Pure Type
+% Systems we have the same grammar for terms and types
+%
+%, as shown in figure~\ref{fig:terms}.
+% \todo{Let's think about that: we need A at least, but A is also a metavariable for atoms}
+% %\begin{figure}
+% \begin{align*}
+% t,u ::= & k\ l \;|\; \forall x : t.\, u \\
+% l ::= & [] \;|\; (t\ ::\ l)
+% \end{align*}
+% % \caption{Grammar of terms}
+% % \label{fig:terms}
+% % \end{figure}
+
+
+% we denote by $\Pscr_A$ the
+% set of type declarations for the constructors of type $A$, of the form
+% $k : D$ where $D$ is of the form
+% $\forall x_1 : t_1.\, \dots \forall x_n : t_n.\, D\ u_1 \dots u_m$. We
+% denote by $\mathcal{A}$ the set of arity declaration for the inductive
+% types.
+
+%
+%
+%done Explain relations with other term assignments. Note that we do not use
+% explicit substitutions (we are cut free)
+% Explain the choice of not having certificates represent proof terms.
+% \todo{  Explain that the unfold clause handles
+% defined atoms and defined connectives (conjunction, disjunction, existential
+% and also equality): this may be less efficient and proof-theoretically induce
+% pointless phase changes, but it is arguably very elegant e simplifies proof
+% terms that are inherited by Coq }
+
+
+
+
 %% \begin{metanote}
 %%   This paragraph seem to identify proof and type theory with sequents
 %%   and nat ded and while I agree with the gist (although people such as
