@@ -1,20 +1,14 @@
-\newpage
 \section{Elaboration of external proof certificates for the Coq
   kernel}
-
-% Follow the text in \cite{blanco20coq}.
 
 The trusted base of Coq is its kernel, which is a type-checking
 program that certifies that a dependently typed $\lambda$-term has a
 given type.  If type checking succeeds, the formula corresponding to
 that type is, in fact, accepted by Coq users as a theorem of
-intuitionistic logic.
-\begin{metanote}
-  Small point: the Coq kernel can be soundly extended with axioms and will also validate classical tautologies
-\end{metanote}
-The rest of the Coq system, especially its
-tactic language, is designed to help a human user build
-proofs-as-$\lambda$-terms that can be checked by the kernel.
+intuitionistic logic along with any axioms that have been adopted.
+The rest of the Coq system, especially its tactic language, is
+designed to help a human user build proofs-as-$\lambda$-terms that can
+be checked by the kernel.
 
 There are many theorem provers for intuitionistic logic
 \cite{raths07jar} for which a successful proof is not the kind of
@@ -54,7 +48,8 @@ connecting external provers of first-order intuitionistic logic to
 Coq.
 %
 Following the general outline that has been described in
-\cite{blanco17cade}, we assume that the following step are taken.
+\cite{blanco17cade,blanco20coq}, we assume that the following step are
+taken.
 %
 \begin{enumerate}
 \item Have an external prover output some form of proof evidence
@@ -75,42 +70,32 @@ checking of one certificate, it is possible to synthesize, for
 example, a fully detailed term that is appropriate for handing to the
 Coq kernel.
 
-\todo{Mention that we did \textbf{not} use pairing as well for the check predicate in sec 3}
 If one is interested only in building Coq kernel proof structures, we
 can bypass the use of an explicit pairing operation and build the
 synthesis of such proof structures directly into the FPC proof
-checker.  If one is interested in checking only one kind of external
-proof structure, then the FPC for that structure could also be built
-into the checker (via, say, partial evaluation of logic programs
-\cite{lloyd91jlp}).
+checker.  (We took exactly this step in Figure~\ref{fig:augmented}
+where proof checking involved both proof certificates as well as
+Coq-term structures.)  If one is interested in checking only one kind
+of external proof structure, then the FPC for that structure could
+also be built into the checker (via, say, partial evaluation of logic
+programs \cite{lloyd91jlp}).
 
-To illustrate this approach to elaborating externally provided proof
-structures into terms the Coq kernel can check, we consider here
-examples take from the file \verb+coq_fpc.v+, which is part of the
-repository \url{https://github.com/proofcert/fpc-elpi/}.
-Figure~\ref{fig:debruijn} presents the specific FPC that defines the
-proof semantics of using the De Bruijn notions for untyped
-$\lambda$-terms as proof evidence of a proof in intuitionistic
-propositional logic.  That FPC definition, along with a proof checker
-capable of synthesizing Coq proof terms during proof checker, makes it
-possible to use the term denoting the untyped $\lambda$-term
-$\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$.
+As an example, consider an external theorem prover for propositional
+intuitionistic logic which return proof structures that are De Bruijn
+expressions for the underlying untype $\lambda$-proof that encodes
+(part of) the proofs it finds.  Consider the De Buijn expression
+example at the end of Section~\ref{ssec:beyond}.  This can be used as
+evidence that the following is a theorem of Coq.
 
-\begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
-(lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
-                                                    [lambda (apply 1 [])])])]))
-\end{lstlisting}
-as a proof of following theorem of Coq.
 \begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
 Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q).
 \end{lstlisting}
 
-\begin{figure}
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.mod}
-\caption{The FPC definition of De Bruijn notation as proof evidence.}
-\label{fig:debruijn}
-\end{figure}
+Of course, the proof information in the untyped term must be
+elaborated to be a fully typed and functional expression.  Proof
+checking using the FPC in Figure~\ref{fig:debruijn} and (an extension
+of) the proof Figure~\ref{fig:kernel}.
+
 
 \begin{metanote}
   AM: I think we need more: the FPC may go to the appendix, we may want to say that there is a tactic that proves these theorems etc. 

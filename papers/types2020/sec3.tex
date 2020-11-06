@@ -1,19 +1,13 @@
-
-\newpage
 \section{Proof theory and proof certificates}
 \label{sec:three}
 
-\newcommand{\XXi}{{\color{blue}{\Xi}}}
-\newcommand{\bc}[5]{#1#2\Downarrow #3 : #4 \vdash #5}
-
-\todo{Right now there is no intro to FPC}
+%\todo{Right now there is no intro to FPC}
 % \begin{metanote}
 %   (AM): Start with the logical reconstruction of \texttt{check}, to and then reverse engineer what we want/need to say about focusing and FPC. We \textbf{do} not talk about PBT yet, just logic programming (with proof terms). % In sec 4 we package \texttt{check} in a PBT query and explain how \texttt{check} works for term generation.
 % \end{metanote}
 
-\subsection{Proof systems with certificates}
+\subsection{Proof for the Horn fragment}
 \label{ssec:focused}
-\todo{Change title? }
 
 % The proof search approach to encoding Horn clause computation
 % results in the structuring of proofs with repeated
@@ -25,6 +19,42 @@
 %\label{ssec:fpc}
 
 % \todo{Figure now uses Dale kernel-v2 --- needs further abstraction and explanation, see appendix}
+
+A \emph{Horn clause} is a formula of the form $\forall \bar
+x_1. A_1\supset \forall \bar x_2. A_2\supset \forall \bar
+x_n. A_n\supset A_0$ where $\forall\bar x_i$ denote a list of
+universal quantifiers ($i\in\{1,\ldots,n\}$) and $A_0,\ldots,A_n$ are
+atomic formulas.  It is well known that the following set of sequent
+calculus proof rules are complete for both classical and
+intuitionistic logic when one is attempting to prove that a given
+atomic formula $A$ is provable from a give set $\Pscr$ of Horn
+clauses. 
+\[
+  \infer[decide]{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
+  \qquad
+  \infer[init]{\Pscr\Downarrow A\vdash A}{}
+\]
+\[
+  \infer[\forall L]{\Pscr\Downarrow\forall x. D\vdash A}
+        {\Pscr\Downarrow D[t/x]\vdash A}
+  \qquad
+  \infer[\supset L]{\Pscr\Downarrow B\supset D\vdash A}
+        {\Pscr\vdash B\qquad \Pscr\Downarrow D\vdash A}
+\]
+Here, we use two different styles of sequents.  The sequent
+$\Pscr\vdash A$ is the usual sequent which we generally use as the end
+sequent (the conclusion) of a proof.  The sequent $\Pscr\Downarrow
+D\vdash A$ is a \emph{focused} sequent in which the formula $D$ is the
+\emph{focus} of the sequent.  The two left introduction rules and the
+initial rule can only be applied to the focused formula.  This latter
+point is in constrast to Gentzen's sequent calculus where these rules
+can involve \emph{any} formula on the left of the $\vdash$.  The fact
+that this proof system is complete for both classical and
+intuitionistic logic (when restricted to the Horn clause fragment)
+follows from rather simple considerations of Horn clauses
+\cite{nadathur90jacm} and from the completeness of LJT proofs
+\cite{Herbelin94}.  The use of the term \emph{focus} comes from
+Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 
 \begin{figure}[t]
 \[
@@ -38,29 +68,17 @@
 \[
   \infer{\XXi\vdash  s : A}{{E[] \vdash_{CIC} s : A}}% The order should be s : A, not A : s ?
   \qquad
-  \infer{\bc{\XXi}{}{[]} A A}{\trueExpert{\XXi}}
+  \infer{\bc{\XXi}{}{[]} A A}{\initLExpert{\XXi}}
   \qquad
-  \infer{\bc{\XXi}{}{(t\ ::\ l)}{\forall x:B.\, D} A}
+  \infer{\bc{\XXi}{}{(t\ ::\ l)}{\depprod{x}{B}{D}}{A}}
         {\XXi_1\vdash t : B\qquad
          \bc{\XXi_2}{}l {D[t/x]} A\qquad
-         \prodExpert{\XXi}{\XXi_1}{\XXi_2}}
+         \prodE{\XXi}{\XXi_1}{\XXi_2}{t}}
 \]
 \caption{Specification of the checking of a proof certificate and the
   synthesis of a dependently typed $\lambda$-term.}
 \label{fig:augmented}
 \end{figure}
-
-\[
-  \infer{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
-  \qquad
-  \infer{\Pscr\Downarrow A\vdash A}{}
-  \qquad
-  \infer{\Pscr\Downarrow\forall x. B(x)\supset D(x)\vdash A}
-        {\vdash B(t)\qquad \Pscr\Downarrow D(t)\vdash A}
-\]
-Here, $\Pscr$ is a collection of Horn clauses, i.e., formulas of the
-form $\forall \bar x_1. A_1\supset \forall \bar x_2. A_2\supset
-\forall \bar x_n. A_n\supset A_0$. 
 
 \begin{figure}
 \lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={sigs-end}]{code/dep-kernel.sig}
@@ -69,21 +87,38 @@ form $\forall \bar x_1. A_1\supset \forall \bar x_2. A_2\supset
 \label{fig:kernel}
 \end{figure}
 
+Figure~\ref{fig:augmented} contains these proof rules and extends it
+in the following fours ways so that it more appropriately fits into
+the Coq proof system.
+\begin{enumerate}
+  \item Instead of having separate connectives for $\forall$ and
+    $\supset$, we have the dependent product connective $(x:A)D$. 
+  \item We have incorporated both \emph{proof certificates} (using the
+    schematic variable $\XXi$) along with expert predicates
+    (predicates with the $e$ subscript).
+  \item The inference rules are also anotated by terms structures that
+    can be give directly to the Coq kernel for checking.
+  \item We have added various premises which are responsible to
+    pulling information across the Elpi API with Coq.
+\end{enumerate}
+The proof system described in Figure~\ref{fig:kernel} corresponds to
+the Calculus of Inductive Constructions restricted to the Horn clause
+fragment of pure \lsti{Inductive} definitions.
+This proof system is inspired by the calculus for proof search in
+Pure Type Systems introduced in \cite{LengrandDM06}, based in turn on
+ideas stemming from focusing (in particular, the LJT calculus of
+Herbelin \cite{Herbelin94}). Similarly to that calculus, we have a
+term language that includes terms and lists of terms, and two distinct
+typing judgments for the two categories. In our case, where proof
+search steps are viewed as computation, the term judgment $\XXi\vdash
+t \colon A$ corresponds to a goal-reduction step while the judgment
+$\XXi \Downarrow l \colon D\vdash A$ corresponds to a backchaining
+step. This coincides with the idea behind the \emph{spine
+  calculus}~\cite{Cervesato97tr}.  The main novelity of our proof
+system here is that proof terms and proof certificates are used
+simultaneously in all inference rules.
 
-Figure~\ref{fig:augmented} contains an implicitly focused proof system  for a small fragment of the Calculus of Inductive Constructions that corresponds to Horn logic programming over pure \lsti{Inductive} definitions.
-%
-It is a sequent calculus inspired by the calculus for
-proof search in Pure Type Systems introduced in \cite{LengrandDM06}, based in
- turn on ideas stemming from focusing (in particular, the LJT calculus of
-Herbelin \cite{Herbelin94}). Similarly to that calculus, we have a term
-language that includes terms and lists of terms, and two distinct typing
-judgments for the two categories. In our case, where proof search steps are
-viewed as computation, the term judgment $\XXi\vdash t \colon A$ corresponds to a goal-reduction
-step while the judgment $\XXi \Downarrow  l \colon D\vdash A$ corresponds to a backchaining step. This coincides
-with the idea behind the \emph{spine calculus}~\cite{Cervesato97tr}.
-
-
-The proof system is parameterized by Coq' global environment $E$, which
+The proof system is parameterized by Coq's global environment $E$, which
 here can be thought to consist of a set of inductive definitions,
 which following Coq's reference manual we denote with
 $\mathrm{Ind}[p]  (\Gamma_I := \Gamma_C)$.  One  rule delegates
@@ -98,49 +133,21 @@ arguments.
 
 The \emph{unfold} rule is the equivalent in our simplified setting of
 a \emph{decide} rule in an explicitly focused system. From a logic
-programming viewpoint, given an atom, the rule selects a clause on which to
-back-chain on: we look-up the costructors from an \lsti{Inductive}
-definition from the global enviroment, one that matches the atom we wish to bachchain on and then call the latter judgment. The rules for backchaining are standard, corresponding to the \emph{init} and $\forall$-left rules.
+programming viewpoint, given an atom, the rule selects a clause on
+which to back-chain on: we look-up the costructors from an
+\lsti{Inductive} definition from the global enviroment, one that
+matches the atom we wish to bachchain on and then call the latter
+judgment. The rules for backchaining are standard, corresponding to
+the \emph{init} and $\forall$-left rules.
 
 It may be at first surprising that there are no
 introduction rules for propositional connectives, nor equality for
 that matter. However, one of the beauty of the Calculus of Inductive
-Construction is that they are in fact defined inductively and
+Construction is that they are, in fact,  defined inductively and
 therefore the \emph{unfold} rule will handle those; this also
 simplifies the syntax of proof-terms.
 
-  % , and as is usual in Pure Type
-% Systems we have the same grammar for terms and types
-%
-%, as shown in figure~\ref{fig:terms}.
-% \todo{Let's think about that: we need A at least, but A is also a metavariable for atoms}
-% %\begin{figure}
-% \begin{align*}
-% t,u ::= & k\ l \;|\; \forall x : t.\, u \\
-% l ::= & [] \;|\; (t\ ::\ l)
-% \end{align*}
-% % \caption{Grammar of terms}
-% % \label{fig:terms}
-% % \end{figure}
-
-
-% we denote by $\Pscr_A$ the
-% set of type declarations for the constructors of type $A$, of the form
-% $k : D$ where $D$ is of the form
-% $\forall x_1 : t_1.\, \dots \forall x_n : t_n.\, D\ u_1 \dots u_m$. We
-% denote by $\mathcal{A}$ the set of arity declaration for the inductive
-% types.
-
-%
-%
-%done Explain relations with other term assignments. Note that we do not use
-% explicit substitutions (we are cut free)
-% Explain the choice of not having certificates represent proof terms.
-% \todo{  Explain that the unfold clause handles
-% defined atoms and defined connectives (conjunction, disjunction, existential
-% and also equality): this may be less efficient and proof-theoretically induce
-% pointless phase changes, but it is arguably very elegant e simplifies proof
-% terms that are inherited by Coq }
+\subsection{Proof certificate checking}
 
 Figure~\ref{fig:kernel} contains the Elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ corresponds to
@@ -157,13 +164,13 @@ Coq terms are accessed through the Coq-Elpi API, and their representation
 in \lP takes advantage of the native \lP constructs such as lists and binders.
 The following is a list of some of the signatures of the notions that we use:
 \begin{lstlisting}
-  kind term   type.                                   % reification of Coq terms
-  kind gref    type                                 % reification of refernces to global terms
-  type global gref -> term.                      % coercion to term
-  type indt   inductive -> gref.                 % reification of inductive types
-  type indc   constructor -> gref.             % reification of their constructors 
-  type app    list term -> term.               % reification of nary application
-  type prod   name -> term -> (term -> term) -> term. % reification of dependent product
+kind term   type.                                   % reification of Coq terms
+kind gref   type                                    % reification of references to global terms
+type global gref -> term.                            % coercion to term
+type indt   inductive -> gref.                       % reification of inductive types
+type indc   constructor -> gref.                     % reification of their constructors 
+type app    list term -> term.                       % reification of nary application
+type prod   name -> term -> (term -> term) -> term. % reification of dependent product
 \end{lstlisting}
 
 Note that \lsti{prod} encodes dependent products taking a name for pretty
@@ -303,7 +310,71 @@ restricted to depth-first search, since it follows the dictate of the
 given FPC, for example iterative-deepening. Furthermore, the FPC can
 provide a \emph{trace} that may be more customable that the one
 offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
-%
+
+\subsection{Moving beyond Horn clauses}
+\label{ssec:beyond}
+
+If we do not restrict our attention to only Horn clauses then there is
+no problem will presenting a focused proof system for all of
+first-order intuitionistic logic using the connectives $\forall$ and
+$\supset$.  The following rules extend those given earlier.
+\[
+  \infer[decide]{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
+  \qquad
+  \infer[init]{\Pscr\Downarrow A\vdash A}{}
+\]
+\[
+  \infer[\forall L]{\Pscr\Downarrow\forall x. D\vdash A}
+        {\Pscr\Downarrow D[t/x]\vdash A}
+  \qquad
+  \infer[\supset L]{\Pscr\Downarrow B\supset D\vdash A}
+        {\Pscr\vdash B\quad \Pscr\Downarrow D\vdash A}
+  \qquad
+  \infer[\supset R]{\Pscr\vdash B\supset D}{\Pscr, B\vdash D}
+  \qquad
+  \infer[\forall R]{\Pscr\vdash \forall x.D}{\Pscr\vdash D[y/x]}
+\]
+As before, the syntactic variable $A$ denotes atomic formulas and, as
+usual, the $\forall R$ rule has the restriction that $y$ is not free in
+its conclusion.
+
+As has been detailed in earlier work on foundational proof
+certificates, this richer notion of proof system can provide for
+richer proof certificates.  The main differences with what we have
+seen before is that the left-hand sides of sequents can now grow
+during the proof checking process.  As a result, an indexing mechanism
+is invoked so that it is possible for the decide expert to properly
+select locally added assumptions instead of just those assumptions
+accepted globally.
+
+
+*** To illustrate this approach to elaborating externally provided proof
+structures into terms the Coq kernel can check, we consider here
+examples take from the file \verb+coq_fpc.v+, which is part of the
+repository \url{https://github.com/proofcert/fpc-elpi/}.
+Figure~\ref{fig:debruijn} presents the specific FPC that defines the
+proof semantics of using the De Bruijn notions for untyped
+$\lambda$-terms as proof evidence of a proof in intuitionistic
+propositional logic.  That FPC definition, along with a proof checker
+capable of synthesizing Coq proof terms during proof checker, makes it
+possible to use the term denoting the untyped $\lambda$-term
+$\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$.
+
+\begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
+(lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
+                                                    [lambda (apply 1 [])])])]))
+\end{lstlisting}
+
+
+\begin{figure}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.mod}
+\caption{The FPC definition of De Bruijn notation as proof evidence.}
+\label{fig:debruijn}
+\end{figure}
+
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
