@@ -163,9 +163,9 @@ inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ correspon
 Coq terms are accessed through the Coq-Elpi API, and their representation
 in \lP takes advantage of the native \lP constructs such as lists and binders.
 The following is a list of some of the signatures of the notions that we use:
-\begin{lstlisting}
+\begin{lstlisting}[language=lprolog]
 kind term   type.                                   % reification of Coq terms
-kind gref   type                                    % reification of references to global terms
+kind gref   type.                                   % reif. of references to global terms
 type global gref -> term.                            % coercion to term
 type indt   inductive -> gref.                       % reification of inductive types
 type indc   constructor -> gref.                     % reification of their constructors 
@@ -175,7 +175,7 @@ type prod   name -> term -> (term -> term) -> term. % reification of dependent p
 
 Note that \lsti{prod} encodes dependent products taking a name for pretty
 printing, a term and a \lP function from terms to terms: namely $\forall x :
-A, B$ is encoded by \texttt{prod ``x'' A (x\textbackslash{} B x)}; when, in the
+A, B$ is encoded by \lsti{prod ``x'' A (x\ B x)}; when, in the
 implementation of the product-left rule, we apply $B$ to the variable
 \lsti{Tm}, we get a term that can be used to continue backchaining. This
 application is obtained via meta-level substitution, in the style of HOAS. In
@@ -262,7 +262,7 @@ Thanks to the Coq-Elpi interface, in particular to the ``main''
 proocedure \lsti{solve}, we can package the \lP's code for the checker
 as a tactic that can be called as any other tactic in a Coq script.
 
-\begin{lstlisting}
+\begin{lstlisting}[deletekeywords={goal}]
 Elpi Tactic dprolog.
 Elpi Accumulate lp:{{
   solve [str ''height'', int N] [goal _  Ev G _] _ :-
@@ -295,7 +295,7 @@ Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 | i_c : forall y: nat, forall ys rs, y <= x -> insert x ys rs -> insert x (y :: ys) (x :: rs).
 Lemma i1:  exists R, insert 2 [0;1] R.
 eexists.
-elpi  dprolog height 10.
+elpi dprolog height 10.
 Qed.
 Print i1.
 ex_intro (fun R : list nat => insert 2 [0; 1] R) [0; 1; 2]
@@ -317,7 +317,7 @@ offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
 If we do not restrict our attention to only Horn clauses then there is
 no problem will presenting a focused proof system for all of
 first-order intuitionistic logic using the connectives $\forall$ and
-$\supset$.  The following rules extend those given earlier.
+$\supset$. The following rules extend those given earlier.
 \[
   \infer[decide]{\Pscr\vdash A}{D \in \Pscr\quad \Pscr\Downarrow D\vdash A}
   \qquad
