@@ -105,15 +105,12 @@ ideas stemming from focusing (in particular, the LJT calculus of
 Herbelin \cite{Herbelin94}). Similar to that calculus, we have a
 term language that includes terms and lists of terms, and two distinct
 typing judgments for the two categories.
-\begin{metanote}
-  This is repeated in 3.2 and isn't too early to talk about code here? -am
-\end{metanote}
-%
-In our case, the \lP goal formula \lsti{(check Xi (go B T))}
-corresponds to $\XXi\vdash B \colon T$ and the formula
-%
-\lsti{(check Xi (bc D B L))} corresponds to $\XXi\Downarrow L\colon
-D\vdash B$.
+% %
+% In our case, the \lP goal formula \lsti{(check Xi (go B T))}
+% corresponds to $\XXi\vdash B \colon T$ and the formula
+% %
+% \lsti{(check Xi (bc D B L))} corresponds to $\XXi\Downarrow L\colon
+% D\vdash B$.
 %
 This style of  proof terms coincides with the idea behind the \emph{spine
   calculus}~\cite{Cervesato97tr}.  The main novelty of our proof
@@ -132,12 +129,10 @@ although the proof theory would gladly allow it. This means at the
 term level that we do not have variables in our grammar of
 terms. Terms are always applied to a (possibly empty) list of
 arguments.
-\begin{metanote}
-  Should we call ``unfold'' \emph{decide} (left) and be done with it? AM
-\end{metanote}
-The \emph{unfold} rule is the equivalent in our simplified setting of
-a \emph{decide} rule in an explicitly focused system
-\cite{liang09tcs}.  As in the previous proof system for Horn logic,  given an atom,
+The \emph{decide} rule, %  is the equivalent in our 
+% a \emph{decide} rule in an explicitly focused system
+% \cite{liang09tcs}.  
+as in the previous proof system for Horn logic,  given an atom,
 the rule selects a clause on which to back-chain on: we lookup the
 constructors from an \lsti{Inductive} definition from the global
 environment, one that matches the atom we wish to backchain on and then
@@ -149,7 +144,7 @@ It may be at first surprising that there are no
 introduction rules for propositional connectives, nor equality for
 that matter. However, one of the beauty of the Calculus of Inductive
 Construction is that they are, in fact,  defined inductively and
-therefore the \emph{unfold} rule will handle those; this also
+therefore the \emph{decide} rule will handle those; this also
 simplifies the syntax of proof-terms.
 
 \subsection{Proof certificate checking}
@@ -187,11 +182,11 @@ explicit ones as in LJT and PTSC's tradition, the more since proof search in
 our application is cut-free.
 % Syntax: one can think as if something of type \lsti{term -> term} were a
 % \lsti{term} with a hole in it for another \lsti{term}.
-The unfolding rule makes use of the Coq-Elpi primitives
+The decide rule makes use of the Coq-Elpi primitives
 \lsti{coq.safe-dest-app} in order to obtain the head term of a (possibly
 nested) application, and \lsti{coq.env.indt} in order to access the global
 environment of inductive definitions and query for information about them.
-The \lsti{unfoldE} predicate,  has, among others, the role of selecting which
+The \lsti{decideE} predicate,  has, among others, the role of selecting which
 constructor to introduce for the inductive type. The kernel will successively
 obtain the type of the selected constructor, and initiate the backchaining
 phase on it.
@@ -226,8 +221,7 @@ provable in  the kernel using the clauses in Figures~\ref{fig:kernel}
 and~\ref{fig:resources} if and only if the height of that proof is 5
 or less.
 %
-Similarly, the second FPC can be used to bound the total number of instances of
-unfoldings in a proof.
+Similarly, the second FPC can be used to bound the total number of instances of uses of the decide rule in a proof.
 %
 %In particular, the query \mbox{\lsti{(check (qsize 5 H) B)}}
 % \begin{lstlisting}

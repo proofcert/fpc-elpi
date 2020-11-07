@@ -52,12 +52,12 @@ check _ (go (sort S) A):- coq.typecheck A (sort S) _.
 check Cert (go A Tm) :-
   coq.safe-dest-app Atom (global (indt Prog)) _,
   coq.env.indt Prog _ _ _ _ Kn Clauses.
-  unfoldE Kn Cert Cert' K,
+  decideE Kn Cert Cert' K,
   std.lookup {std.zip Kn Clauses} K Clause, 
   check Cert' (bc D A L),
   Tm = (app [global (indc K)|L]).
 check Cert (bc (prod _ B D) A [Tm|L]) :-
-  prodE Cert Cert1 Cert2,
+  prodE Cert Cert1 Cert2 Tm,
   check Cert1 (bc (D Tm) A L),
   check Cert2 (go B Tm).
 check Cert (bc A A []) :- initialE Cert.

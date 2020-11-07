@@ -19,7 +19,7 @@ will implement only FPC corresponding to different flavors
 SmallCheck~\cite{smallcheck} and
 $\alpha$Check~\cite{cheney_momigliano_2017}, and their
 combination. Note however that it would take  no more than two lines of
-code in the \lsti{unfoldE} expert to implement a form of random data
+code in the \lsti{decideE} expert to implement a form of random data
 generation in the sense of randomized
 backtracking~\cite{pltredexconstraintlogic}.
 
@@ -42,12 +42,7 @@ work in the configuration of generators and shrinkers.
 \subsection{PBT as proof reconstruction}
 \label{ssec:pbt-lp}
 
-% \begin{metanote}
-%   I'm just saying the bare minimum -am
-% \end{metanote}
-
-
-If we view  a property as a many-sorted logical formula:
+If we view  a Horn property (in uncurried form) as a many-sorted logical formula:
 \[
   \forall x_1 \colon \tau_1\dots x_n \colon \tau_m, A_1\land\dots\land A_m \supset B\tag{*}\label{eq:prop}
   \]
