@@ -48,7 +48,8 @@ backchain D A :- is_uni D D',  backchain (D' X) A.
 % Checker %
 %%%%%%%%%%%
 /* check */
-check _ (go (sort S) A):- coq.typecheck A (sort S) _. 
+check _ (go (sort S) A):-
+  coq.typecheck A (sort S) _. 
 check Cert (go A Tm) :-
   coq.safe-dest-app Atom (global (indt Prog)) _,
   coq.env.indt Prog _ _ _ _ Kn Clauses.
@@ -60,7 +61,8 @@ check Cert (bc (prod _ B D) A [Tm|L]) :-
   prodE Cert Cert1 Cert2 Tm,
   check Cert1 (bc (D Tm) A L),
   check Cert2 (go B Tm).
-check Cert (bc A A []) :- initialE Cert.
+check Cert (bc A A []) :-
+  initialE Cert.
 /* end */
 % check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
 % 	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).

@@ -92,14 +92,14 @@ the Coq proof system.
   \item The inference rules are also annotated by terms structures that
     can be give directly to the Coq kernel for checking.
   \item We have added various premises which are responsible to
-    pulling information across the Elpi API with Coq.
+    pulling information across  Coq's global environment.
 \end{enumerate}
 The proof system described in Figure~\ref{fig:augmented} (and
-implemented in Figure~\ref{fig:kernel}) corresponds to the Calculus
+implemented in Figure~\ref{fig:kernel}) corresponds to a subset of the Calculus
 of Inductive Constructions in which all inductive definitions are
-limited to the Horn clause.
+limited to pure Horn clauses.
 %
-This proof system is inspired by the calculus for proof search in
+This  system is inspired by the calculus for proof search in
 Pure Type Systems introduced in \cite{LengrandDM06}, based in turn on
 ideas stemming from focusing (in particular, the LJT calculus of
 Herbelin \cite{Herbelin94}). Similar to that calculus, we have a
@@ -117,25 +117,26 @@ This style of  proof terms coincides with the idea behind the \emph{spine
 system here is that proof terms and proof certificates are used
 simultaneously in all inference rules.
 
-The proof system is parameterized by Coq's global environment $E$, which
-here we take as a set of inductive definitions,
-which, following Coq's reference manual, we denote with
-$\mathrm{Ind}[p]  (\Gamma_I := \Gamma_C)$.  One  rule delegates
-to Coq's type checking the enforcement of the well-sortedness of such types. We
-do not have a \emph{local context} since we are only dealing with types
-that correspond to Horn clauses, and atomic types are inductively
-defined. In fact, we do not have a $\forall$ rule on the right,
-although the proof theory would gladly allow it. This means at the
-term level that we do not have variables in our grammar of
+The proof system is parameterized by Coq's global environment $E$,
+which here we take as a set of inductive definitions; following Coq's
+reference manual, we denote such a definition with
+$\mathrm{Ind}[p] (\Gamma_I := \Gamma_C)$, where $\Gamma_I$ determines
+the names and types of the inductive type and $\Gamma_C$ the names
+and types of its constructors. A rule delegates to Coq's
+type checking the enforcement of the well-sortedness of such types. We
+do not have a \emph{local context} since we are only dealing with
+types that correspond to Horn clauses, and atomic types are
+inductively defined. In fact, we do not have a $\forall$ rule on the
+right, although the proof theory would gladly allow it. This means at
+the term level that we do not have variables in our grammar of
 terms. Terms are always applied to a (possibly empty) list of
-arguments.
-The \emph{decide} rule, %  is the equivalent in our 
+arguments.  The \emph{decide} rule, % is the equivalent in our
 % a \emph{decide} rule in an explicitly focused system
 % \cite{liang09tcs}.  
 as in the previous proof system for Horn logic,  given an atom,
-the rule selects a clause on which to back-chain on: we lookup the
+ selects a clause on which to back-chain on: we lookup the
 constructors from an \lsti{Inductive} definition from the global
-environment, one that matches the atom we wish to backchain on and then
+environment, one that matches the atom we wish to backchain on, and then
 call the latter judgment. The rules for backchaining are standard,
 corresponding to the \emph{init} and the (conflation of the) left introduction rules for
 $\forall$ and $\supset$.
@@ -172,10 +173,10 @@ type prod   name -> term -> (term -> term) -> term. % reification of dependent p
 \end{lstlisting}
 %
 Note that \lsti{prod} encodes dependent products taking a name for pretty
-printing, a term and a \lP abstraction from terms to terms: namely $(x :
-B) D$ is encoded by \lsti{prod ``x'' B (x\ D x)}; when, in the
+printing, a term and a \lP abstraction from terms to terms: i.e., $(x :
+B) D$ is encoded by \verb|prod ``x'' B (x\ D x)|; when, in the
 implementation of the product-left rule, we apply $D$ to the variable
-\lsti{Tm}, we get a term that can be used to continue backchaining. This
+\lsti{Tm}, we get a new formula that can be used to continue backchaining. This
 application is obtained via meta-level substitution, in the style of HOAS. In
 this sense, our calculus uses \emph{implicit} substitutions, rather than
 explicit ones as in LJT and PTSC's tradition, the more since proof search in
@@ -187,11 +188,12 @@ The decide rule makes use of the Coq-Elpi primitives
 nested) application, and \lsti{coq.env.indt} in order to access the global
 environment of inductive definitions and query for information about them.
 The \lsti{decideE} predicate,  has, among others, the role of selecting which
-constructor to introduce for the inductive type. The kernel will successively
+constructor to focus on from the inductive type. The kernel will successively
 obtain the type of the selected constructor, and initiate the backchaining
-phase on it.
+phase.
 
 \subsubsection{FPC-specific code}
+\label{ssec:fpc}
 
 Each inference rule in Figure~\ref{fig:augmented} is augmented with an
 additional premise involving an \emph{expert predicate} and is
@@ -246,7 +248,7 @@ constructor \lsti{<c>} in Figure~\ref{fig:resources} forms the pair of
 two proof certificates and the pairing experts for the certificate
 \lsti{Cert1 <c> Cert2} simply request that the corresponding experts
 also succeed for both \lsti{Cert1} and \lsti{Cert2} Thus, the query
-\lsti{check ((qheight 4) <c> (qsize 10)) A} will succeed if there is a
+\verb+check ((qheight 4) <c> (qsize 10)) A+ will succeed if there is a
 proof of \lsti{A} that has a height less than or equal to 4 while also
 being of size less than or equal to 10.
 
@@ -272,7 +274,7 @@ Elpi Accumulate lp:{{
 The glue code between Coq-Elpi and the implementation of our calculus
 is straightforward: the goal is given to us as a quadruple of a (here
 inactive) context, an \emph{evar}, a type (goal) and a list of extra
-information. In addition, we supply the certificate  when calling the tactic (it simply is an integer and a string to
+information. In addition, we supply the certificate  when calling the tactic (it is simply  an integer and a string to
 identify the ``resource'' FPC we will use in this case). We just need
 to call \lsti{check} on the goal, together with the
 certificate, in order to obtain a reconstructed proof term. We do not
@@ -317,4 +319,4 @@ offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
 % LocalWords:  Andreoli's basicstyle lprolog sigs Coq's sortedness Ev
 % LocalWords:  backchain gref indt indc coq dest unfoldings str fpc
 % LocalWords:  evar nat forall ys elpi Qed lc args ljf HOAS unfoldE
-% LocalWords:  FPCs Prolog evars untyped
+% LocalWords:  FPCs Prolog evars untyped decideE
