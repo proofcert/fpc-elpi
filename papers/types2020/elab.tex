@@ -1,4 +1,3 @@
-%\newpage\quad\newpage
 \section{Elaboration of external proof certificates for the Coq kernel}
 \label{sec:elab}
 
@@ -32,49 +31,53 @@ details are often not included.  For example:
   non-deterministic proof-search engine might be expected to
   reconstruct an equivalent simplification.
 \end{enumerate}
-
-As we have describe in Section~\ref{sec:three}, the Foundational Proof
-Certificate (FPC) framework has been designed for formally defining a
-broad collection of proof certificates that do not necessarily contain
-full details.  Proof checkers for FPC certificates can be written
-using simple logic programs: the standard implementation mechanisms of
-unification and backtracking search can then be used to reconstruct
-missing proof details \cite{miller17fac}.  Such proof checking kernels
-can also be used to elaborate such certificates into fully detailed
-proofs \cite{blanco17phd,blanco17cade}.
-
-\subsection{Moving beyond Horn clauses - because most provers are
-  without induction}
-\label{ssec:beyond}
-
-If we do not restrict our attention to only Horn clauses then there is
-no problem presenting a focused proof system for all of first-order
-intuitionistic logic using the connectives $\forall$ and $\supset$.
-The following rules extend those given earlier in
-Section~\ref{ssec:focused}. 
+A majority of the external and automatic theorem provers for
+intuitionistic logic do not involve induction.  Instead, they go
+beyond Horn clause by permitting formulas with no restriction on
+occurrences of $\forall$ and $\supset$.  In that case, we need to
+modify the focused proof rules that we have seen in
+Section~\ref{ssec:focused} by adding the following rules.
 \[
   \infer[\supset R]{\Pscr\vdash B\supset D}{\Pscr, B\vdash D}
   \qquad
   \infer[\forall R]{\Pscr\vdash \forall x.D}{\Pscr\vdash D[y/x]}
 \]
-As usual, the $\forall R$ rule has the restriction that $y$ is not
-free in its conclusion.
+As usual, the $\forall R$ rule has the restriction that the
+eigenvariable $y$ is not free in its conclusion.
 
 As has been detailed in earlier work on foundational proof
 certificates, this richer notion of proof system can provide for
 richer proof certificates.  The main differences with what we have
 seen before is that the left-hand sides of sequents can now grow
-during the proof checking process.  As a result, an indexing mechanism
-is used so that it is possible for the decide expert to properly
-select locally added assumptions instead of just those assumptions
-accepted globally.
+during the proof checking process.  When reading the right
+introduction rule for $\supset$ from conclusion to premise, we shall
+say that the antecedent of the implication is \emph{stored} in the
+left side of the context.  When this store action occurs, an
+\emph{index} is used by the store command to name that new, left-hand
+formula occurrence.  In this extended situation, the decide expert
+uses the index of an assumption in order to enter a focus phase of
+inference.  A full proof checking kernel for first-order
+intuitionistic logic has been given in \cite{chihani17jar} so we do
+not reproduce it here.
 
-To illustrate a proof certificate format that uses this richer logic
-and proof system, consider the simple \lP code in
-Figure~\ref{fig:debruijn}.  Using the constants provided in that
-figure, the untyped $\lambda$-term
-$\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$ can be
-encoded as the following Elpi term of type \lsti{deb}.
+\begin{figure}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.mod}
+\caption{The FPC definition of De Bruijn notation as proof evidence.}
+\label{fig:debruijn}
+\end{figure}
+
+To give an example, consider using untyped $\lambda$-terms encoded
+using De Bruijn's notation as proof certificates for the propositional
+intuitionistic logic over just $\supset$.  The fact that such terms
+can be used as proof certificates for such formulas (denoting simple
+types) can be formally defined using the FPC description in
+Figure~\ref{fig:debruijn}.
+%
+Using the constants provided in that figure, the untyped
+$\lambda$-term $\lambda x (x (\lambda y (y (\lambda z (x (\lambda
+u\,z))))))$ can be encoded as the following Elpi term of type
+\lsti{deb}.
 %
 \begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
 (lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
@@ -85,52 +88,30 @@ syntax (terms of type \lsti{deb}) are incorporated into proof
 certificates (terms of type \lsti{cert}) along with other integer
 arguments that are needed to compute offsets to address bound
 variables.  
-%
-This FPC can be interpreted by the proof certificate checker in the
-file \verb+ljf-dep.mod+ of the repository
-\url{https://github.com/proofcert/fpc-elpi/}.  We note that this proof
-certificate checker is also able to simultaneously synthesize a Coq
-proof term while checking (see Section~\ref{sec:elab}) all the while
-remaining less than 90 lines of Elpi code.
-
-\begin{figure}
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.mod}
-\caption{The FPC definition of De Bruijn notation as proof evidence.}
-\label{fig:debruijn}
-\end{figure}
-
-
-****************
-
 
 We describe here briefly how to use the technology behind FPCs and
 logic programming in order to provide a flexible approach to
 connecting external provers of first-order intuitionistic logic to
-Coq.
-%
-Following the general outline that has been described in
-\cite{blanco17cade,blanco20coq}, we assume that the following step are
+Coq.  Following the general outline that has been described in
+\cite{blanco17cade,blanco20coq}, we assume that the following steps are
 taken.
-%
 \begin{enumerate}
 \item Modify an external prover to output some form of proof evidence
   (proof certificate) for formulas it claims are theorems.
 
 \item Develop a formal definition of the semantics behind such proof
-  certificates using the FPC framework.
+  certificates using the FPC framework.  The FPC for De Bruijn
+  expressions given in Figure~\ref{fig:debruijn} is an example of this
+  step.
 
 \item Check proofs by executing the logic programming checker that is
   parameterized by the particular FPC definition.
 \end{enumerate}
-%
-***
-The logic programming setting allows such parallel checking
-to also serve as checking-and-synthesizing.  That is, during the
-checking of one certificate, it is possible to synthesize, for
-example, a fully detailed term that is appropriate for handing to the
-Coq kernel.
-
+As we have mentioned in Section~\ref{ssec:fpc}, the logic programming
+setting allows parallel checking and synthesizing of a pair of
+certificates.  That is, during the checking of one certificate, it is
+possible to synthesize, for example, a fully detailed term that is
+appropriate for handing to the Coq kernel.
 If one is interested only in building Coq kernel proof structures, we
 can bypass the use of an explicit pairing operation and build the
 synthesis of such proof structures directly into the FPC proof
@@ -143,24 +124,24 @@ programs \cite{lloyd91jlp}).
 
 As an example, consider an external theorem prover for propositional
 intuitionistic logic which returns proof structures as untyped
-$\lambda$-terms using De Bruijn's notation \cite{}.  For example, the
-De Bruijn expression at the end of Section~\ref{ssec:beyond} can be
-used as evidence that the following is a theorem of Coq.
+$\lambda$-terms using De Bruijn's notation.   Using the FPC provided
+in Figure~\ref{fig:debruijn} and the proof certificate checker in the
+file \verb+ljf-dep.mod+ of the repository
+\url{https://github.com/proofcert/fpc-elpi/},  the De Bruijn term
+display above can be elaborated into a proper proof for the following
+Coq theorem. 
 
 \begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
 Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q).
 \end{lstlisting}
 
-Of course, the proof information in the untyped term must be
-elaborated to be a fully typed and functional expression.  Proof
-checking using the FPC in Figure~\ref{fig:debruijn} and (an extension
-of) the proof checker in Figure~\ref{fig:kernel}.
-
-%\newpage
+We note that this proof certificate checker and Coq proof synthesizer
+is rather compact, comprising less than 90 lines of Elpi code.
 
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
 
-% LocalWords:  intuitionistic dneg peirce forall
+% LocalWords:  intuitionistic dneg peirce forall basicstyle lprolog
+% LocalWords:  Elpi lc args ljf dep
