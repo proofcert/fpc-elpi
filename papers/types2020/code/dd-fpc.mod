@@ -4,23 +4,23 @@ type indx   index.
 kind nat    type.
 type zero   nat.
 type s      nat -> nat.
-storeL_jc   (dd D) (x\ dd D) (x\ indx).
-decideL_je  (dd (s D)) (dd D) indx.
+storeC   (dd D) (x\ dd D) (x\ indx).
+decideE  (dd (s D)) (dd D) indx.
 decideR_je  (dd (s D)) (dd D).
 storeR_jc   (dd D) (dd D).
 releaseL_je (dd D) (dd D).
 releaseR_je (dd D) (dd D).
-initialL_je (dd _D).
+initialE (dd _D).
 initialR_je (dd _D) indx.
 some_jc     (dd D) (x\ dd D).
 all_jc      (dd D) (x\ dd D).
 some_je     (dd D) (dd D) _.
 all_je      (dd D) (dd D) _.
-arr_jc      (dd D) (dd D).
+impC      (dd D) (dd D).
 andPos_jc    (dd D) (dd D).
 or_jc       (dd D) (dd D) (dd D).
 andNeg_jc   (dd D) (dd D) (dd D).
-arr_je      (dd D) (dd D) (dd D).
+impE      (dd D) (dd D) (dd D).
 andPos_je   (dd D) (dd D) (dd D).
 or_je       (dd D) (dd D) _.
 andNeg_je   (dd D) (dd D) _.

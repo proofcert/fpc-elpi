@@ -48,20 +48,20 @@ type assoc   term -> term -> prop.
 
 ljf_entry C Form Term :- async [] (unk Form) C Term.
 
-async [] (str R) Cert Term :- decideL_je Cert Cert' Indx, assoc Var N, isNeg N,
+async [] (str R) Cert Term :- decideE Cert Cert' Indx, assoc Var N, isNeg N,
   lfoc N R Cert' (abs T), Term = (T Var).
 async [] (str P) Cert T :- isPos P, decideR_je Cert Cert', rfoc P Cert' T.
 lfoc P R Cert T :- isPos P, releaseL_je Cert Cert', async [P] (str R) Cert' T.
 rfoc N Cert   T :- isNeg N, releaseR_je Cert Cert', async [] (unk N) Cert'  T.
 async [C|Theta] R Cert (abs T) :- (isNeg C ; isPosAtm C),
-  storeL_jc Cert Cert' Indx, pi w\ decl w _Name C => assoc w C =>  async Theta R (Cert' w) (T w).
+  storeC Cert Cert' Indx, pi w\ decl w _Name C => assoc w C =>  async Theta R (Cert' w) (T w).
 async [] (unk D) Cert T :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', async [] (str D) Cert' T.
-lfoc Na Na Cert (abs (x\ x)) :- isNegAtm Na, initialL_je Cert.
+lfoc Na Na Cert (abs (x\ x)) :- isNegAtm Na, initialE Cert.
 rfoc Pa Cert    Var :- isPosAtm Pa, initialR_je Cert Indx, assoc Var Pa.
 
 async [] (unk (prod _ Ty1 (x\ Ty2))) Cert (fun _name Ty1 F) :-
-  arr_jc Cert Cert', async [Ty1] (unk Ty2) Cert' (abs F).
+  impC Cert Cert', async [Ty1] (unk Ty2) Cert' (abs F).
 async [] (unk (prod Name Ty1 Ty2)) Cert (fun Name Ty1 F) :-
   pred_type Ty1 Args, mkproplist Args term_type Preds,
   pi w\ isNegAtm w => decl w Name Ty1 => Preds => async [] (unk (Ty2 w)) Cert (F w).
@@ -83,7 +83,7 @@ async [app [global Ex_indt, Ty, (fun _ Ty B)] | Theta] R Cert
   some_jc Cert Cert',
   pi w\ decl w _Name Ty => async [B w | Theta] R (Cert' w) (abs (Proof w)).
 
-lfoc {{lp:A -> lp:B}} R Cert (abs (x\ T (app [x, Tm]))) :- arr_je Cert CertA CertB, rfoc A CertA Tm, lfoc B R CertB (abs T).
+lfoc {{lp:A -> lp:B}} R Cert (abs (x\ T (app [x, Tm]))) :- impE Cert CertA CertB, rfoc A CertA Tm, lfoc B R CertB (abs T).
 lfoc (prod _ Ty B) R Cert (abs (x\ T (app [x, Tm]))) :- term_type Ty, all_je Cert Cert' Tm, lfoc (B Tm) R Cert' (abs T).
 rfoc {{lp:A \/ lp:_B}} Cert {{or_introl lp:T}} :- or_je Cert Cert' left,  rfoc A Cert' T.
 rfoc {{lp:_A \/ lp:B}} Cert {{or_intror lp:T}} :- or_je Cert Cert' right, rfoc B Cert' T.
