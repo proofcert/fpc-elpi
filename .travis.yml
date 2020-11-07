@@ -15,4 +15,5 @@ install:
   - opam install -y -v coq-elpi
   - eval $(opam env) 
 script:
-  - coqc pbt.v
+  - coq_makefile -f _CoqProject -o Makefile
+  - make

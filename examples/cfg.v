@@ -84,5 +84,5 @@ with bb   : list alphabet -> Prop :=
  Goal sounds G1.ss.
  unfold sounds.
  intros.
-  elpi pbt (H) (H0 /\ H1) 10 (W).
+  Fail elpi pbt (H) (H0 /\ H1) 10 (W).
  Abort.

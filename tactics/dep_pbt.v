@@ -1,8 +1,8 @@
 From elpi Require Import elpi.
 
 Elpi Tactic dep_pbt.
-Elpi Accumulate File "../pbt/dep-kernel.mod".
-Elpi Accumulate File "../pbt/fpc-qbound.mod".
+Elpi Accumulate File "pbt/dep-kernel.mod".
+Elpi Accumulate File "pbt/fpc-qbound.mod".
 Elpi Accumulate lp:{{
   %% build_clauses: given a Coq context, creates copy clauses associating
   %% the eigenvariables to fresh logic variables
@@ -29,6 +29,7 @@ Elpi Accumulate lp:{{
   env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
     env_clauses L Cs.
   %% remove_trm: removes the coercion trm on the argument and returns a list of terms
+  type remove_trm list argument -> list term -> prop.
   remove_trm [trm A] [A].
   remove_trm [trm A | R] [A|R'] :- remove_trm R R'.
   solve [int N, trm Prog | SpecT] [goal Ctx _Ev Goal _] _OutGoals :-
@@ -59,12 +60,12 @@ Elpi Accumulate lp:{{
 %    coq.say "Spec Vars:" {std.map SpecVars (t\s\ coq.term->string t s)},
 %    coq.say "Prog:" {coq.term->string ProgGoal},
 %    coq.say "Prop:" {coq.term->string PropGoal},
-    std.map SpecGoals (g\t\ coq.say "calling" g t, check (qgen (qheight N)) (go g t)) SpecVars,
-    coq.say "Proof Term:" {std.map SpecVars (t\s\ coq.term->string t s)},
+    std.map SpecGoals (g\t\ check (qgen (qheight N)) (go g t)) SpecVars,
+    % coq.say "Proof Term:" {std.map SpecVars (t\s\ coq.term->string t s)},
     % coq.say "Interp" {coq.term->string ProgGoal},
     interp ProgGoal,
     % coq.say "Run" {coq.term->string PropGoal},
     not (interp PropGoal),
-    coq.say "Got" {coq.term->string ProgGoal}.
+    coq.say "Counterexample:" {coq.term->string ProgGoal}.
 }}.
 Elpi Typecheck.

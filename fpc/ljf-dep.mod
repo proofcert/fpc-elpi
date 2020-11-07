@@ -54,7 +54,7 @@ ljf_entry Cert Form Term :- check [] Cert (async [] (unk Form)) Term.
 % Structural Rules
 % decide
 check Ctx Cert (async [] (str R)) Term :-
-  decideL_je Cert Cert' Indx,
+  decideL_je Cert Cert' _Indx,
   look Ctx Var N, isNeg N,
   check Ctx Cert' (lfoc N R) (abs T),
   Term = (T Var).
@@ -65,7 +65,7 @@ check Ctx Cert (lfoc P R) T :- isPos P, releaseL_je Cert Cert', check Ctx Cert' 
 check Ctx Cert (rfoc N)   T :- isNeg N, releaseR_je Cert Cert', check Ctx Cert' (async [] (unk N))  T.
 % store
 check Ctx Cert (async [C|Theta] R) (abs T) :- (isNeg C ; isPosAtm C),
-  storeL_jc Cert Cert' Indx, 
+  storeL_jc Cert Cert' _Indx, 
   % pi w\ storage Indx w C => 
   pi w\ decl w _Name C =>
     check [(pr w C)| Ctx] (Cert' w) (async Theta R) (T w).
@@ -73,8 +73,8 @@ check Ctx Cert (async [] (unk D)) T :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', check Ctx Cert' (async [] (str D)) T.
 % Identity rules
 % initial (all atoms are negative)
-check Ctx Cert (lfoc Na Na) T :- T = (abs (x\ x)), isNegAtm Na, initialL_je Cert.
-check Ctx Cert (rfoc Pa)    Var :- isPosAtm Pa, initialR_je Cert Indx, look Ctx Var Pa.% storage Indx Pa.
+check _Ctx Cert (lfoc Na Na) T :- T = (abs (x\ x)), isNegAtm Na, initialL_je Cert.
+check Ctx Cert (rfoc Pa)    Var :- isPosAtm Pa, initialR_je Cert _Indx, look Ctx Var Pa.% storage Indx Pa.
 % cut
 % check Ctx Cert (async [] (str R)) :- cut_je Cert CertA CertB F, 
 %   check Ctx CertA (async [] (unk F)), check Ctx CertB (async [F] (str R)).
@@ -103,7 +103,7 @@ check Ctx Cert (async [{{lp:A \/ lp:B}}| Theta] R) (abs (x\ app [global OrInd, A
   check Ctx CertB (async [B | Theta] R) (abs T2).
 %% Negation
 % check Ctx Cert (async [{{False}}| _Theta] (unk R)) (abs (x\ app [global FalseInd, R, x])):-
-check Ctx Cert (async [{{False}}| _Theta] R) (abs (x\ app [global FalseInd, F, x])):-
+check _Ctx _Cert (async [{{False}}| _Theta] R) (abs (x\ app [global FalseInd, F, x])):-
   (R = unk F; R = str F),
   coq.locate "False_ind" FalseInd.
 % conjunction

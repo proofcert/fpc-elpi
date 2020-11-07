@@ -3,9 +3,9 @@ Require Import Arith.
 Require Import Coq.Lists.List.
 Import ListNotations.
 Elpi Tactic pbt.
-Elpi Accumulate File "../pbt/kernel.mod".
-Elpi Accumulate File "../pbt/fpc-qbound.mod".
-Elpi Accumulate File "../pbt/fpc-pair.mod".
+Elpi Accumulate File "pbt/kernel.mod".
+Elpi Accumulate File "pbt/fpc-qbound.mod".
+Elpi Accumulate File "pbt/fpc-pair.mod".
 
 Elpi Accumulate lp:{{
   %% build_clauses: given a Coq context, creates copy clauses associating
@@ -26,7 +26,7 @@ Elpi Accumulate lp:{{
   env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
     env_clauses L Cs.
 
-  solve [trm Spec, trm Prog, int N, trm Monitor] [goal Ctx _Ev Ty _Who] _OutGoals :-
+  solve [trm Spec, trm Prog, int N, trm Monitor_] [goal Ctx _Ev Ty _Who] _OutGoals :-
     build_clauses Ctx Cs,
     env_clauses Ctx Progs,
     (Progs => ( copy Spec SpecType,
@@ -39,12 +39,13 @@ Elpi Accumulate lp:{{
     coq.say "Prop:" {coq.term->string PropGoal},
     check (qgen (qheight N)) (go SpecGoal),
     interp ProgGoal,
-    (Cs => copy Monitor Result),
-    coq.say "Trying:" {coq.term->string Result}, 
+    % Use of monitor variable should be deprecated
+    % (Cs => copy Monitor Result),
+    % coq.say "Trying:" {coq.term->string Result}, 
     not (interp PropGoal),
-    coq.say "Cex:" {coq.term->string PropGoal}.
+    coq.say "Counterexample:" {coq.term->string PropGoal}.
 %qsize
-  solve [str "size", trm Spec, trm Prog, int N, trm Monitor] [goal Ctx _Ev Ty _Who] _OutGoals :-
+  solve [str "size", trm Spec, trm Prog, int N, trm Monitor_] [goal Ctx _Ev Ty _Who] _OutGoals :-
     build_clauses Ctx Cs,
     env_clauses Ctx Progs,
     (Progs => ( copy Spec SpecType,
@@ -57,13 +58,13 @@ Elpi Accumulate lp:{{
     coq.say "Prop:" {coq.term->string PropGoal},
     check (qgen (qsize N N0_)) (go SpecGoal),
     interp ProgGoal,
-    (Cs => copy Monitor Result),
-    coq.say "Trying:" {coq.term->string Result}, 
+    % (Cs => copy Monitor Result),
+    % coq.say "Trying:" {coq.term->string Result}, 
     not (interp PropGoal),
-    coq.say "Cex:" {coq.term->string PropGoal}.
+    coq.say "Counterexample:" {coq.term->string PropGoal}.
 
 %pairing
-solve [str "pair", trm Spec, trm Prog, int N, int S, trm Monitor] [goal Ctx _Ev Ty _Who] _OutGoals :-
+solve [str "pair", trm Spec, trm Prog, int N, int S, trm Monitor_] [goal Ctx _Ev Ty _Who] _OutGoals :-
     build_clauses Ctx Cs,
     env_clauses Ctx Progs,
     (Progs => ( copy Spec SpecType,
@@ -76,13 +77,9 @@ solve [str "pair", trm Spec, trm Prog, int N, int S, trm Monitor] [goal Ctx _Ev 
     coq.say "Prop:" {coq.term->string PropGoal},
     check (pair (qgen (qheight N)) (qgen (qsize S S2_ ))) (go SpecGoal),
     interp ProgGoal,
-    (Cs => copy Monitor Result),
-    coq.say "Trying:" {coq.term->string Result}, 
+    % (Cs => copy Monitor Result),
+    % coq.say "Trying:" {coq.term->string Result}, 
     not (interp PropGoal),
-    coq.say "Cex:" {coq.term->string PropGoal}.
+    coq.say "Counterexample:" {coq.term->string PropGoal}.
 }}.
 Elpi Typecheck.
-
-(* Elpi Trace. *)
-Elpi Bound Steps 100000.
-

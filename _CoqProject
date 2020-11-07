@@ -4,12 +4,7 @@ tactics/pbt.v
 tactics/coq_fpc.v
 tactics/dep_pbt.v
 examples/aexp.v
-examples/cfg.v
-examples/coq_fpc_firstorder.v
-examples/iaexp.v
 examples/list.v
 examples/list_queries.v
-examples/mut1_cfg.v
-examples/ordered.v
-examples/TImp.v
-examples/toy.v
+examples/dd_fpc.v
+examples/deb_fpc.v
