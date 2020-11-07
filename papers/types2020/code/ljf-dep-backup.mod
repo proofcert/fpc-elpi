@@ -50,7 +50,7 @@ ljf_entry C Form Term :- check C (async [] (unk Form)) Term.
 ljf_entry Cert Form Term :- check Cert (async [] (unk Form)) Term.
 
 check Cert (async [] (str R)) Term :-
-  decideL_je Cert Cert' Indx,
+  decideE Cert Cert' Indx,
   assoc Var N, isNeg N,
   check Cert' (lfoc N R) (abs T),
   Term = (T Var).
@@ -59,15 +59,15 @@ check Cert (async [] (str P)) T :-
 check Cert (lfoc P R) T :- isPos P, releaseL_je Cert Cert', check Cert' (async [P] (str R)) T.
 check Cert (rfoc N)   T :- isNeg N, releaseR_je Cert Cert', check Cert' (async [] (unk N))  T.
 check Cert (async [C|Theta] R) (abs T) :- (isNeg C ; isPosAtm C),
-  storeL_jc Cert Cert' Indx, 
+  storeC Cert Cert' Indx, 
   pi w\ decl w _Name C => assoc w C =>  check (Cert' w) (async Theta R) (T w).
 check Cert (async [] (unk D)) T :- (isPos D ; isNegAtm D),
   storeR_jc Cert Cert', check Cert' (async [] (str D)) T.
-check Cert (lfoc Na Na) T :- T = (abs (x\ x)), isNegAtm Na, initialL_je Cert.
+check Cert (lfoc Na Na) T :- T = (abs (x\ x)), isNegAtm Na, initialE Cert.
 check Cert (rfoc Pa)    Var :- isPosAtm Pa, initialR_je Cert Indx, assoc Var Pa.
 
 check Cert (async [] (unk (prod _ Ty1 (x\ Ty2)))) (fun _name Ty1 F) :-
-  arr_jc Cert Cert',
+  impC Cert Cert',
   check Cert' (async [Ty1] (unk Ty2)) (abs F).
 check Cert (async [] (unk (prod Name Ty1 Ty2))) (fun Name Ty1 F) :-
   pred_type Ty1 Args, mkproplist Args term_type Preds,
@@ -96,7 +96,7 @@ check Cert (async [app [global Ex_indt, Ty, (fun _ Ty B)] | Theta] R)
   pi w\ decl w _Name Ty => check (Cert' w) (async [B w | Theta] R) (abs (Proof w)).
 
 check Cert (lfoc {{lp:A -> lp:B}} R) (abs (x\ T (app [x, Tm]))) :-
-  arr_je Cert CertA CertB,
+  impE Cert CertA CertB,
   check CertA (rfoc A) Tm, check CertB (lfoc B R) (abs T).
 check Cert (lfoc (prod _ Ty B) R) (abs (x\ T (app [x, Tm]))) :-
   term_type Ty,
