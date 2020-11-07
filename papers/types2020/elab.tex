@@ -69,7 +69,7 @@ not reproduce it here.
 \end{figure}
 
 To give an example, consider using untyped $\lambda$-terms encoded
-using De Bruijn's notation as proof certificates for the propositional
+using De Bruijn's notation as proof certificates for propositional
 intuitionistic logic over just $\supset$.  The fact that such terms
 can be used as proof certificates for such formulas (denoting simple
 types) can be formally defined using the FPC description in
@@ -117,23 +117,23 @@ appropriate for handing to the Coq kernel.
 If one is interested only in building Coq kernel proof structures, we
 can bypass the use of an explicit pairing operation and build the
 synthesis of such proof structures directly into the FPC proof
-checker.  (We took exactly this step in Figure~\ref{fig:augmented}
+checker.  We took exactly this step in Figure~\ref{fig:augmented}
 where proof checking involved both proof certificates as well as
-Coq-term structures.)  If one is interested in checking only one kind
+Coq terms.  If one is interested in checking only one kind
 of external proof structure, then the FPC for that structure could
 also be built into the checker (via, say, partial evaluation of logic
 programs \cite{lloyd91jlp}).
 
-As an example, consider an external theorem prover for propositional
-intuitionistic logic which returns proof structures as untyped
-$\lambda$-terms using De Bruijn's notation.   Using the FPC provided
-in Figure~\ref{fig:debruijn} and the proof certificate checker in the
-file \verb+ljf-dep.mod+ of the repository
-\url{https://github.com/proofcert/fpc-elpi/},  the De Bruijn term
-display above can be elaborated into a proper proof for the following
-Coq theorem. 
+Continuing with the previous example, consider an external theorem
+prover for propositional intuitionistic logic which returns proof
+structures as untyped $\lambda$-terms using De Bruijn's notation.
+Using the FPC provided in Figure~\ref{fig:debruijn} and the proof
+certificate checker in the file \verb+ljf-dep.mod+ of the repository
+\url{https://github.com/proofcert/fpc-elpi}, the De Bruijn term
+displayed above can be elaborated into a proper proof for the
+following Coq theorem.
 
-\begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
+\begin{lstlisting}[basicstyle=\ttfamily,language=coq]
 Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q).
 \end{lstlisting}
 
