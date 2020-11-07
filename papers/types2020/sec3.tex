@@ -179,15 +179,9 @@ type prod   name -> term -> (term -> term) -> term. % reification of dependent p
 \end{lstlisting}
 
 Note that \lsti{prod} encodes dependent products taking a name for pretty
-<<<<<<< HEAD
 printing, a term and a \lP function from terms to terms: namely $(x :
-B) D$ is encoded by \texttt{prod ``x'' B (x\textbackslash{} D x)}; when, in the
-implementation of the product-left rule, we apply $D$ to the logic variable
-=======
-printing, a term and a \lP function from terms to terms: namely $\forall x :
-A, B$ is encoded by \lsti{prod ``x'' A (x\ B x)}; when, in the
-implementation of the product-left rule, we apply $B$ to the variable
->>>>>>> f42e7aac15e4c83d9d2bf530dab1474df2c1bc95
+B) D$ is encoded by \lsti{prod ``x'' B (x\ D x)}; when, in the
+implementation of the product-left rule, we apply $D$ to the variable
 \lsti{Tm}, we get a term that can be used to continue backchaining. This
 application is obtained via meta-level substitution, in the style of HOAS. In
 this sense, our calculus uses \emph{implicit} substitutions, rather than
