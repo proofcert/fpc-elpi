@@ -1,7 +1,8 @@
 \section{Revisiting property-based testing for Coq}
 
 We have presented in a previous paper~\cite{blanco19ppdp} a
-proof-theoretical reconstruction of property-based testing (PBT) \cite{fink97sen}of
+proof-theoretical reconstruction of property-based testing (PBT)~\cite{fink97sen}
+of
 relational specifications, adopting techniques from foundational proof
 certificates to account for several features of this testing
 paradigm: from various \emph{generation} strategies, to
@@ -14,7 +15,7 @@ perform PBT over \lstinline{Inductive} types.
 
 While nothing prevents us from porting all the PBT features we have
 accounted for in~\cite{blanco19ppdp}, for the sake of this paper we
-will implement only FPC corresponding to different flavors
+will implement only FPC corresponding to different flavors of
 \emph{exhaustive} generation, as adopted, e.g., in
 SmallCheck~\cite{smallcheck} and
 $\alpha$Check~\cite{cheney_momigliano_2017}, and their
@@ -284,4 +285,4 @@ the specification had to be massaged non-insignificantly.
 % LocalWords:  decidability shrinkers dep pbt fpc interp forall ness
 % LocalWords:  ord unfoldings pre relationally shrinker booleans typ
 % LocalWords:  tfalse tpred tiszero TBool TNat subexp SuccBool
-% LocalWords:  notstuck unfoldE
+% LocalWords:  notstuck unfoldE decideE

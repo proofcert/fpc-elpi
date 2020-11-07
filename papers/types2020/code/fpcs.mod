@@ -5,12 +5,10 @@ ttE     (qheight _).
 prodE   (qheight H) (qheight H) (qheight H).
 unfoldE Kn (qheight H) (qheight H') K :-
       std.mem Kn K, H  > 0, H' is H  - 1.
-
 eqE    (qsize In In).
 prodE  (qsize In Out) (qsize In Mid) (qsize Mid Out).
 unfoldE Kn (qsize In Out) (qsize In' Out) K :-
    std.mem Kn K, In > 0, In' is In - 1.
-
 ttE      (A <c> B) :- ttE A, ttE B.
 unfoldE (A <c> B) (C <c> D) :- unfoldE A C, unfoldE B D.
 prodE (pair C1 C2) (pair C1' C2') (pair C1'' C2'') :-
