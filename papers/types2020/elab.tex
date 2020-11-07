@@ -79,10 +79,11 @@ $\lambda$-term $\lambda x (x (\lambda y (y (\lambda z (x (\lambda
 u\,z))))))$ can be encoded as the following Elpi term of type
 \lsti{deb}.
 %
+\begin{small}
 \begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
-(lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
-                                                    [lambda (apply 1 [])])])]))
+(lambda (apply 0 [lambda (apply 0 [lambda (apply 2 [lambda (apply 1 [])])])]))
 \end{lstlisting}
+\end{small}
 Using the constructor \lsti{lc} and \lsti{args}, terms in De Bruijn
 syntax (terms of type \lsti{deb}) are incorporated into proof
 certificates (terms of type \lsti{cert}) along with other integer

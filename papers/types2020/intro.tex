@@ -2,13 +2,13 @@
 \label{sec:intro}
 
 Recently, Enrico Tassi et al.\ developed the Elpi
-implementation \cite{dunchev15lpar} of \lP \cite{miller12proghol} and
+implementation~\cite{dunchev15lpar} of \lP~\cite{miller12proghol} and
 more recently, Tassi has made Elpi available as the Coq-Elpi
 plugin~\cite{tassi18coqpl} (\url{https://github.com/LPCIC/coq-elpi})
 to the Coq proof assistant.  This implementation of \lP extends
 earlier ones in primarily two directions: First, Elpi adds a notion of
 constraints and constraints handling rules, which makes it more
-expressive than the Teyjus implementation \cite{nadathur99cade} of
+expressive than the Teyjus implementation~\cite{nadathur99cade} of
 \lP. Second, the plugin version of Elpi comes equipped with a
 quotation and anti-quotation syntax for mixing Coq expressions with
 \lP program elements and an API for accessing the Coq environment,
@@ -28,17 +28,16 @@ Since relations (not functions) are central in \lP, Elpi is capable to
 providing direct support for the many relations that have a role in
 proof assistants implementation and usage.  Such relations include
 typing (e.g., $\Gamma\vdash M\colon\sigma$), evaluation (e.g., natural
-semantics specifications \cite{kahn87stacs,hannan93jfp}), and
-interaction (e.g., structured operational semantics
-\cite{milner89book,plotkin81}).
+semantics specifications~\cite{kahn87stacs,hannan93jfp}), and
+interaction (e.g., structured operational semantics~\cite{milner89book,plotkin81}).
 
 Felty has also made the point that LCF-style tactics and tacticals can
 be given an elegant and natural specification using the higher-order
-relational specifications provided by \lP \cite{felty93jar}.  Some
+relational specifications provided by \lP~\cite{felty93jar}.  Some
 recent implementations built using Elpi support the usefulness of
 higher-order logic programming as a meta-programming language for
 proof assistants in general~\cite{DunchevCT16,coen19mscs} and, in
-particular, for Coq via the Coq-Elpi plug~\cite{CohenST20,tassi19itp} .
+particular, for Coq via the Coq-Elpi plug~\cite{CohenST20,tassi19itp}.
 
 In this paper, we present two applications of Elpi within Coq. With
 these examples, we shall illustrate that Elpi is useful not only
@@ -46,10 +45,9 @@ because of its meta-programming features, but also because it soundly
 implements a higher-order intuitionistic logic: such implementations
 of higher-order logic have long been known to provide powerful and
 flexible approaches to implementing many different logics and their
-proof systems \cite{felty89phd,felty88cade,paulson89jar}.  Following
+proof systems~\cite{felty89phd,felty88cade,paulson89jar}.  Following
 that tradition, the Elpi system makes it possible to encode the proofs
-and proof theory of various subsets of the logic behind Coq (see also
-\cite{felty93lics}). 
+and proof theory of various subsets of the logic behind Coq (see also~\cite{felty93lics}). 
 
 While other meta-programming frameworks based on functional
 programming such as \emph{MetaCoq}~\cite{sozeau2020metacoq} can and

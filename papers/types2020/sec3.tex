@@ -89,14 +89,14 @@ the Coq proof system.
   \item We have incorporated both \emph{proof certificates}~\cite{chihani17jar} (using the
     schematic variable $\XXi$) along with expert predicates
     (predicates with the $e$ subscript). We explain this in Section~\ref{ssec:cert}.
-  \item The inference rules are also annotated by terms structures that
-    can be give directly to the Coq kernel for checking.
-  \item We have added various premises which are responsible to
+  \item The inference rules are  annotated by terms structures that
+    can be given directly to the Coq kernel for checking.
+  \item We have added various premises which are responsible for
     pulling information across  Coq's global environment.
 \end{enumerate}
 The proof system described in Figure~\ref{fig:augmented} (and
 implemented in Figure~\ref{fig:kernel}) corresponds to a subset of the Calculus
-of Inductive Constructions in which all inductive definitions are
+of Inductive Constructions in which inductive definitions are
 limited to pure Horn clauses.
 %
 This  system is inspired by the calculus for proof search in
@@ -135,7 +135,7 @@ arguments.  The \emph{decide} rule, % is the equivalent in our
 % \cite{liang09tcs}.  
 as in the previous proof system for Horn logic,  given an atom,
  selects a clause on which to back-chain on: we lookup the
-constructors from an \lsti{Inductive} definition from the global
+constructors of an \lsti{Inductive} definition from the global
 environment, one that matches the atom we wish to backchain on, and then
 call the latter judgment. The rules for backchaining are standard,
 corresponding to the \emph{init} and the (conflation of the) left introduction rules for
@@ -155,7 +155,7 @@ inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ correspon
 \lsti{check $\XXi$ (go A T)} and $\XXi \Downarrow  l \colon D\vdash A$ corresponds to
 \lsti{check $\XXi$ (bc D A L)}.
 %
-The code in that figure mixes both Coq-specific items with
+The code in that figure mixes both Coq-specific and
 FPC-specific items.  We describe both of these separately.
 
 \subsubsection{Coq-specific code}
@@ -172,14 +172,14 @@ type app    list term -> term.                       % reification of nary appli
 type prod   name -> term -> (term -> term) -> term. % reification of dependent product
 \end{lstlisting}
 %
-Note that \lsti{prod} encodes dependent products taking a name for pretty
+Note that \lsti{prod} encodes dependent products by taking a name for pretty
 printing, a term and a \lP abstraction from terms to terms: i.e., $(x :
 B) D$ is encoded by \verb|prod ``x'' B (x\ D x)|; when, in the
-implementation of the product-left rule, we apply $D$ to the variable
+implementation of the product-left rule, we apply \lsti{D} to the variable
 \lsti{Tm}, we get a new formula that can be used to continue backchaining. This
 application is obtained via meta-level substitution, in the style of HOAS. In
 this sense, our calculus uses \emph{implicit} substitutions, rather than
-explicit ones as in LJT and PTSC's tradition, the more since proof search in
+explicit ones as in the  LJT and PTSC's tradition, the more since proof search in
 our application is cut-free.
 % Syntax: one can think as if something of type \lsti{term -> term} were a
 % \lsti{term} with a hole in it for another \lsti{term}.
@@ -223,7 +223,8 @@ provable in  the kernel using the clauses in Figures~\ref{fig:kernel}
 and~\ref{fig:resources} if and only if the height of that proof is 5
 or less.
 %
-Similarly, the second FPC can be used to bound the total number of instances of uses of the decide rule in a proof.
+Similarly, the second FPC can be used to bound the total number of
+instances of the decide rule in a proof.
 %
 %In particular, the query \mbox{\lsti{(check (qsize 5 H) B)}}
 % \begin{lstlisting}
@@ -247,7 +248,7 @@ satisfying two FPCs simultaneously.  In particular, the infix
 constructor \lsti{<c>} in Figure~\ref{fig:resources} forms the pair of
 two proof certificates and the pairing experts for the certificate
 \lsti{Cert1 <c> Cert2} simply request that the corresponding experts
-also succeed for both \lsti{Cert1} and \lsti{Cert2} Thus, the query
+also succeed for both \lsti{Cert1} and \lsti{Cert2}. Thus, the query
 \verb+check ((qheight 4) <c> (qsize 10)) A+ will succeed if there is a
 proof of \lsti{A} that has a height less than or equal to 4 while also
 being of size less than or equal to 10.
@@ -272,16 +273,17 @@ Elpi Accumulate lp:{{
 \end{lstlisting}
 
 The glue code between Coq-Elpi and the implementation of our calculus
-is straightforward: the goal is given to us as a quadruple of a (here
+is straightforward: the goal consists of a quadruple of a (here
 inactive) context, an \emph{evar}, a type (goal) and a list of extra
-information. In addition, we supply the certificate  when calling the tactic (it is simply  an integer and a string to
-identify the ``resource'' FPC we will use in this case). We just need
-to call \lsti{check} on the goal, together with the
-certificate, in order to obtain a reconstructed proof term. We do not
-call the reconstruction directly on the evar because Coq-Elpi
-ensures that evars manipulated by \lP are well-typed at all times; since
-we cannot guarantee that, as we work with partially reconstructed
-term, we  get  around this by an explicit unification.
+information, also inactive. In addition, we supply the certificate: it
+is simply an integer and a string to identify the ``resource'' FPC that we
+will use in this case. We just need to call \lsti{check} on the goal,
+together with the certificate, in order to obtain a reconstructed
+proof term. We do not call the reconstruction directly on the evar
+because Coq-Elpi ensures that evars manipulated by \lP are well-typed
+at all times; since we cannot guarantee that, as we work with
+partially reconstructed term, we get around this by an explicit
+unification.
 
 The following
 example shows how we can use the above tactic to do FPC-driven logic
@@ -305,7 +307,7 @@ Coq's \lsti{auto}: it currently lacks the latter's capability of
 solving goals by \lsti{reflexivity} as well as the modularity of using
 \lsti{Hints} as introduction rules; on the bright side, it is not
 restricted to depth-first search, since it follows the dictate of the
-given FPC, for example iterative-deepening. Furthermore, the FPC can
+given FPC, for example adding iterative-deepening search. Furthermore, the FPC can
 provide a \emph{trace} that may be more customized than the one
 offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
 

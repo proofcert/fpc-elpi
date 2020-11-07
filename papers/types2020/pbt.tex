@@ -13,7 +13,7 @@ programming and the internals of Coq, it is natural to extend the
 FPC-driven logic programming interpreter of the previous section to
 perform PBT over \lstinline{Inductive} types.
 
-While nothing prevents us from porting all the PBT features we have
+While nothing prevents us from porting all the PBT features that we have
 accounted for in~\cite{blanco19ppdp}, for the sake of this paper we
 will implement only FPC corresponding to different flavors of
 \emph{exhaustive} generation, as adopted, e.g., in
@@ -28,14 +28,14 @@ Of course, Coq already features \textsf{QuickChick}~\cite{QChick}
 (\url{https://softwarefoundations.cis.upenn.edu/qc-current}), which is
 a sophisticated and well-supported PBT tool, based on a different
 perspective: being a clone of Haskell's QuickCheck, it emphasizes
-testing executable (read \emph{decidable)} specifications with random
+testing executable (read \emph{decidable}) specifications with random
 generators. While current research~\cite{LampropoulosPP18} aims to
 increase automation, it is fair to say that testing with
 \textsf{QuickChick}, in particular of relational specifications, is
 still very labor intensive. We do not intend to compete with
 \textsf{QuickChick} at this stage, but we shall see that we can test immediately
 \lsti{Inductive} definitions that corresponds to pure Horn
-programs. We can do that without having to provide a decidability
+programs, without having to provide a decidability
 proof for those definitions. Furthermore, we are not committed to a
 fixed random generation strategy, which in general requires additional
 work in the configuration of generators and shrinkers.
@@ -43,7 +43,7 @@ work in the configuration of generators and shrinkers.
 \subsection{PBT as proof reconstruction}
 \label{ssec:pbt-lp}
 
-If we view  a Horn property (in uncurried form) as a many-sorted logical formula:
+If we view  a Horn property (in uncurried form) as a many-sorted logical formula
 \[
   \forall x_1 \colon \tau_1\dots x_n \colon \tau_m, A_1\land\dots\land A_m \supset B\tag{*}\label{eq:prop}
   \]
@@ -53,12 +53,12 @@ If we view  a Horn property (in uncurried form) as a many-sorted logical formula
 using Horn clause specifications, a counter-example to this conjecture
 consists of a witness of the negated formula
 \[
-  \exists x_1 \colon \tau_1\dots x_n \colon \tau_n [A_1\land\dots\land A_m\wedge \neg B]
+  \exists x_1 \colon \tau_1\dots x_n \colon \tau_n , A_1\land\dots\land A_m\wedge \neg B
   \tag{**}\label{eq:full}
 \]
 %\(\exists x [(\tau(x)\land P(x)) \land \neg Q(x)]\).
 
-In our Coq  setting $A_i$ and $B$ will be \lsti{Inductive}
+In our Coq  setting $A_i$ and $B$ will be 
 propositions, while the $\tau_j$ are honest-to-goodness datatypes. We
 will treat the two quite differently, in so far as elements of those
 datatypes will be \emph{generated}, while predicates will only be
@@ -66,7 +66,7 @@ datatypes will be \emph{generated}, while predicates will only be
 type-checking and  plays also a part in interpreting the
 negation sign.
 %
-When using a focused proof system for logic extended with fixed
+In a proof system for intuitionistic logic extended with fixed
 points~\cite{baelde12tocl}, negation corresponds to the usual
 intuitionistic interpretation, which is  what Coq supports.  % proofs of formulas such as
 % \[
@@ -108,7 +108,7 @@ intuitionistic interpretation, which is  what Coq supports.  % proofs of formula
 However, for the sake of PBT and as we argued in~\cite{blanco19ppdp}  , we can identify a proof certificate for
 $(\ref{eq:full})$ simply with a proof certificate for
 $
- \exists x_1 \colon \tau_1\dots x_n \colon \tau_n [A_1\land\dots\land A_m]
+ \exists x_1 \colon \tau_1\dots x_n \colon \tau_n , A_1\land\dots\land A_m
 $
 and we can resort to negation-as-failure to check that the conclusion does not hold without caring for any evidence for the latter. This also means that we do not produce a Coq proof terms for the refutation of our property --- and neither does \textsf{QuickChick}, which runs at the OCaml level --- although we can return the witness for the existential.
 % Such a certificate would contain the witness (closed) term $t$ for the
@@ -170,8 +170,8 @@ and the specification of a FPC, the call to the tactic will be:
 elpi dep_pbt <fpc> $(A_1\land\dots\land A_m) \ (x_1) \dots (x_n)$.
 \end{lstlisting}
 The tactic calls \lsti{check} with the given FPC on the dependent
-variables and will simply call a vanilla meta-interpreter (see
-Fig.~\ref{fig:interp} in the appendix) to test the hypotheses and the negation of the
+variables and delegates to  a vanilla meta-interpreter (see
+Fig.~\ref{fig:interp} in the appendix) the  test of the hypotheses and of the negation of the
 goal:
 \begin{lstlisting}
 interp $(A_1\land\dots\land A_m$), not (interp $B$)
@@ -197,7 +197,7 @@ Abort.
 \end{lstlisting}
 In this query the tactic tests the hypotheses \lsti{Ho} and \lsti{Hi}
 against data \lsti{x,xs} generated exhaustively up to height
-at most $5$  form the library \lsti{Inductive} definitions of
+at most $5$  from the library \lsti{Inductive} definitions of
 \lsti{nat} and \lsti{list}. We do not generate values for \lsti{rs},
 since by mode information we know that it will be computed.
 %
@@ -207,9 +207,9 @@ we therefore abort the proof.
 
 
 In order to generate the PBT query, some
-pre-processing is needed. In particular, we need to turn the data
+pre-processing is needed. In particular, we turn the data
 eigenvariables into \lP logic variables when they appear inside a
-specification, and to generate queries %to \lsti|check|
+specification, and  generate queries %to \lsti|check|
 for each of
 these logic variables in association with the type of the data
 variable it corresponds to.  In order to realize this pre-processing step,
@@ -235,9 +235,9 @@ and Booleans with if-then-else, which comes from the \emph{Software Foundations}
 Inductive tm : Type :=
  | ttrue : tm | tfalse : tm | tif : tm -> tm -> tm -> tm | tzero : tm | tsucc : tm -> tm
  | tpred : tm -> tm | tiszero : tm -> tm.
- Inductive typ : Type := |TBool : typ |TNat : typ.
+ Inductive typ : Type := | TBool : typ | TNat : typ.
 \end{lstlisting}
-The completely standard static and small step dynamic semantics are
+The completely standard static and small step dynamic semantics rules are
 reported in appendix~\ref{ssec:types}.
 
 While it is obvious that \emph{subject expansion} fails for this calculus, it is gratifying to have it confirmed by our tactic, with counterexample \lsti{e = tif ttrue tzero ttrue}:
