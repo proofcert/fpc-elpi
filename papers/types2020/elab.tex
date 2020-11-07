@@ -5,7 +5,7 @@ The trusted base of Coq is its kernel, which is a type-checking
 program that certifies that a dependently typed $\lambda$-term has a
 given type.  If type checking succeeds, the formula corresponding to
 that type is, in fact, accepted by Coq users as a theorem of
-intuitionistic logic along with any axioms that have been adopted.
+intuitionistic logic (along with any axioms that have been asserted).
 The rest of the Coq system, especially its tactic language, is
 designed to help a human user build proofs-as-$\lambda$-terms that can
 be checked by the kernel.
@@ -34,13 +34,73 @@ details are often not included.  For example:
 
 As we have describe in Section~\ref{sec:three}, the Foundational Proof
 Certificate (FPC) framework has been designed for formally defining a
-rich collection of proof certificates that do not necessarily contain
+broad collection of proof certificates that do not necessarily contain
 full details.  Proof checkers for FPC certificates can be written
 using simple logic programs: the standard implementation mechanisms of
 unification and backtracking search can then be used to reconstruct
 missing proof details \cite{miller17fac}.  Such proof checking kernels
 can also be used to elaborate such certificates into fully detailed
 proofs \cite{blanco17phd,blanco17cade}.
+
+\subsection{Moving beyond Horn clauses}
+\label{ssec:beyond}
+
+If we do not restrict our attention to only Horn clauses then there is
+no problem presenting a focused proof system for all of first-order
+intuitionistic logic using the connectives $\forall$ and $\supset$.
+The following rules extend those given earlier in
+Section~\ref{ssec:focused}. 
+\[
+  \infer[\supset R]{\Pscr\vdash B\supset D}{\Pscr, B\vdash D}
+  \qquad
+  \infer[\forall R]{\Pscr\vdash \forall x.D}{\Pscr\vdash D[y/x]}
+\]
+As usual, the $\forall R$ rule has the restriction that $y$ is not
+free in its conclusion.
+
+As has been detailed in earlier work on foundational proof
+certificates, this richer notion of proof system can provide for
+richer proof certificates.  The main differences with what we have
+seen before is that the left-hand sides of sequents can now grow
+during the proof checking process.  As a result, an indexing mechanism
+is used so that it is possible for the decide expert to properly
+select locally added assumptions instead of just those assumptions
+accepted globally.
+
+To illustrate a proof certificate format that uses this richer logic
+and proof system, consider the simple \lP code in
+Figure~\ref{fig:debruijn}.  Using the constants provided in that
+figure, the untyped $\lambda$-term
+$\lambda x (x (\lambda y (y (\lambda z (x (\lambda u\,z))))))$ can be
+encoded as the following Elpi term of type \lsti{deb}.
+%
+\begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
+(lambda (apply 0 [lambda (apply 0 [lambda (apply 2 
+                                                    [lambda (apply 1 [])])])]))
+\end{lstlisting}
+Using the constructor \lsti{lc} and \lsti{args}, terms in De Bruijn
+syntax (terms of type \lsti{deb}) are incorporated into proof
+certificates (terms of type \lsti{cert}) along with other integer
+arguments that are needed to compute offsets to address bound
+variables.  
+%
+This FPC can be interpreted by the proof certificate checker in the
+file \verb+ljf-dep.mod+ of the repository
+\url{https://github.com/proofcert/fpc-elpi/}.  We note that this proof
+certificate checker is also able to simultaneously synthesize a Coq
+proof term while checking (see Section~\ref{sec:elab}) all the while
+remaining less than 90 lines of Elpi code.
+
+\begin{figure}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.sig}
+\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={start-end}]{code/deb-fpc.mod}
+\caption{The FPC definition of De Bruijn notation as proof evidence.}
+\label{fig:debruijn}
+\end{figure}
+
+
+****************
+
 
 We describe here briefly how to use the technology behind FPCs and
 logic programming in order to provide a flexible approach to
@@ -52,7 +112,7 @@ Following the general outline that has been described in
 taken.
 %
 \begin{enumerate}
-\item Have an external prover output some form of proof evidence
+\item Modify an external prover to output some form of proof evidence
   (proof certificate) for formulas it claims are theorems.
 
 \item Develop a formal definition of the semantics behind such proof
@@ -62,8 +122,8 @@ taken.
   parameterized by the particular FPC definition.
 \end{enumerate}
 %
-It is also possible to pair two different proof certificates, defined
-by two different FPC definitions, and do the proof checking in
+It is also possible to pair together two different proof certificates,
+defined by two different FPC definitions, and do the proof checking in
 parallel.  The logic programming setting allows such parallel checking
 to also serve as checking-and-synthesizing.  That is, during the
 checking of one certificate, it is possible to synthesize, for
@@ -81,11 +141,10 @@ also be built into the checker (via, say, partial evaluation of logic
 programs \cite{lloyd91jlp}).
 
 As an example, consider an external theorem prover for propositional
-intuitionistic logic which return proof structures that are De Bruijn
-expressions for the underlying untype $\lambda$-proof that encodes
-(part of) the proofs it finds.  Consider the De Buijn expression
-example at the end of Section~\ref{ssec:beyond}.  This can be used as
-evidence that the following is a theorem of Coq.
+intuitionistic logic which returns proof structures as untyped
+$\lambda$-terms using De Bruijn's notation \cite{}.  For example, the
+De Bruijn expression at the end of Section~\ref{ssec:beyond} can be
+used as evidence that the following is a theorem of Coq.
 
 \begin{lstlisting}[basicstyle=\ttfamily,language=lprolog]
 Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q).
@@ -94,20 +153,11 @@ Theorem dneg_peirce_mid : forall P Q: Prop, (((((P -> Q) -> P) -> P) -> Q) -> Q)
 Of course, the proof information in the untyped term must be
 elaborated to be a fully typed and functional expression.  Proof
 checking using the FPC in Figure~\ref{fig:debruijn} and (an extension
-of) the proof Figure~\ref{fig:kernel}.
-
-***
-presents the  specific FPC that defines the proof semantics of using
-the De Bruijn notions for untyped $\lambda$-terms as proof evidence of
-a proof in intuitionistic propositional logic.
-
-\begin{metanote}
-  AM: I think we need more: the FPC may go to the appendix, we may want to say that there is a tactic that proves these theorems etc. 
-\end{metanote}
+of) the proof checker in Figure~\ref{fig:kernel}.
 
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
 %%% End:
 
-% LocalWords:  intuitionistic
+% LocalWords:  intuitionistic dneg peirce forall
