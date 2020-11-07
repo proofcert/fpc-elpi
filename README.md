@@ -1,10 +1,8 @@
-# FPC-Elpi (Property Based Testing) [![Build Status](https://travis-ci.com/proofcert/fpc-elpi.svg?branch=pbt)](https://travis-ci.com/proofcert/fpc-elpi)
+# FPC-Elpi [![Build Status](https://travis-ci.com/proofcert/fpc-elpi.svg)](https://travis-ci.com/proofcert/fpc-elpi)
 
 This repository contains a development that integrates the Foundational Proof
 Certificate (FPC) framework into the Coq proof assistant by way of ELPI, an
 embeddable λProlog interpreter.
-
-**This is an experimental branch exploring integration with Property-Based Testing**
 
 ## Description
 
@@ -28,15 +26,9 @@ OPAM package manager, using the standard [OCaml OPAM
 repository](https://opam.ocaml.org/) as well as the official [Coq OPAM
 repository](https://coq.inria.fr/opam/released/).
 
-`coq` 8.10.2
-
-- `coq-elpi` 1.3.0
-
-- `elpi` 1.10.2
-
 `coq` 8.11.0
 
-- `coq-elpi` 1.4.1
+- `coq-elpi` 1.6.0
 
 - `elpi` 1.11.2
 
@@ -44,7 +36,7 @@ These toolchains should work with recent versions of OCaml (between 4.05.0 and
 4.10.0).
 
 Support to use FPC-Elpi interactively is offered by either the Coq toplevel or
-the Visual Studio Code editor with `coq`, `Elpi lang` and `Coq Elpi lang` addons
+the Visual Studio Code editor with `vscoq`, `Elpi lang` and `Coq Elpi lang` addons
 installed.
 
 ## Examples
