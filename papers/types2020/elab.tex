@@ -1,3 +1,4 @@
+%\newpage\quad\newpage
 \section{Elaboration of external proof certificates for the Coq kernel}
 \label{sec:elab}
 
@@ -42,7 +43,8 @@ missing proof details \cite{miller17fac}.  Such proof checking kernels
 can also be used to elaborate such certificates into fully detailed
 proofs \cite{blanco17phd,blanco17cade}.
 
-\subsection{Moving beyond Horn clauses}
+\subsection{Moving beyond Horn clauses - because most provers are
+  without induction}
 \label{ssec:beyond}
 
 If we do not restrict our attention to only Horn clauses then there is
@@ -122,9 +124,8 @@ taken.
   parameterized by the particular FPC definition.
 \end{enumerate}
 %
-It is also possible to pair together two different proof certificates,
-defined by two different FPC definitions, and do the proof checking in
-parallel.  The logic programming setting allows such parallel checking
+***
+The logic programming setting allows such parallel checking
 to also serve as checking-and-synthesizing.  That is, during the
 checking of one certificate, it is possible to synthesize, for
 example, a fully detailed term that is appropriate for handing to the
@@ -154,6 +155,8 @@ Of course, the proof information in the untyped term must be
 elaborated to be a fully typed and functional expression.  Proof
 checking using the FPC in Figure~\ref{fig:debruijn} and (an extension
 of) the proof checker in Figure~\ref{fig:kernel}.
+
+%\newpage
 
 %%% Local Variables:
 %%% mode: latex

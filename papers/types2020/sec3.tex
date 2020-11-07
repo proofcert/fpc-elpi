@@ -158,28 +158,26 @@ Figure~\ref{fig:kernel} contains the Elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ corresponds to
 \lsti{check $\XXi$ (go A T)} and $\XXi \Downarrow  l \colon D\vdash A$ corresponds to
 \lsti{check $\XXi$ (bc D A L)}.
+%
+The code in that figure mixes both Coq-specific items with
+FPC-specific items.  We describe both of these separately.
 
-% here the infix
-% turnstile $\vdash$ symbol is replaced by the \lsti{check} predicate, and every rule
-% is directly mapped to a clause in the code. The argument of the clause is
-% either given by a \lsti{go} or a \lsti{bc} constructor, signaling whether the clause
-% is a goal-reduction or a backchaining one.
-
+\subsubsection{Coq-specific code}
 Coq terms are accessed through the Coq-Elpi API, and their representation
 in \lP takes advantage of the native \lP constructs such as lists and binders.
-The following is a list of some of the signatures of the notions that we use:
+The following is part of the Coq-Elpi API signature of constants we use:
 \begin{lstlisting}[language=lprolog]
-kind term   type.                                   % reification of Coq terms
-kind gref   type.                                   % reif. of references to global terms
+kind term   type.                               % reification of Coq terms
+kind gref   type.                               % reif. of references to global terms
 type global gref -> term.                            % coercion to term
 type indt   inductive -> gref.                       % reification of inductive types
 type indc   constructor -> gref.                     % reification of their constructors 
 type app    list term -> term.                       % reification of nary application
 type prod   name -> term -> (term -> term) -> term. % reification of dependent product
 \end{lstlisting}
-
+%
 Note that \lsti{prod} encodes dependent products taking a name for pretty
-printing, a term and a \lP function from terms to terms: namely $(x :
+printing, a term and a \lP abstraction from terms to terms: namely $(x :
 B) D$ is encoded by \lsti{prod ``x'' B (x\ D x)}; when, in the
 implementation of the product-left rule, we apply $D$ to the variable
 \lsti{Tm}, we get a term that can be used to continue backchaining. This
@@ -198,21 +196,26 @@ constructor to introduce for the inductive type. The kernel will successively
 obtain the type of the selected constructor, and initiate the backchaining
 phase on it.
 
-\begin{metanote}
-  I still don't like this transition -am
-\end{metanote}
-In Figure~\ref{fig:augmented}  each
-inference rule is augmented with an additional premise involving an
-\emph{expert predicate}, a certificate $\Xi$, and possibly continuations of
-certificates ($\Xi'$, $\Xi_1$, $\Xi_2$) with extracted information from
+\subsubsection{FPC-specific code}
+
+Each inference rule in Figure~\ref{fig:augmented} is augmented with an
+additional premise involving an \emph{expert predicate} and is
+annotated with variables $\Xi$, $\Xi'$, $\Xi_1$, $\Xi_2$ that range
+over proof certificates.  These expert predicates are used to extract
+information from a certificate.  For example, the premise
+$\prodE{\XXi}{\XXi_1}{\XXi_2}{t}$ can be understood as a procedure for
+extracting from the certificate $\XXi$ a substitution term $t$ and two
+continuation certificates $\XXi_1$ and $\XXi_2$.
+%
 These notions are taken from the general setting of \emph{foundational
   proof certificates}~\cite{chihani17jar}.
 %
 %%\todo{MM: Talk about randomized FPC? They mentioned afterwards -am}
-In our case here, an FPC is a collection of \lP clauses that
-provide the remaining details not supplied in Figure~\ref{fig:augmented} and~\ref{fig:kernel}:
-that is, the exact set of constructors for the  type of certificates as
-well as the specification of the expert predicates listed \emph{ibidem}.
+In our case here, an FPC is a collection of \lP clauses that provide
+the remaining details not supplied in Figures~\ref{fig:augmented}
+and~\ref{fig:kernel}: that is, the exact set of constructors for the
+type of certificates \lsti{cert} as well as the specification of the expert
+predicates listed \emph{ibidem}.
 %
 The top of Figure~\ref{fig:resources} displays two FPCs,
 both of which can be used to describe proofs where we bound
@@ -240,29 +243,18 @@ unfoldings in a proof.
 \label{fig:resources}
 \end{figure}
 
-\todo{We could move here from elab the paragraph ``It is also possible to pair two different proof certificates, defined
-by two different FPC definitions,'' and/or reduce redundancy}
-Further, if we view a particular FPC as a means of restricting proofs, it is
-possible to build an FPC that \emph{restricts} proofs satisfying two FPCs
-simultaneously.
-%
-% In particular, Figure~\ref{fig:pairing} defines an FPC based on the
-% (infix) constructor \lsti{<c>}, which \emph{pairs} two terms of type
-% \lsti{cert}.
-%
-The pairing experts for the certificate \lsti{Cert1 <c> Cert2} simply
-request that the corresponding experts also succeed for both
-\lsti{Cert1} and \lsti{Cert2} 
-%
-Thus, the query \lsti{check ((qheight 4) <c> (qsize 10)) A}
-will succeed if there is a proof of \lsti{A} that has a height less
-than or equal to 4 while also being of size less than or equal to 10.
-
-% Various  additional examples and experiments using the pairing of FPCs
-% can be found in~\cite{blanco17cade}. Using similar techniques, it is possible to define FPCs that target
-% specific types for special treatment: for example, when generating
-% integers, only (user-defined) small integers could be produced.
-
+As it has been described in \cite{blanco17cade}, it is also possible
+to pair together two different proof certificates, defined by two
+different FPC definitions, and do the proof checking in parallel.
+This means that we can build an FPC that \emph{restricts} proofs
+satisfying two FPCs simultaneously.  In particular, the infix
+constructor \lsti{<c>} in Figure~\ref{fig:resources} forms the pair of
+two proof certificates and the pairing experts for the certificate
+\lsti{Cert1 <c> Cert2} simply request that the corresponding experts
+also succeed for both \lsti{Cert1} and \lsti{Cert2} Thus, the query
+\lsti{check ((qheight 4) <c> (qsize 10)) A} will succeed if there is a
+proof of \lsti{A} that has a height less than or equal to 4 while also
+being of size less than or equal to 10.
 
 \subsection{A Prolog-like tactic}
 
