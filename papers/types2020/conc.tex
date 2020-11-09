@@ -28,8 +28,11 @@ say lists with at least two elements as \texttt{[1,2|Tail]}, without
 recurring to needed narrowing as in 
 LazySmallCheck~\cite{smallcheck}. On the more practical side, it would be worthwhile to investigate \emph{random} generation, following the ideas in~\cite{pltredexconstraintlogic,blanco19ppdp}.
 
-Another obvious limitation of our PBT tactic is that it does not 
- handle any computation (conversion) within an inductive relation. We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
+Another current limitation of our PBT tactic is that it does not
+handle conversion within an inductive relation. One way to address
+this is to have the \emph{init} rule use Coq's unification rather than
+\lP's, via Coq-Elpi's \lsti{coq.unif-eq} hook.
+%We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
 % Mention \emph{Harpoon}, Beluga's new tactic language?
 
  Finally it makes sense to tie together the two threads of this paper
