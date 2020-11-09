@@ -37,8 +37,8 @@ interp {{ex (lp:G)}} :- interp (G X).
 interp Atom :-
   atomic Atom,
   coq.safe-dest-app Atom (global (indt Prog)) _,
-  coq.env.indt Prog _ _ _ _ _ Clauses,
-  std.mem Clauses D, backchain D Atom.
+  coq.env.indt Prog _ _ _ _ _ KTypes,
+  std.mem KTypes D, backchain D Atom.
 backchain A A :- atomic A.
 backchain D A :- is_imp D A D', !, backchain D' A, interp Ty.
 backchain D A :- is_uni D D',  backchain (D' X) A.
@@ -51,10 +51,11 @@ backchain D A :- is_uni D D',  backchain (D' X) A.
 check _ (go (sort S) A):-
   coq.typecheck A (sort S) _. 
 check Cert (go A Tm) :-
-  coq.safe-dest-app Atom (global (indt Prog)) _,
-  coq.env.indt Prog _ _ _ _ Kn Clauses.
+  coq.safe-dest-app A (global (indt Prog)) _,
+  coq.env.indt Prog _ _ _ _ Kn KTypes,
   decideE Kn Cert Cert' K,
-  std.lookup {std.zip Kn Clauses} K Clause, 
+  std.zip Kn KTypes Clauses,
+  std.lookup Clauses K Clause, 
   check Cert' (bc D A L),
   Tm = (app [global (indc K)|L]).
 check Cert (bc (prod _ B D) A [Tm|L]) :-

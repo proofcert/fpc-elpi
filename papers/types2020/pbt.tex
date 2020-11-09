@@ -184,7 +184,7 @@ insertion a definition of ordered list:
 Inductive ordered : list nat -> Prop :=
 | o_n : ordered []
 | o_s : forall x : nat, ordered [x]
-| o_c : forall (x y : nat), forall xs,  ordered xs  -> x <= y -> ordered (x:: y :: xs).     
+| o_c : forall (x y : nat), forall xs,  ordered xs  -> x <= y -> ordered (x :: y :: xs).     
 \end{lstlisting}
 %
 A property we may wish to check before embarking in a formal proof is
@@ -201,14 +201,16 @@ at most $5$  from the library \lsti{Inductive} definitions of
 \lsti{nat} and \lsti{list}. We do not generate values for \lsti{rs},
 since by mode information we know that it will be computed.
 %
-Since we did slip in an error (where?), our tactic reports a
-counter-example, namely \verb|Proof Term: [0, [0; 1; 0]]|, and
-we therefore abort the proof.
+Since we did slip in an error, our tactic reports a counter-example,
+namely \verb|Proof Term: [0, [0; 1; 0]]|, which unpacks to \lsti{x = 0}
+and \lsti{xs = [0; 1; 0]}. As the latter is definitely not an
+ordered list, this points to a quite evident bug in the definition of
+\lsti{ordered}. We leave it to the reader and we abort the proof.
 
 
 In order to generate the PBT query, some
-pre-processing is needed. In particular, we turn the data
-eigenvariables into \lP logic variables when they appear inside a
+pre-processing is needed. In particular, we turn 
+variables inhabiting datatypes into \lP logic variables when they appear inside a
 specification, and  generate queries %to \lsti|check|
 for each of
 these logic variables in association with the type of the data

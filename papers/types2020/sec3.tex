@@ -302,14 +302,17 @@ ex_intro (fun R : list nat => insert 2 [0; 1] R) [0; 1; 2]
   (i_c 2 0 [1] [1; 2] (i_c 2 1 [] [2] (i_n 2)) : exists R : list nat, insert 2 [0; 1] R
 \end{lstlisting}
 
-The \lsti{dprolog} tactic can be seen as a programmable version of
-Coq's \lsti{auto}: it currently lacks the latter's capability of
-solving goals by \lsti{reflexivity} as well as the modularity of using
-\lsti{Hints} as introduction rules; on the bright side, it is not
-restricted to depth-first search, since it follows the dictate of the
-given FPC, for example adding iterative-deepening search. Furthermore, the FPC can
-provide a \emph{trace} that may be more customized than the one
-offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
+The \lsti{dprolog} tactic can be seen as a programmable (and possibly
+faster) version of Coq's \lsti{eauto}, although it currently lacks the
+latter's capability of solving goals by
+\lsti{reflexivity}; % as well as the modularity of using
+% \lsti{Hints} as introduction rules
+ \lsti{dprolog} is not restricted to depth-first search, since
+it follows the dictate of the given FPC, for example we could easily add
+iterative-deepening search. Furthermore, the tactic can still use
+\lsti{Hints} via Elpi's \lsti{Db} feature, and FPCs can provide a
+\emph{trace} that may be more customizable than the one offered by the
+\lsti{(e)auto}'s hard-wired \lsti{Debug} facility. 
 
 %%% Local Variables:
 %%% mode: latex
@@ -321,4 +324,4 @@ offered by the \lsti{auto}'s hard-wired \lsti{Debug} facility.
 % LocalWords:  Andreoli's basicstyle lprolog sigs Coq's sortedness Ev
 % LocalWords:  backchain gref indt indc coq dest unfoldings str fpc
 % LocalWords:  evar nat forall ys elpi Qed lc args ljf HOAS unfoldE
-% LocalWords:  FPCs Prolog evars untyped decideE
+% LocalWords:  FPCs Prolog evars untyped decideE eauto
