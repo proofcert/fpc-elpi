@@ -1,3 +1,4 @@
+
 \section{Proof theory and proof certificates}
 \label{sec:three}
 
@@ -18,7 +19,7 @@ universal quantifiers ($i\in\{1,\ldots,n\}$) and $A_0,\ldots,A_n$ are
 atomic formulas.  It is well known that the following set of sequent
 calculus proof rules are complete for both classical and
 intuitionistic logic when one is attempting to prove that a given
-atomic formula $A$ is provable from a give set $\Pscr$ of Horn
+atomic formula $A$ is provable from a  set $\Pscr$ of Horn
 clauses. 
 \[
   \infer[decide]{\Pscr\vdash A}
@@ -52,7 +53,7 @@ Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 \[
 \infer{\XXi_1\vdash k\ l : A}
       { \mathrm{Ind}[p] \ (\Gamma_I := \Gamma_C) \in E\quad 
-       (\mathit{head} \ A : T)\in \Gamma_I\quad  
+       (\mathit{head} \ A) : T \in \Gamma_I\quad  
        k : D \in \Gamma_C\quad 
        \bc{\XXi_2}{} l D A \quad\unfoldExpert{\XXi_1}{\XXi_2}} 
 \]
@@ -121,14 +122,15 @@ The proof system is parameterized by Coq's global environment $E$,
 which here we take as a set of inductive definitions; following Coq's
 reference manual, we denote such a definition with
 $\mathrm{Ind}[p] (\Gamma_I := \Gamma_C)$, where $\Gamma_I$ determines
-the names and types of the inductive type and $\Gamma_C$ the names
-and types of its constructors. A rule delegates to Coq's
-type checking the enforcement of the well-sortedness of such types. We
-do not have a \emph{local context} since we are only dealing with
-types that correspond to Horn clauses, and atomic types are
-inductively defined. In fact, we do not have a $\forall$ rule on the
-right, although the proof theory would gladly allow it. This means at
-the term level that we do not have variables in our grammar of
+the names and types of the (possibly mutually)inductive type and
+$\Gamma_C$ the names and types of its constructors; finally $p$
+denotes the number of parameters and playes no role. We delegate to
+Coq's type checking the enforcement of the well-sortedness of
+inductive types. The \emph{local context} is empty, since we are only
+dealing with types that correspond to Horn clauses, and atomic types
+are inductively defined. In fact, we do not have a $\forall$ rule on
+the right, although the proof theory would gladly allow it. This means
+at the term level that we do not have variables in our grammar of
 terms. Terms are always applied to a (possibly empty) list of
 arguments.  The \emph{decide} rule, % is the equivalent in our
 % a \emph{decide} rule in an explicitly focused system
@@ -136,8 +138,8 @@ arguments.  The \emph{decide} rule, % is the equivalent in our
 as in the previous proof system for Horn logic,  given an atom,
  selects a clause on which to back-chain on: we lookup the
 constructors of an \lsti{Inductive} definition from the global
-environment, one that matches the atom we wish to backchain on, and then
-call the latter judgment. The rules for backchaining are standard,
+environment, one that matches the head symbol of the atom we aim to backchain on, and then
+call the latter judgment that will find a correct instantiation, if any. The rules for backchaining are standard,
 corresponding to the \emph{init} and the (conflation of the) left introduction rules for
 $\forall$ and $\supset$.
 

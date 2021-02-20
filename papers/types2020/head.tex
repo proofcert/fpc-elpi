@@ -3,8 +3,10 @@
 \usepackage{xspace}
 \usepackage{listings}
 \usepackage{letltxmacro}
-\usepackage[dvipsnames]{xcolor}
-\usepackage{cmll}  % Improved linear logic symbols
+\usepackage[]{xcolor}
+\usepackage[xcolor]{changebar}
+
+%\usepackage{cmll}  % Improved linear logic symbols
 
 \definecolor{dkgreen}{RGB}{34,139,34}
 
@@ -129,5 +131,10 @@
 \newcommand{\depprod}[3]{(#1\colon#2)#3}
 \newcommand{\prodE}[4]{\hbox{\sl prod}_e(#1,#2,#3,#4)}
 
-
+\newcommand{\reva}[1]{%
+  \cbcolor{yellow}
+  \begin{changebar}
+    #1
+  \end{changebar}%
+  }%
 % LocalWords:  grnd nat lst ACheck tt

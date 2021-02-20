@@ -1,0 +1,10 @@
+changebar for new stuff?
+
+README:md for code
+
+
+- page 1: put some references for
+"that has not been given a satisfactory representation in type theory"
+and for
+"have difficulty treating linear negation and the multiplicative disjunction"
+[TODO DALE]

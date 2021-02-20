@@ -1,5 +1,33 @@
+
+Print nat.
+Print list.
+Check (list nat).
+Definition ln : Type:= list nat.
+Check ln.
+
 (*
 
+- The last detail worth mentioning is that
+this program makes no use of backtracking: the std.do! combinator signals that.
+
+[could use for interp]
+
+-- list numbering in lstlisting
+
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+
+  \newcommand{\includecode}[2][c]{\lstinputlisting[caption=#2, escapechar=, style=custom#1]{#2}<!---->}
+% ...
+
+\includecode{sched.c}
+\includecode[asm]{sched.s}
+% ...
+
+\lstlistoflistings
+
+[DONE]
 - make the arguments uniform in the call to the tactic ????
 
 ex: 
@@ -9,25 +37,24 @@ ex:
 something similar with pbt             
 
 -------------------------
+[DONE]
 can we preprocess the constructors of Inductive
 with copy, so that we put them n "clausal" forms, by removing
 the Coq quantifiers? Then we can remove backchaining altoghether.
 
 
 
-Elpi tactic takes the conjecture in it's orifinal form
+Elpi tactic takes the conjecture in it's original form
 and it is disproved, we abort. This makes sense, but
 in reality we are proving a theorem, namely its negation.
-
-If Elpi fails, the trace is kernel is not displayed
------------------------
+----------------------
 
 
 -----------------------------------
 - should we do dep products in check as well? [done]
 ---------------------
-- on generation: feeding the right term, the query does work
 
+[obsolete]
 - lack of indexing: to prove 1 <= 10 we do 21 backchaining
 steps, since we always try x <= x first. At worst
 if we have k constructors, when prolog would take n steps
@@ -46,7 +73,7 @@ indexing?
 
 
 ----------------------------
-kernel.mod:
+kernel.mod: [obsolete]
 
 the axiom and pi-left rule assume that Ctx contains at most one formula.
 This may hold in our application, but is generally false -- 
