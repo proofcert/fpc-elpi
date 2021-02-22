@@ -124,7 +124,7 @@ reference manual, we denote such a definition with
 $\mathrm{Ind}[p] (\Gamma_I := \Gamma_C)$, where $\Gamma_I$ determines
 the names and types of the (possibly mutually)inductive type and
 $\Gamma_C$ the names and types of its constructors; finally $p$
-denotes the number of parameters and playes no role. We delegate to
+denotes the number of parameters and plays no role. We delegate to
 Coq's type checking the enforcement of the well-sortedness of
 inductive types. The \emph{local context} is empty, since we are only
 dealing with types that correspond to Horn clauses, and atomic types
@@ -162,11 +162,11 @@ FPC-specific items.  We describe both of these separately.
 
 \subsubsection{Coq-specific code}
 Coq terms are accessed through the Coq-Elpi API, and their representation
-in \lP takes advantage of the native \lP constructs such as lists and binders.
-The following is part of the Coq-Elpi API signature of constants we use:
+in \lP takes advantage of native \lP constructs such as lists and binders.
+The following is part of the Coq-Elpi API signature of constants that we use:
 \begin{lstlisting}[language=lprolog]
-kind term   type.                               % reification of Coq terms
-kind gref   type.                               % reif. of references to global terms
+kind term   type.                                 % reification of Coq terms
+kind gref   type.                                 % reif. of references to global terms
 type global gref -> term.                            % coercion to term
 type indt   inductive -> gref.                       % reification of inductive types
 type indc   constructor -> gref.                     % reification of their constructors 
@@ -178,16 +178,16 @@ Note that \lsti{prod} encodes dependent products by taking a name for pretty
 printing, a term and a \lP abstraction from terms to terms: i.e., $(x :
 B) D$ is encoded by \verb|prod ``x'' B (x\ D x)|; when, in the
 implementation of the product-left rule, we apply \lsti{D} to the variable
-\lsti{Tm}, we get a new formula that can be used to continue backchaining. This
+\lsti{Tm}, we get a new term that can be used to continue backchaining. This
 application is obtained via meta-level substitution, in the style of HOAS. In
 this sense, our calculus uses \emph{implicit} substitutions, rather than
-explicit ones as in the  LJT and PTSC's tradition, the more since proof search in
-our application is cut-free.
+explicit ones as in the  LJT and PTSC's tradition; this is consistent with proof search in
+our application being cut-free, whereas explicit substitutions are linked to cuts.
 % Syntax: one can think as if something of type \lsti{term -> term} were a
 % \lsti{term} with a hole in it for another \lsti{term}.
 The decide rule makes use of the Coq-Elpi primitives
-\lsti{coq.safe-dest-app} in order to obtain the head term of a (possibly
-nested) application, and \lsti{coq.env.indt} in order to access the global
+\lsti{coq.safe-dest-app} to obtain the head term of a (possibly
+nested) application, and \lsti{coq.env.indt} to access the global
 environment of inductive definitions and query for information about them.
 The \lsti{decideE} predicate,  has, among others, the role of selecting which
 constructor to focus on from the inductive type. The kernel will successively
@@ -258,7 +258,7 @@ being of size less than or equal to 10.
 \subsection{A Prolog-like tactic}
 
 Thanks to the Coq-Elpi interface, in particular to the ``main''
-procedure \lsti{solve}, we can package the \lP's code for the checker
+procedure \lsti{solve}, we can package the \lP code for the checker
 as a tactic that can be called as any other tactic in a Coq script.
 
 \begin{lstlisting}[deletekeywords={goal}]
@@ -269,8 +269,7 @@ Elpi Accumulate lp:{{
     check (qheight N) (go G Term),
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
-...
-(* Other clauses for different fpc omitted *)
+... (* Other clauses for different fpc omitted *)
 }}.
 \end{lstlisting}
 
@@ -279,7 +278,7 @@ is straightforward: the goal consists of a quadruple of a (here
 inactive) context, an \emph{evar}, a type (goal) and a list of extra
 information, also inactive. In addition, we supply the certificate: it
 is simply an integer and a string to identify the ``resource'' FPC that we
-will use in this case. We just need to call \lsti{check} on the goal,
+will use in this case. We just need to call \lsti{check} on the goal  \lsti{G},
 together with the certificate, in order to obtain a reconstructed
 proof term. We do not call the reconstruction directly on the evar
 because Coq-Elpi ensures that evars manipulated by \lP are well-typed
@@ -310,10 +309,10 @@ latter's capability of solving goals by
 \lsti{reflexivity}; % as well as the modularity of using
 % \lsti{Hints} as introduction rules
  \lsti{dprolog} is not restricted to depth-first search, since
-it follows the dictate of the given FPC, for example we could easily add
+it follows the dictate of the given FPC; for example we could easily add
 iterative-deepening search. Furthermore, the tactic can still use
 \lsti{Hints} via Elpi's \lsti{Db} feature, and FPCs can provide a
-\emph{trace} that may be more customizable than the one offered by the
+\emph{trace} that may be more customizable than the one offered by 
 \lsti{(e)auto}'s hard-wired \lsti{Debug} facility. 
 
 %%% Local Variables:

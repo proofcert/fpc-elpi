@@ -1,10 +1,87 @@
+%% files for things to take care for the reviewers (R) and additional comments
+%% in second reading
+
 changebar for new stuff?
 
-README:md for code
+README.md for code updated (the existing one refers to the ijcar subsmission)
 
-
+R1
 - page 1: put some references for
 "that has not been given a satisfactory representation in type theory"
 and for
 "have difficulty treating linear negation and the multiplicative disjunction"
 [TODO DALE]
+
+
+ R1:
+  An introduction to the topic, or at
+least a section explaining the application in the paper, would be
+necessary to open the paper to a larger audience. However, that
+requires space. Personally, I would suggest the authors to sacrifice
+part of Section 2 for this.
+
+[TODO DALE]
+AM:
+pag 5: \caption{Specification of the checking of a proof certificate and the
+  synthesis of a dependently typed $\lambda$-term.}
+
+It's not a lambda calculus in so far it does not have variable sor abstraction. In general,  the caption does not read well
+
+\caption{Implementation of a  dependent kernel for Coq terms.}
+Again, inprecise: what is dependent? what coq terms?
+
+pag 7: prod_e takes 4 argument, the relative code 3 (no subst term, of course because of unification). Comment?
+
+page 8: in the def of insert, i_n has a is_nat assumption. Really needed here?
+
+%%%%%%%%%% Implementation %%%%
+
+- can we do something about eauto/solve and Hints?
+for example, take insert and remove one construcorr. Then re-add it as an axiom/parameter.
+Give it as hint. Does it get picked by dprolog?
+
+can we have a variant of dprolog such as eato with <set of lemmas>
+
+
+%%%% below, just some text about hints taken from various souces
+https://coq.inria.fr/refman/proofs/automatic-tactics/auto.html?highlight=hint#the-hints-databases-for-auto-and-eauto
+
+(this is nuts, the level of details and flexibility)
+
+[info_eauto]
+
+ [Hint Resolve T : core.]
+
+          Add theorem or constructor [T] to the global DB
+
+      - [Hint Constructors c : core.]
+
+          Add _all_ constructors of [c] to the global DB
+
+      - [Hint Unfold d : core.]
+
+          Automatically expand defined symbol [d] during [auto]
+
+This workaround
+    relies on a powerful mechanism called "external hint." This
+    mechanism allows to manually describe the condition under which
+    a particular lemma should be tried out during proof search.
+
+    For the case of transitivity of subtyping, we are going to tell
+    Coq to try and apply the transitivity lemma on a goal of the form
+    [subtype S U] only when the proof context already contains an
+    assumption either of the form [subtype S T] or of the form
+    [subtype T U]. In other words, we only apply the transitivity
+    lemma when there is some evidence that this application might
+    help.  To set up this "external hint," one has to write the
+    following. *)
+
+Hint Extern 1 (subtype ?S ?U) =>
+  match goal with
+  | H: subtype S ?T |- _ => apply (@subtype_trans S T U)
+  | H: subtype ?T U |- _ => apply (@subtype_trans S T U)
+  end : core.
+
+Hint Transparent state total_map : core.
+
+Remove Hints baz1 baz2 : typeclass_instances.

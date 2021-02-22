@@ -1,15 +1,5 @@
 module dep-kernel-v2.
 
-%% DM Revising the interpreter's appearance
-
-% DM I don't see the need for this query.  If get_head succeeds, the
-% work will be redone by backchain.  If get_head fails, backchain
-% would succeed almost as quickly.
-
-% get_head (prod _ _ T) Head :- get_head (T X_) Head.
-% get_head (app L) (app L).
-
-%% Support code for the interpreter put here.
 
 non_atomic {{True}}.
 non_atomic (sort _).
@@ -55,7 +45,7 @@ check Cert (go A Tm) :-
   coq.env.indt Prog _ _ _ _ Kn KTypes,
   decideE Kn Cert Cert' K,
   std.zip Kn KTypes Clauses,
-  std.lookup Clauses K Clause, 
+  std.lookup Clauses K D, 
   check Cert' (bc D A L),
   Tm = (app [global (indc K)|L]).
 check Cert (bc (prod _ B D) A [Tm|L]) :-
@@ -65,5 +55,3 @@ check Cert (bc (prod _ B D) A [Tm|L]) :-
 check Cert (bc A A []) :-
   initialE Cert.
 /* end */
-% check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
-% 	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).

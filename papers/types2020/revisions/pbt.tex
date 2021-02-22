@@ -31,7 +31,7 @@ perspective: being a clone of Haskell's QuickCheck, it emphasizes
 testing executable (read \emph{decidable}) specifications with random
 generators. While current research~\cite{LampropoulosPP18} aims to
 increase automation, it is fair to say that testing with
-\textsf{QuickChick}, in particular of relational specifications, is
+\textsf{QuickChick}, in particular relational specifications, is
 still very labor intensive. We do not intend to compete with
 \textsf{QuickChick} at this stage, but we shall see that we can test immediately
 \lsti{Inductive} definitions that corresponds to pure Horn
@@ -199,13 +199,13 @@ In this query the tactic tests the hypotheses \lsti{Ho} and \lsti{Hi}
 against data \lsti{x,xs} generated exhaustively up to height
 at most $5$  from the library \lsti{Inductive} definitions of
 \lsti{nat} and \lsti{list}. We do not generate values for \lsti{rs},
-since by mode information we know that it will be computed.
+since by (informal) mode information we know that it will be computed.
 %
 Since we did slip in an error, our tactic reports a counter-example,
 namely \verb|Proof Term: [0, [0; 1; 0]]|, which unpacks to \lsti{x = 0}
 and \lsti{xs = [0; 1; 0]}. As the latter is definitely not an
 ordered list, this points to a quite evident bug in the definition of
-\lsti{ordered}. We leave it to the reader and we abort the proof.
+\lsti{ordered}. We leave the fix to the reader. % and we abort the proof.
 
 
 In order to generate the PBT query, some
@@ -251,7 +251,7 @@ Conjecture subexp:  forall e e' t, step e e' -> has_type e' t -> has_type e t.
 \end{lstlisting}
 
 
-Another way to asses the fault detection capability of a PBT setup is via \emph{mutation analysis}~\cite{CavadaCM20}, whereby localized bugs are voluntarily inserted, with the view that they should caught (``killed'') by a ``good enough'' testing suite. Following on  an exercise in the aforementioned chapter of SF, we modify the typing relation by adding the following (nonsensical)  clause:
+Another way to asses the fault detection capability of a PBT setup is via \emph{mutation analysis}~\cite{CavadaCM20}, whereby localized bugs are purposely inserted, with the view that they should caught (``killed'') by a ``good enough'' testing suite. Following on  an exercise in the aforementioned chapter of SF, we modify the typing relation by adding the following (nonsensical)  clause:
 
 \begin{lstlisting}
 Module M1.
@@ -260,15 +260,15 @@ $\dots$
   | T_SuccBool : forall t, has_type t TBool -> has_type (tsucc t) TBool.
 end M1.
 \end{lstlisting}
-Some of the required properties for our SUT now fails: not
+Some of the desired properties for our SUT now fails: not
 only type uniqueness, but also progress with counterexample \lsti{e = tsucc ttrue}:
 \begin{lstlisting}
-Definition progress (e :tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
+Definition progress (e : tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> Prop):= 
      forall t, Has_type e t -> notstuck e Step.
 Conjecture progress_m1:  forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
- elpi dep_pbt height 2 (Ht) (e) .
+ elpi dep_pbt height 2 (Ht) (e).
  Abort.
 \end{lstlisting}
 
