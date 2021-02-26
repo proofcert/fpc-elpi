@@ -150,7 +150,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  unfold progress.
  intros e t Ht.    
  elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *)
- elpi dep_pbt 2 (Ht) (e) .   
+ elpi dep_pbt 2 (Ht) (e) . (* does not work gen (t)*)   
  Abort.
  
  (* variation 3: failure of step det *)
@@ -203,29 +203,6 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  elpi dep_pbt 3 (H /\ H0) (x). 
  Abort.
  
- (* now obsolete, given dep_pbt*)
- Inductive is_tm : tm  -> Prop :=
-   | I_Tru :        is_tm ttrue 
-   | I_Fls :       is_tm tfalse 
-    | I_Test : forall t1 t2 t3 ,
-        is_tm t1 ->
-        is_tm t2  ->
-        is_tm t3  ->
-        is_tm (tif  t1 t2 t3)  
-   | I_Zro :       is_tm tzero 
-   | I_Scc : forall t1,
-         is_tm t1  ->        is_tm (tsucc t1) 
-   | I_Prd : forall t1,
-        is_tm t1  ->       is_tm (tpred t1 ) 
-   | I_Iszro : forall t1,
-        is_tm t1  ->       is_tm (tiszero t1) .
- 
- (* Elpi Bound Steps 100000.
- *)
- Goal forall (e1 e2 e3  : tm), is_tm e1 ->  M3.step e1 e2 -> M3.step e1 e3 -> e2 = e3.
-   intros.
-   elpi pbt (H) (H0 /\ H1) 4 (e2).
- Abort.
  
  
  (*variation 6*)
@@ -265,20 +242,20 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  unfold preservation.
  intros e e' t Hs Ht.    
  elpi pbt (Ht) (Hs)  3 (e).
- elpi dep_pbt 3 (Ht /\ Hs) (e). 
+ elpi dep_pbt 2 (Ht /\ Hs) (e). 
  Abort.
  
  (* Next  fails with same cex
  E = tpred(tzero)
  T1 = tnat
  T2 = tbool
- Recall: set a low bound*)
+ Recall: set a low bound. Strangely, it's not monotonic*)
  
  Elpi Bound Steps 1000000.
  Goal deterministic M6.has_type.
  unfold deterministic.
  intros.
- Fail elpi dep_pbt 3 (H  /\ H0) (x). 
+ elpi dep_pbt 2 (H  /\ H0) (x). 
  Abort.
  
  (* a typo-like mutation*)
@@ -303,18 +280,41 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
         has_type (tpred t1 ) TNat
    | T_Iszro : forall t1,
         has_type t1 TBool ->
-        has_type (tiszero t1) TNat.
+        has_type (tiszero t1) TNat. (* bug *)
  
  End Mty.
  
  
  (*???*)
- (* Elpi Bound Steps 10000*)
+  Elpi Bound Steps 1000000.
  Goal forall e, progress e Mty.has_type step.
  unfold progress.
  intros e t Ht.
  Fail elpi dep_pbt 5 (Ht) (e).    
- Fail elpi pbt (Ht) (True) 5 (e). (* it finds cex:  tiszero(ttrue)
+ (*Fail elpi pbt (Ht) (True) 5 (e).  it finds cex:  tiszero(ttrue)
  T = tnat*)
  Abort.
+ (*
+ (* now obsolete, given dep_pbt*)
+ Inductive is_tm : tm  -> Prop :=
+   | I_Tru :        is_tm ttrue 
+   | I_Fls :       is_tm tfalse 
+    | I_Test : forall t1 t2 t3 ,
+        is_tm t1 ->
+        is_tm t2  ->
+        is_tm t3  ->
+        is_tm (tif  t1 t2 t3)  
+   | I_Zro :       is_tm tzero 
+   | I_Scc : forall t1,
+         is_tm t1  ->        is_tm (tsucc t1) 
+   | I_Prd : forall t1,
+        is_tm t1  ->       is_tm (tpred t1 ) 
+   | I_Iszro : forall t1,
+        is_tm t1  ->       is_tm (tiszero t1) .
  
+ Goal forall (e1 e2 e3  : tm), is_tm e1 ->  M3.step e1 e2 -> M3.step e1 e3 -> e2 = e3.
+   intros.
+   elpi pbt (H) (H0 /\ H1) 4 (e2).
+ Abort.
+ 
+ *)
