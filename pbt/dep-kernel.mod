@@ -50,7 +50,7 @@ interp (app [global (indt Prog) | _Args] as Atom) :-
 
 backchain (prod _ Ty (x\P)) G :- !, backchain P G, interp Ty.
 backchain (prod _ _Ty (x\P x)) G :- !, backchain (P X_) G.
-backchain G G.
+backchain G G' :- coq.unify-eq G G' ok.
 
 %%%%%%%%%%%
 % Checker %
@@ -123,8 +123,9 @@ check Cert (go (app [(fun A B C)| Args]) Term) :-
 % check Cert (bc (prod _ Ty1 Ty2) Goal (app [Tm|ArgsList])) :-
 
 
-check Cert (bc A A []) :-
-	tt_expert Cert .
+check Cert (bc A A' []) :-
+	tt_expert Cert,
+  coq.unify-eq A A' ok.
 	
 check Cert (bc (prod _ Ty1 Ty2) Goal OutTerm) :-
    prod_expert Cert Cert1 Cert2,
