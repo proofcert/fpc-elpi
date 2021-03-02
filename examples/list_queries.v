@@ -18,7 +18,9 @@ ordered_bad xs -> insert 0 xs rs ->
 ordered_bad rs.
 
 intros xs rs Gen H1 H2.
-elpi pbt (Gen /\ H1) (H2) 5 (rs). 
+elpi pbt (Gen /\ H1) (H2) 5 (rs). (* why rs?*) 
+
+elpi pbt (Gen /\ H1) (H2) 5 (xs /\ rs).
 Abort.
 
 
@@ -34,7 +36,8 @@ Abort.
 (* generating both nat and natlist*)
 
 Goal forall x xs rs,
-is_nat x -> is_natlist xs -> ordered_bad xs -> insert x xs rs -> ordered_bad rs.
+is_nat x -> is_natlist xs -> 
+  ordered_bad xs -> insert x xs rs -> ordered_bad rs.
 
 intros x xs rs GenN GenL  H1 H2.
 elpi pbt (GenN /\ GenL ) (H1 /\ H2) 5 (rs). 
@@ -50,7 +53,7 @@ Abort.
 (* This property is false *)
 Goal forall xs rs, is_natlist xs -> rev xs rs -> xs = rs.
 intros xs rs Gen H.
-elpi pbt (Gen) (H) 5 (xs).
+elpi pbt (Gen) (H) 4 (rs).
 Abort.
 
 (* true *)
@@ -86,6 +89,7 @@ intros xs rs H.
 elpi dep_pbt 3 (H) (xs).
 Abort.
 
+(* same query, different type*)
 Goal forall (xs rs : list bool), rev xs rs -> xs = rs.
 intros xs rs H.
 elpi dep_pbt 3 (H) (xs).
@@ -95,7 +99,7 @@ Goal forall x xs rs,
 ordered_bad xs -> insert x xs rs -> ordered_bad rs.
 
 intros x xs rs   H1 H2.
-elpi dep_pbt 5 (H1 /\ H2 ) (x) (xs). 
+elpi dep_pbt 5 (H1 /\ H2 ) (x) (xs).
 Abort.
 
 

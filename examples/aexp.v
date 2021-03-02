@@ -284,8 +284,15 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  End Mty.
  
- 
- (*???*)
+ Goal exists e t,  Mty.has_type e t /\  (notstuck e step -> False).
+ exists (tiszero ttrue) .
+ exists TNat.
+ split.
+ - repeat constructor.
+ - intros. inversion_clear H;subst; inversion_clear H0. 
+inversion H.
+Qed.
+ (* why does it not find it ??*)
   Elpi Bound Steps 1000000.
  Goal forall e, progress e Mty.has_type step.
  unfold progress.

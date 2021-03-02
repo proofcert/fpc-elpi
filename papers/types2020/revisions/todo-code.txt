@@ -4,6 +4,7 @@
 0. in the paper we call dep_pbt with a fpc as input, but now it's just qheight.
 On the other hand prolog.v is parametric with different clauses for solve (default qheight).
 Making dep_pbt parametric needs some factoring of the preprocessing
+[DONE: gen_dep_pbt.v Could use more factoring. Does not work yet]
 
 1. can we add conversion to the dependent kernel using unify-eq? Just
 in the init rule?  Or in decide? Should we move to a residuation
@@ -50,3 +51,7 @@ Counterexample:
  tif (tpred tzero) ttrue ttrue ===> tif tzero ttrue ttrue)
 
 ... and we are generating the same stuff, exp.
+
+
+- Property  Goal forall e, progress e Mty.has_type step is clarly false (cex (tiszero ttrue))
+but it runs out of steps???

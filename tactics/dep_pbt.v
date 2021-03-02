@@ -3,6 +3,7 @@ From elpi Require Import elpi.
 Elpi Tactic dep_pbt.
 Elpi Accumulate File "pbt/dep-kernel.mod".
 Elpi Accumulate File "pbt/fpc-qbound.mod".
+Elpi Accumulate File "pbt/fpc-pair.mod".
 Elpi Accumulate lp:{{
   %% build_clauses: given a Coq context, creates copy clauses associating
   %% the eigenvariables to fresh logic variables
