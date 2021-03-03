@@ -192,7 +192,7 @@ whether insertion preserves ordered-ness:
 \begin{lstlisting}
 Conjecture ins_ord:  forall (x : nat) xs rs, ordered xs -> insert x xs rs -> ordered rs.
 intros x xs rs Ho Hi.
-elpi dep_pbt height 5 (Ho /\ Hi ) (x) (xs).
+elpi dep_pbt (height 5) (Ho /\ Hi) (x) (xs).
 Abort.
 \end{lstlisting}
 In this query the tactic tests the hypotheses \lsti{Ho} and \lsti{Hi}
@@ -246,7 +246,7 @@ While it is obvious that \emph{subject expansion} fails for this calculus, it is
 \begin{lstlisting}
 Conjecture subexp:  forall e e' t, step e e' -> has_type e' t -> has_type e t. 
  intros e e' t HS HT.
- elpi dep_pbt height 2 (HS /\ HT) (e).
+ elpi dep_pbt (height 2) (HS /\ HT) (e).
  Abort.
 \end{lstlisting}
 
@@ -268,7 +268,7 @@ Definition progress (e : tm) (Has_type : tm -> typ -> Prop) (Step : tm -> tm -> 
 Conjecture progress_m1:  forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
- elpi dep_pbt height 2 (Ht) (e).
+ elpi dep_pbt (height 2) (Ht) (e).
  Abort.
 \end{lstlisting}
 

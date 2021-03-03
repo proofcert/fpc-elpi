@@ -1,4 +1,10 @@
+bugs?
 
+in iaexp.elf, progress is found to be false with cex
+
+Run (progress (tif TBool ttrue ttrue ttrue) step)
+
+which is impossible (it's provable).Same for last mutation: progress is trulyu false, but cex is spurious.
 -- code ---
 
 0. in the paper we call dep_pbt with a fpc as input, but now it's just qheight.
@@ -45,7 +51,7 @@ by stating them, perhaps, as trivial lemma]
 Some usability desiderata
 
 - What we print as counterexample is actually the instantiation of the
-all the premises of query and hence hard to read: ex:
+all the premises of the query and hence hard to read: ex:
 
 Goal forall x x' y: list nat,
 append [0] x x' -> rev x y -> rev y x'.
