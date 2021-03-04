@@ -50,7 +50,7 @@ You seem to never instantiate them in the rule. Moverover, the premise
 that premise to compute a substitution \sigma for p, to be applied to D
 in both premises (e.g. D\sigma).
 
-[AM: I agrre that head A is imprecise: we mean the head symbol of A.]
+[AM: I agree that head A is imprecise: we mean the head symbol of A.]
 
 The alternative is that the parameters are explicitly quantified both in
 \Gamma_i and \Gamma_C (the way the inductive type packet is represented
@@ -86,9 +86,9 @@ The two tactics developed by the authors are interesting, both as examples of th
 As some minor remarks, let me add the following comments:
 
  1. The proof term shown as the result of calling the tactic to prove i1 is missing some terms, namely, the inequalities proofs. Are these also automatically obtained by the tactic?
-
+[DONE]
  2. Several figures have glitches.
-
+[would be nice to know which]
  3. The font in the figure of 3.2.1 is different from the one used in the previous figures.
-Reviewer's confidence:	
+[DONE]
 
