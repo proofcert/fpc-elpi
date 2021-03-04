@@ -290,7 +290,7 @@ example shows how we can use the above tactic to do FPC-driven logic
 programming in Coq and return a Coq proof-term:
 \begin{lstlisting}
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
-| i_n : is_nat x -> insert x [] [x]
+| i_n : insert x [] [x]
 | i_s : forall y: nat, forall ys, x <= y -> insert x (y :: ys) (x :: y :: ys)
 | i_c : forall y: nat, forall ys rs, y <= x -> insert x ys rs -> insert x (y :: ys) (x :: rs).
 Lemma i1:  exists R, insert 2 [0;1] R.
@@ -303,15 +303,15 @@ ex_intro (fun R : list nat => insert 2 [0; 1] R) [0; 1; 2]
 \end{lstlisting}
 
 The \lsti{dprolog} tactic can be seen as a programmable (and possibly
-faster) version of Coq's \lsti{eauto}, although it currently lacks the
-latter's capability of solving goals by
-\lsti{reflexivity}; % as well as the modularity of using
+faster) version of Coq's \lsti{eauto}; % , although it currently lacks the
+% latter's capability of solving goals by
+% \lsti{reflexivity}; % as well as the modularity of using
 % \lsti{Hints} as introduction rules
  \lsti{dprolog} is not restricted to depth-first search, since
-it follows the dictate of the given FPC, for example we could easily add
+it follows the dictates of the given FPC --- for example we could easily add
 iterative-deepening search. Furthermore, the tactic can still use
 \lsti{Hints} via Elpi's \lsti{Db} feature, and FPCs can provide a
-\emph{trace} that may be more customizable than the one offered by the
+\emph{trace} that may be more customizable than the one offered by 
 \lsti{(e)auto}'s hard-wired \lsti{Debug} facility. 
 
 %%% Local Variables:

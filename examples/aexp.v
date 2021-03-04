@@ -145,7 +145,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Elpi Bound Steps 1000000.
 
  (* Adapted from Types.v in volume  of SF *)
-  (* OK *)
+  (* OK : (M1.has_type (tsucc ttrue) TBool)*)
  Goal forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    

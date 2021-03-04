@@ -5,7 +5,7 @@ ttE (qheight _).
 prodE (qheight H) (qheight H) (qheight H).
 decideE Kn (qheight H) (qheight H') K :-
       std.mem Kn K, H  > 0, H' is H  - 1.
-eqE (qsize In In).
+ttE (qsize In In).
 prodE (qsize In Out) (qsize In Mid) (qsize Mid Out).
 decideE Kn (qsize In Out) (qsize In' Out) K :-
    std.mem Kn K, In > 0, In' is In - 1.

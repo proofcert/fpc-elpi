@@ -50,8 +50,32 @@ it should be made explicit in the paper.
 
 -------------
 
+NEW
+
 -- If unify-eq works, reformulate inint and eq in the calculus to
-apply modulo conversion (in which context???). We said the local context is empty and
+apply modulo conversion (in which context???). In ref manual (page
+16), reduction is defined as
+
+E[Gamma] |- t |> u
+
+Conversion as E[Γ] ⊢ t1 =_{βδιζη} t2 . defined as equi-reduction modulo eta-expansion
+(and irrelevant (?) subterms)
+
+
+Now we  say the local context is empty and
 the global one is just Inductive, but coq.unify-eq must use these context
 
--- if we get the tactics to work with Hints, we need a new decide rule (or change the one we have).
+From manual:
+A ** local context** is an ordered list of declarations of variables. The
+declaration of a variable x is either an assumption, written x ∶ T
+(where T is a type) or a definition, written x ∶= t ∶ T .
+
+A **global environment** is an ordered list of declarations. Global
+declarations are either assumptions, definitions or declarations of
+inductive objects. assumptions are written as (c ∶ T ), indicating
+that c is of the type T . Definitions are written as c ∶= t ∶ T 
+
+-- add certificate so sort rule!
+
+-- if we get the tactics to work with Hints, we need a new decide rule
+   (or change the one we have).
