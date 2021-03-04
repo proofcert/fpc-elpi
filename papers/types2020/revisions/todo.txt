@@ -48,54 +48,10 @@ it should be made explicit in the paper.
 
 [AM: I don't think that's it. If i have an inductive predicate p and then prove a lemma about p, this does not violate the CWA, since, well, the lemma is true in the same least model of p]
 
-%%%%%%%%%% Implementation %%%%
+-------------
 
-- can we do something about eauto/solve and Hints?
-for example, take insert and remove one construcorr. Then re-add it as an axiom/parameter.
-Give it as hint. Does it get picked by dprolog?
+-- If unify-eq works, reformulate inint and eq in the calculus to
+apply modulo conversion (in which context???). We said the local context is empty and
+the global one is just Inductive, but coq.unify-eq must use these context
 
-can we have a variant of dprolog such as eato with <set of lemmas>
-
-
-%%%% below, just some text about hints taken from various souces
-https://coq.inria.fr/refman/proofs/automatic-tactics/auto.html?highlight=hint#the-hints-databases-for-auto-and-eauto
-
-(this is nuts, the level of details and flexibility)
-
-[info_eauto]
-
- [Hint Resolve T : core.]
-
-          Add theorem or constructor [T] to the global DB
-
-      - [Hint Constructors c : core.]
-
-          Add _all_ constructors of [c] to the global DB
-
-      - [Hint Unfold d : core.]
-
-          Automatically expand defined symbol [d] during [auto]
-
-This workaround
-    relies on a powerful mechanism called "external hint." This
-    mechanism allows to manually describe the condition under which
-    a particular lemma should be tried out during proof search.
-
-    For the case of transitivity of subtyping, we are going to tell
-    Coq to try and apply the transitivity lemma on a goal of the form
-    [subtype S U] only when the proof context already contains an
-    assumption either of the form [subtype S T] or of the form
-    [subtype T U]. In other words, we only apply the transitivity
-    lemma when there is some evidence that this application might
-    help.  To set up this "external hint," one has to write the
-    following. *)
-
-Hint Extern 1 (subtype ?S ?U) =>
-  match goal with
-  | H: subtype S ?T |- _ => apply (@subtype_trans S T U)
-  | H: subtype ?T U |- _ => apply (@subtype_trans S T U)
-  end : core.
-
-Hint Transparent state total_map : core.
-
-Remove Hints baz1 baz2 : typeclass_instances.
+-- if we get the tactics to work with Hints, we need a new decide rule (or change the one we have).

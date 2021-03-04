@@ -1,27 +1,47 @@
+bugs?
 
+in iaexp.elf, progress is found to be false with cex
+
+Run (progress (tif TBool ttrue ttrue ttrue) step)
+
+which is impossible (it's provable).Same for last mutation: progress is trulyu false, but cex is spurious.
 -- code ---
 
 0. in the paper we call dep_pbt with a fpc as input, but now it's just qheight.
 On the other hand prolog.v is parametric with different clauses for solve (default qheight).
 Making dep_pbt parametric needs some factoring of the preprocessing
-[DONE: gen_dep_pbt.v Could use more factoring. Does not work yet]
+[DONE: gen_dep_pbt.v Could use more factoring]
 
-1. can we add conversion to the dependent kernel using unify-eq? Just
-in the init rule?  Or in decide? Should we move to a residuation
+1. Conversion would help to allow computations inside inductive
+definitions, so that we do not have to turn existing Coq code into
+purely relation Prolog-like programs (eg. additions would be computed
+by a primitive recursive function, not a relation). This way, the
+dprolog/pbt tactic would mimic what (e)auto does, which
+does a limited form of conversion by using simple apply
+[note: auto is 534 line of inscrutable ML code with lots of heuristics
+on how to use the default hint database]. auto incorporates conversion in goals
+by adding eq_refl to the core database.
+
+can we add conversion to the dependent kernel using unify-eq? Just
+in the init rule?  Or in decide?
+Should we move to a residuation
 semantics to make equations explicit (not now)? And how does it
 interact with Elpi's constraints? There might be something relevant in
 the Dyckhoff-Legrange paper
 
-Conversion would help to allow computations inside inductive
-definitions, so that we do not have to turn existing Coq code into
-purely relation Prolog-like programs (eg. additions would be computed
-by a primitive recursive function, not a relation). This way, the dprolog tactic would mimic
-what (e)auto does, e.g. calling reflexivity [note: auto is 534 line of inscrutable ML code]
+[DONE: it's only in init and let us do prolog-computation modulo conversion, example:
+  ordered ([1] ++ [2]), where ++ is primitive recursive def of append. However, we
+  need to do this also for goals in interp/check [EASY]]
+
 
 2. auto and hints. Trying to do everything that hints do in Coq is hopeless, but
 at the moment we decide only on elements of Inductive and not for example on lemmas
 (that would be <auto using <lemma>>). Coq-elpi provides a coq.elpi.accumulate
 that helps modulate accumulation of lprolog files. Enrico says it can be used for hints.
+
+[IN PROGRESS: we can do this for Hint Resolve. need to check more, possibly to use
+cerficates to give priorities to hints. need to think if we can do also Rewrite and Unfold
+by stating them, perhaps, as trivial lemma]
 
 3. Repo reorganization to link to:
 
@@ -31,7 +51,7 @@ that helps modulate accumulation of lprolog files. Enrico says it can be used fo
 Some usability desiderata
 
 - What we print as counterexample is actually the instantiation of the
-all the premises of query and hence hard to read: ex:
+all the premises of the query and hence hard to read: ex:
 
 Goal forall x x' y: list nat,
 append [0] x x' -> rev x y -> rev y x'.

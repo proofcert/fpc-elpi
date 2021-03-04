@@ -4,7 +4,7 @@
  Require Import Arith List. Import ListNotations.
 
 Require Import Coq.Program.Equality.
- Require Import pbt.
+ Require Import dep_pbt.
  
 
 Inductive typ : Type :=
@@ -26,6 +26,7 @@ Inductive typ : Type :=
    | ibv_t : value ttrue
    | ibv_f : value tfalse.
 
+   Print value.
  
 
  Inductive step : forall {T : typ}, tm T -> tm T -> Prop :=
@@ -57,12 +58,22 @@ Inductive typ : Type :=
   | ps e' : Step e e' -> progress e Step.
  
  
- (* progress holds*)
+  Goal progress (tif TBool ttrue ttrue ttrue) step.
+  econstructor 2.
+  econstructor.
+  Qed.
+ (* progress falsified???
+ 
+ Run (progress (tif TBool ttrue ttrue ttrue) step)
+Counterexample: True
+
+This is wrong*)
  Goal forall T (e : tm T), progress e  step.
  intros.    
- Fail elpi pbt (e) (True) 5 (e).
+ elpi dep_pbt 2 (True) (e).
  Abort.
- 
+
+
  
  Module M3.
  (* variation 3: failure of step det *)
@@ -106,55 +117,32 @@ Inductive typ : Type :=
  
 
  
- (* (tif tfalse ?e1 ?e0 = tif ttrue ?e0 ?e6) 
- Finds the cex, albeit not fully instantiated: should have a is_exp generetor
- *)
+ (* e = (tif TBool tfalse (tif TBool ttrue ttrue ttrue) ttrue)  *)
  Goal  forall (T : typ) (x y1 y2 : tm T ), M3.step x y1 -> M3.step  x y2 -> y1 = y2.
  
  intros.
- elpi pbt (H ) (H0)  5 (x). 
- Abort.
- 
- (* we should do this with dep kernel*)
- Inductive is_tm : forall {T}, tm T -> Prop :=
-   | I_Tru :        is_tm ttrue 
-   | I_Fls :       is_tm tfalse 
-    | I_Test : forall T t1 t2 t3 ,
-        is_tm t1 ->
-        is_tm t2  ->
-        is_tm t3  ->
-        is_tm (tif  T t1 t2 t3)  
-   | I_Zro :       is_tm tzero 
-   | I_Scc : forall t1,
-         is_tm t1  ->        is_tm (tsucc t1) 
-   | I_Prd : forall t1,
-        is_tm t1  ->       is_tm (tpred t1 ) 
-   | I_Iszro : forall t1,
-        is_tm t1  ->       is_tm (tiszero t1) .
- 
- 
- Goal forall T (e1 e2 e3  : tm T), is_tm e1 ->  M3.step e1 e2 -> M3.step e1 e3 -> e2 = e3.
-   intros.
-   elpi pbt (H) (H0 /\ H1) 15 (e2).
+ elpi dep_pbt 3 (H /\ H0)  (x). 
  Abort.
  
  
- 
- (* a typo-like mutation -- modules don't work
+ (* M1
  when changing tm, so repeat the whole thing:
 
-actually, preservation fails, so step cannot be formulated*)
+*)
  
- (*
+ 
  Inductive tmb : typ -> Type :=
+ | tiszerob : tmb TNat-> tmb TBool
+ 
  | ttrueb : tmb TBool
  | tfalseb : tmb TBool
  | tifb T: tmb  TBool-> tmb T -> tmb T -> tmb T
  | tzerob : tmb TNat
  | tsuccb : tmb TNat -> tmb TNat
  | tpredb : tmb TNat-> tmb TNat
- | tiszerob : tmb TBool-> tmb TNat. (*bug*)
+ | tsuccbug : tmb TBool-> tmb TBool. (*bug*)
 
+ 
  Inductive valueb : forall {T:typ}, tmb T -> Prop :=
    | iNzb : valueb tzerob
    | invsb : forall t, valueb t -> valueb (tsuccb t)
@@ -182,4 +170,16 @@ actually, preservation fails, so step cannot be formulated*)
    | ST_Iszerob : forall t1 t1',
        stepb t1  t1' -> stepb (tiszerob t1) (tiszerob t1').
    
+       Inductive progressb {T : typ }(e : tmb T) (
+           Step : tmb T -> tmb T -> Prop) : Prop :=
+       | pbb : valueb e  -> progressb e Step
+       | psb e' : Step e e' -> progressb e Step.
+       
+       
+       (* NO! false negative un 
+   (tiszerob tzerob)
 *)
+       Goal forall T (e : tmb T), progressb e  stepb.
+       intros.    
+       elpi dep_pbt 2 (True) (e).
+       Abort.
