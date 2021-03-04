@@ -38,7 +38,7 @@ interp {{lp:G1 \/ lp:G2}} :-
 	interp G1;
 	interp G2.
 
-interp {{lp:G = lp:G}}.
+interp {{lp:G1 = lp:G2}} :- coq.unify-eq G1 G2.
 
 interp (app [global (indt Prog) | _Args] as Atom) :-
 %   coq.say "prog: " Prog,
@@ -71,7 +71,8 @@ check Cert (go X Term ):-
   var X,
   declare_constraint (check Cert (go X Term)) [X].
 
-check _ (go (sort S) Term ):-
+check Cert (go (sort S) Term ):-
+ 	tt_expert Cert,
 %  coq.say "Term" Term "Sort" S,
   coq.typecheck Term (sort S) _. %% Resort to Coq typechecking: we could do better
 % check Cert {{nat}} :-
@@ -79,7 +80,8 @@ check _ (go (sort S) Term ):-
 % check Cert {{True}} :-
 % 	tt_expert Cert.
 
-check Cert (go {{lp:G = lp:G}} {{eq_refl}}):-
+check Cert (go {{lp:G1 = lp:G2}} {{eq_refl}}):-
+  coq.unify-eq G1 G2,
 	eq_expert Cert.
 
 % check Cert (go {{lp:G1 /\ lp:G2}}) {{conj lp:T1 lp:T2}}:-
