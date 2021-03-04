@@ -38,7 +38,7 @@ interp {{lp:G1 \/ lp:G2}} :-
 	interp G1;
 	interp G2.
 
-interp {{lp:G1 = lp:G2}} :- coq.unify-eq G1 G2.
+interp {{lp:G1 = lp:G2}} :- coq.unify-eq G1 G2 ok.
 
 interp (app [global (indt Prog) | _Args] as Atom) :-
 %   coq.say "prog: " Prog,
@@ -81,7 +81,7 @@ check Cert (go (sort S) Term ):-
 % 	tt_expert Cert.
 
 check Cert (go {{lp:G1 = lp:G2}} {{eq_refl}}):-
-  coq.unify-eq G1 G2,
+  coq.unify-eq G1 G2 ok,
 	eq_expert Cert.
 
 % check Cert (go {{lp:G1 /\ lp:G2}}) {{conj lp:T1 lp:T2}}:-
