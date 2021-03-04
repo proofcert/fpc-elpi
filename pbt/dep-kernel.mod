@@ -38,6 +38,7 @@ interp {{lp:G1 \/ lp:G2}} :-
 	interp G1;
 	interp G2.
 
+
 interp {{lp:G1 = lp:G2}} :-
    !,
    coq.unify-eq G1 G2 ok.
