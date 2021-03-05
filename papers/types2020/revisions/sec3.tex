@@ -4,7 +4,7 @@
 
 In this section, we introduce the main ideas from \emph{focused proof
   system}, \emph{foundational proof certificates}, and the
-\emph{Coq-Elpi} plugin.
+\emph{Coq-Elpi} plugin that we need for this paper.
 
 \subsection{Proofs for the Horn fragment}
 \label{ssec:focused}
@@ -84,21 +84,22 @@ Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 \label{fig:kernel}
 \end{figure}
 
-Figure~\ref{fig:augmented} contains these proof rules and extends them
-in the following ways so that it more appropriately fits into
-the Coq proof system.
+Figure~\ref{fig:augmented} contains an annotated version of these
+proof rules: the annotations help us connect to elements of the Coq
+proof system.
 \begin{enumerate}
   \item Instead of having separate connectives for $\forall$ and
     $\supset$, we have the dependent product connective $(x:A)D$. 
   \item We account for \emph{computation} inside atoms by generalizing
-    to \emph{init} rule to work modulo conversion.
-  \item We have incorporated both \emph{proof certificates}~\cite{chihani17jar} (using the
-    schematic variable $\XXi$) along with expert predicates
-    (predicates with the $e$ subscript). We explain this in Section~\ref{ssec:cert}.
+    the \emph{init} rule to allow for term-level conversion.
+  \item We have incorporated both \emph{proof
+  certificates}~\cite{chihani17jar} (using the schematic variable
+    $\XXi$) along with expert predicates (predicates with the $e$
+    subscript). We explain these in Section~\ref{ssec:cert}.
   \item The inference rules are  annotated by terms structures that
     can be given directly to the Coq kernel for checking.
   \item We have added various premises which are responsible for
-    pulling information across  Coq's global environment.
+    pulling information from Coq's global environment.
 \end{enumerate}
 The proof system described in Figure~\ref{fig:augmented} (and
 implemented in Figure~\ref{fig:kernel}) corresponds to a subset of the Calculus
