@@ -116,3 +116,9 @@ append [0] x x' -> rev x y -> rev y x'.
 intros.
 elpi dep_pbt 3 (H /\ H0) (x).
 Abort.
+
+Goal forall x y: list nat,
+rev (app [2] x) y.
+
+intros.
+elpi dep_pbt 3 (True) (x).

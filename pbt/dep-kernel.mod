@@ -116,6 +116,14 @@ check Cert (go Atom Term) :-
 	check Cert' (bc Clause Atom ListArgs),
   coq.mk-app Kons ListArgs Term.
 
+check Cert (go Atom Term) :-
+	% unfold_expert _ Cert Cert' _,
+  hint K Type,
+  get_head Type Atom,
+  coq.say "Select Hint" {coq.term->string K} {coq.term->string Type},
+	check Cert (bc Type Atom ListArgs),
+  coq.mk-app K ListArgs Term.
+
 %% Perform simple reduction in the head
 check Cert (go (app [(fun A B C)| Args]) Term) :-
   coq.mk-app (fun A B C) Args App,
