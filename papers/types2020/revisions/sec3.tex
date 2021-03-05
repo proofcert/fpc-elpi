@@ -4,7 +4,7 @@
 
 In this section, we introduce the main ideas from \emph{focused proof
   system}, \emph{foundational proof certificates}, and the
-\emph{Coq-Elpi} plugin.
+\emph{Coq-Elpi} plugin that we need for this paper.
 
 \subsection{Proofs for the Horn fragment}
 \label{ssec:focused}
@@ -50,7 +50,8 @@ follows from rather simple considerations of Horn clauses
 Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 
 \begin{figure}[t]
-\[
+\centering
+  \[
 \infer{\XXi_1\vdash k\ l : A}
       { \mathrm{Ind}[p] \ (\Gamma_I := \Gamma_C) \in E\quad 
        (\mathit{head} \ A) : T \in \Gamma_I\quad  
@@ -59,46 +60,53 @@ Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 \]
 \vskip -18pt
 \[
-  \infer{\XXi\vdash  A : s}{{E[] \vdash_{CIC} A : s}}% The order should be s : A, not A : s ?
+  \infer{\XXi\vdash  A : s}{E[] \vdash_{CIC} A : s\quad \sortExpert{\XXi}}% The order should be s : A, not A : s ?
   %% we are checking nat : Set, for example, so A : s --AM
   \qquad
-  \infer{\bc{\XXi}{}{[]} A A}{\initLExpert{\XXi}}
-  \qquad
+  \infer{\bc{\XXi}{}{[]} A A'}{E[]\vdash_{CIC} A =_{\beta\delta\iota\xi}A'\quad\initLExpert{\XXi}}
+\]
+  \vskip -18pt
+\[
   \infer{\bc{\XXi}{}{(t\ ::\ l)}{\depprod{x}{B}{D}}{A}}
-        {\XXi_1\vdash t : B\qquad
-         \bc{\XXi_2}{}l {D[t/x]} A\qquad
+        {\XXi_1\vdash t : B\quad
+         \bc{\XXi_2}{}l {D[t/x]} A\quad
          \prodE{\XXi}{\XXi_1}{\XXi_2}{t}}
 \]
-\caption{Specification of the checking of a proof certificate and the
-  synthesis of a dependently typed $\lambda$-term.}
+\caption{Specification of a core calculus% of the checking of a proof certificate and the
+  % synthesis of a dependently typed $\lambda$-term
+  .}
 \label{fig:augmented}
 \end{figure}
 
 \begin{figure}
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={sigs-end}]{../code/dep-kernel.sig}
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={check-end}]{../code/dep-kernel-v2.mod}
-\caption{Implementation of a  dependent kernel for Coq terms.}
+\lstinputlisting[language=lprolog,linerange={sigs-end}]{../code/dep-kernel.sig}
+\lstinputlisting[language=lprolog,linerange={check-end}]{../code/dep-kernel.mod}
+\caption{Implementation of the core calculus.}
 \label{fig:kernel}
 \end{figure}
 
-Figure~\ref{fig:augmented} contains these proof rules and extends them
-in the following fours ways so that it more appropriately fits into
-the Coq proof system.
+Figure~\ref{fig:augmented} contains an annotated version of these
+proof rules: the annotations help us connect to elements of the Coq
+proof system.
 \begin{enumerate}
   \item Instead of having separate connectives for $\forall$ and
     $\supset$, we have the dependent product connective $(x:A)D$. 
-  \item We have incorporated both \emph{proof certificates}~\cite{chihani17jar} (using the
-    schematic variable $\XXi$) along with expert predicates
-    (predicates with the $e$ subscript). We explain this in Section~\ref{ssec:cert}.
+  \item We account for \emph{computation} inside atoms by generalizing
+    the \emph{init} rule to allow for term-level conversion.
+  \item We have incorporated both \emph{proof
+  certificates}~\cite{chihani17jar} (using the schematic variable
+    $\XXi$) along with expert predicates (predicates with the $e$
+    subscript). We explain these in Section~\ref{ssec:cert}.
   \item The inference rules are  annotated by terms structures that
     can be given directly to the Coq kernel for checking.
   \item We have added various premises which are responsible for
-    pulling information across  Coq's global environment.
+    pulling information from Coq's global environment.
 \end{enumerate}
 The proof system described in Figure~\ref{fig:augmented} (and
 implemented in Figure~\ref{fig:kernel}) corresponds to a subset of the Calculus
 of Inductive Constructions in which inductive definitions are
-limited to pure Horn clauses.
+limited to % first-order
+Horn clauses.
 %
 This  system is inspired by the calculus for proof search in
 Pure Type Systems introduced in \cite{LengrandDM06}, based in turn on
@@ -119,29 +127,29 @@ system here is that proof terms and proof certificates are used
 simultaneously in all inference rules.
 
 The proof system is parameterized by Coq's global environment $E$,
-which here we take as a set of inductive definitions; following Coq's
-reference manual, we denote such a definition with
+here a set of constant and inductive definitions; following Coq's
+reference manual, inductive definition are denoted by
 $\mathrm{Ind}[p] (\Gamma_I := \Gamma_C)$, where $\Gamma_I$ determines
-the names and types of the (possibly mutually)inductive type and
+the names and types of the (possibly mutually) inductive type and
 $\Gamma_C$ the names and types of its constructors; finally $p$
-denotes the number of parameters and plays no role. We delegate to
+denotes the number of parameters and plays here no role. We delegate to
 Coq's type checking the enforcement of the well-sortedness of
 inductive types. The \emph{local context} is empty, since we are only
 dealing with types that correspond to Horn clauses, and atomic types
 are inductively defined. In fact, we do not have a $\forall$ rule on
 the right, although the proof theory would gladly allow it. This means
-at the term level that we do not have variables in our grammar of
+at the term level that there are no variables in our grammar of
 terms. Terms are always applied to a (possibly empty) list of
 arguments.  The \emph{decide} rule, % is the equivalent in our
 % a \emph{decide} rule in an explicitly focused system
 % \cite{liang09tcs}.  
 as in the previous proof system for Horn logic,  given an atom,
  selects a clause on which to back-chain on: we lookup the
-constructors of an \lsti{Inductive} definition from the global
+constructors of an inductive definition from the global
 environment, one that matches the head symbol of the atom we aim to backchain on, and then
-call the latter judgment that will find a correct instantiation, if any. The rules for backchaining are standard,
-corresponding to the \emph{init} and the (conflation of the) left introduction rules for
-$\forall$ and $\supset$.
+call the latter judgment that will find a correct instantiation, if any. The rules for backchaining include
+ the (conflation of the) left introduction rules for
+$\forall$ and $\supset$, as well as the \emph{init} rule, which incorporates Coq's conversion.
 
 It may be at first surprising that there are no
 introduction rules for propositional connectives, nor equality for
@@ -192,7 +200,8 @@ environment of inductive definitions and query for information about them.
 The \lsti{decideE} predicate,  has, among others, the role of selecting which
 constructor to focus on from the inductive type. The kernel will successively
 obtain the type of the selected constructor, and initiate the backchaining
-phase.
+phase. The latter is terminated when the focused atom unifies with the current goal, via
+Elpi's primitive \lsti{coq.unify-eq}.
 
 \subsubsection{FPC-specific code}
 \label{ssec:fpc}
@@ -236,8 +245,8 @@ instances of the decide rule in a proof.
 %proof is 5 or less.
 
 \begin{figure}[t]
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={resources-end}]{../code/fpcs.sig}
-\lstinputlisting[basicstyle=\ttfamily,language=lprolog,linerange={resources-end}]{../code/fpcs.mod}
+\lstinputlisting[language=lprolog,linerange={resources-end}]{../code/fpcs.sig}
+\lstinputlisting[language=lprolog,linerange={resources-end}]{../code/fpcs.mod}
 \caption{Sample FPCs}
 \label{fig:resources}
 \end{figure}
@@ -288,7 +297,7 @@ unification.
 
 The following
 example shows how we can use the above tactic to do FPC-driven logic
-programming in Coq and return a Coq proof-term:
+programming modulo conversion in Coq and return a Coq proof-term:
 \begin{lstlisting}[]
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 | i_n : insert x [] [x]
@@ -298,8 +307,9 @@ Lemma i1:  exists R, insert 2 ([0] $++$ [1]) R.
 elpi dprolog height 10.
 Qed.
 Print i1.
-ex_intro (fun R : list nat => insert 2 ([0] $++$ [1]) R)  [0; 1; 2]
-  (i_c 2 0 [1] [1; 2] (i_c 2 1 [] [2] (i_n 2))) : exists R : list nat, insert 2 ([0] $++$ [1]) R
+ex_intro (fun R : list nat => insert 2 ([0] $++$ [1]) R)   [0; 1; 2]
+  (i_c 2 0 [1] [1; 2] (le_S 0 1 (le_S 0 0 (le_n 0)))
+	 (i_c 2 1 [] [2] (le_S 1 1 (le_n 1)) (i_n 2)))
 \end{lstlisting}
 
 The \lsti{dprolog} tactic can be seen as a programmable (and possibly
@@ -310,10 +320,12 @@ faster) version of Coq's \lsti{eauto}% , although it currently lacks the
 % \lsti{Hints} as introduction rules
  \lsti{dprolog} is not restricted to depth-first search, since
 it follows the dictate of the given FPC; for example we could easily add
-iterative-deepening search. Furthermore, the tactic can still use
-\lsti{Hints} via Elpi's \lsti{Db} feature, and FPCs can provide a
+iterative-deepening search. Furthermore,
+%% commented out till we know for sure:
+%%the tactic can still use\lsti{Hints} via Elpi's \lsti{Db} feature, and
+ FPCs can provide a
 \emph{trace} that may be more customizable than the one offered by 
-\lsti{(e)auto}'s hard-wired \lsti{Debug} facility. 
+\texttt{(e)auto}'s hard-wired \texttt{Debug} facility. 
 
 %%% Local Variables:
 %%% mode: latex

@@ -24,14 +24,27 @@
 \maketitle
 
 \begin{abstract}
-The \emph{foundational proof certificate} (FPC) framework is capable
-of checking and elaborating a wide range of proof evidence and can easily
-be implemented using the logic programming language \lP.
-We use the recently released Coq-Elpi plugin for Coq in which the Elpi
-implementation of \lP can send and retrieve information to and from the Coq kernel.
-We provide two examples: first we implement a FPC-driven sequent calculus for a fragment of the Calculus of Inductive Constructions and we package it into a tactic to perform property-based testing of Inductive types corresponding to pure (higher-order) Horn programs. Secondly, we implement a proof checker for first-order LJF to demonstrate how  proof certificates
-can be supplied by external (to Coq) provers and elaborated into the
-fully detailed proof terms that can be checked by the Coq kernel.
+  The logic programming paradigm provides a flexible setting for
+  representing, manipulating, checking, and elaborating proof
+  structures.  This is particularly true when the logic programming
+  language allows for bindings in terms and proofs.  In this paper, we
+  make use of two recent innovations at the intersection of logic
+  programming and proof checking.  One of these is the
+  \emph{foundational proof certificate} (FPC) framework which provides
+  a flexible means of defining the semantics of a range of proof
+  structures for classical and intuitionistic logic.  A second
+  innovation is the recently released Coq-Elpi plugin for Coq in which
+  the Elpi implementation of \lP can send and retrieve information to
+  and from the Coq kernel.  We illustrate the use of both this Coq
+  plugin and FPCs with two example applications.  First, we implement
+  an FPC-driven sequent calculus for a fragment of the Calculus of
+  Inductive Constructions and we package it into a tactic to perform
+  property-based testing of inductive types corresponding to Horn
+  clauses.  Second, we implement in Elpi a proof checker for
+  first-order intuitionistic logic and demonstrate how proof
+  certificates can be supplied by external (to Coq) provers and then
+  elaborated into the fully detailed proof terms that can be checked
+  by the Coq kernel.
 \end{abstract}
  
 \input intro

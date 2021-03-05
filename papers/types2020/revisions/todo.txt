@@ -2,12 +2,20 @@
 %% in second reading
 
 
--- paper --
+- cleanup of the code:
+
+-- README.md for code to be updated (the existing one refers to the ijcar subsmission)
+
+-- keep the dir structure? the kernel is under pbt, not ideal.
+
+-- the code right now does not coincide with what is in the paper; e.g. the kernel has
+additional clauses (forall right, a clause with constraints). The prod expert does not collect the term etc. 
+
+- paper -
+
+-- we have to add DOI to bib entries
 
 
-changebar for new stuff?
-
-README.md for code updated (the existing one refers to the ijcar subsmission)
 
 R1
 - page 1: put some references for
@@ -23,9 +31,9 @@ least a section explaining the application in the paper, would be
 necessary to open the paper to a larger audience. However, that
 requires space. Personally, I would suggest the authors to sacrifice
 part of Section 2 for this.
-
 [TODO DALE]
-AM:
+
+
 pag 5: \caption{Specification of the checking of a proof certificate and the
   synthesis of a dependently typed $\lambda$-term.}
 
@@ -33,11 +41,9 @@ It's not a lambda calculus in so far it does not have variable sor abstraction. 
 
 \caption{Implementation of a  dependent kernel for Coq terms.}
 Again, inprecise: what is dependent? what coq terms?
+[DONE]
 
-pag 7: prod_e takes 4 argument, the relative code 3 (no subst term, of course because of unification). Comment?
-
-page 8: in the def of insert, i_n has a is_nat assumption. Really needed here?
-
+-----------------------------------------------
 R1
 you are re-implementing a better eauto. However, your
 implementation only applies as lemmas constructors of an inductive type.
@@ -52,6 +58,11 @@ it should be made explicit in the paper.
 
 NEW
 
+-- if we get the tactics to work with Hints, we need a new decide rule
+   (or change the one we have).
+
+
+
 -- If unify-eq works, reformulate inint and eq in the calculus to
 apply modulo conversion (in which context???). In ref manual (page
 16), reduction is defined as
@@ -62,8 +73,10 @@ Conversion as E[Γ] ⊢ t1 =_{βδιζη} t2 . defined as equi-reduction modulo 
 (and irrelevant (?) subterms)
 
 
+
 Now we  say the local context is empty and
 the global one is just Inductive, but coq.unify-eq must use these context
+[DECIDED: empty if fine]
 
 From manual:
 A ** local context** is an ordered list of declarations of variables. The
@@ -75,7 +88,6 @@ declarations are either assumptions, definitions or declarations of
 inductive objects. assumptions are written as (c ∶ T ), indicating
 that c is of the type T . Definitions are written as c ∶= t ∶ T 
 
--- add certificate so sort rule!
+-- add expert to sort rule in paper (Fig 1 and 2)
+[DONE]
 
--- if we get the tactics to work with Hints, we need a new decide rule
-   (or change the one we have).
