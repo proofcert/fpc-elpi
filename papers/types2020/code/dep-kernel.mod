@@ -39,7 +39,7 @@ backchain D A :- is_uni D D',  backchain (D' X) A.
 %%%%%%%%%%%
 /* check */
 check Cert (go (sort S) A):-
-  coq.typecheck A (sort S) _,
+  coq.typecheck A (sort S) ok,
   sortE Cert.
 check Cert (go A Tm) :-
   coq.safe-dest-app A (global (indt Prog)) _,
