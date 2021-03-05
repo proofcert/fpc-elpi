@@ -19,17 +19,18 @@ propositions and proofs as separate.  For example, proof theory does
 not assume that there are terms within the logic that describe proofs.
 
 Gentzen's discovered that the key to treating classical and
-intuitionistic logics in the same proof system was the weakening and
-contraction structural rules on the right-side of
-sequents~\cite{gentzen35}.  This discovery lead him away from natural
-deduction to multiple-conclusion sequent calculus, a very important
-kind of proof system that has not been given a satisfactory
-representation in type theory.  This same innovation of Gentzen also
-opened the way to another key proof-theoretic discovery, that of
-linear logic \cite{girard87tcs}.  Similarly, sequent calculus provides
-an elegant presentation of linear logic while most treatments of
-linear logic in type theory have difficulty treating linear negation
-and the multiplicative disjunction  and its unit.
+intuitionistic logics in the same proof system was identifying the
+structural rules of the weakening and contraction and
+placing them on the right-side of sequents~\cite{gentzen35}.
+This discovery lead him away from natural deduction to
+multiple-conclusion sequent calculus, a very important kind of proof
+system that has not been given a satisfactory representation in type
+theory.  This same innovation of Gentzen's also opened the way to
+another key proof-theoretic discovery, that of linear logic
+\cite{girard87tcs}.  Similarly, sequent calculus provides an elegant
+presentation of linear logic while most treatments of linear logic in
+type theory have difficulty treating linear negation and the
+multiplicative disjunction and its unit.
 
 As is often observed, however, sequent calculus is too low-level to be
 used explicitly as capturing the ``essence of a proof''.  Fortunately,
@@ -49,12 +50,12 @@ section and used in our two example applications of Elpi with Coq.
 Gentzen-style proofs are used to model computation in at least two
 different ways.  The functional programming paradigm, following the
 Curry-Howard correspondence, models computation abstractly as
-$\beta$-reduction of natural deduction proof: that is, computation is
-modeled as \emph{proof normalization}.  On the other hand, the logic
-programming paradigm, following the notion of goal-directed proof
-search, models computation abstractly as a regimented search for
-cut-free sequent calculus proofs: that is, computation is modeled as
-\emph{proof search}.
+$\beta$-reduction within natural deduction proofs: that is,
+computation is modeled as \emph{proof normalization}.  On the other
+hand, the logic programming paradigm, following the notion of
+goal-directed proof search, models computation abstractly as a
+regimented search for cut-free sequent calculus proofs: that is,
+computation is modeled as \emph{proof search}.
 
 Proof search has features that are hard to capture in the proof
 normalization setting.  In particular, Gentzen's \emph{eigenvariables}
@@ -64,8 +65,8 @@ However, during the search for cut-free proofs, eigenvariables do not
 vary, and they are part of the syntax of terms and formulas.  As a
 result, they can be used in the treatment of bindings in data
 structures more generally.  Such eigenvariables can be used by the
-logic programming paradigm to provide a natural, elegant, and powerful
-computing approach to bindings within syntax.
+logic programming paradigm to provide a natural and powerful
+approach to computing with bindings within syntax.
 
 It is worth noting that the role of the cut rule and of
 cut-elimination is different in these two approaches to computing.
