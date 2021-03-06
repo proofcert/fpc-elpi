@@ -203,72 +203,53 @@ phase. The latter is terminated when the focused atom unifies with the current g
 Elpi's primitive \lsti{coq.unify-eq}.
 
 
-%\newpage
 \subsubsection{FPC-specific code}
 \label{ssec:fpc}
 
 The \emph{foundational proof certificates} (FPC) framework was
 proposed in \cite{chihani17jar} as a flexible approach to specifying a
 range of proof structures in first-order classical and intuitionistic
-logics.
-%
-Such specifications are also executable using a simple logic
-programming interpreter.
-%
-As a result of using logic programming, proof certificates in this
-framework are allowed to drop details that could be reconstructed during
-the checking phase.
-%
-For example, substitution instances of quantifiers do not need to be
-explicitly described within a certificate since unification within the
-logic programming checker is often capable of reconstructing such
+logics.  Such specifications are also executable using a simple logic
+programming interpreter.  As a result of using logic programming,
+proof certificates in this framework are allowed to lack details that
+can be reconstructed during the checking phase.  For example,
+substitution instances of quantifiers do not need to be explicitly
+described within a certificate since unification within the logic
+programming checker is often capable of reconstructing such
 substitutions.
 
 In this and the next section, we shall only use a much reduced subset
-of the FPC framework.
-%
-In particular, a proof certificate, denoted by the schematic variable
-$\XXi$, is a particular term that is threaded throughout a logic
-programming interperter.
-%
-For example, the inference rules in Figure~\ref{fig:augmented} are
-augmented with an additional premise called an \emph{expert predicate}
-with are responsible for extracting relevant information from a proof
+of the FPC framework.  In particular, a proof certificate, denoted by
+the schematic variable $\XXi$, is a particular term that is threaded
+throughout a logic programming interperter.  For example, the
+inference rules in Figure~\ref{fig:augmented} are augmented with an
+additional premise that invokes an \emph{expert predicate} with is
+responsible for extracting relevant information from a proof
 certificate $\XXi$ as well as constructing continuation certificates,
-such as, $\XXi_1$ and $\XXi_2$.
-%
-For example, the premise $\prodE{\XXi}{\XXi_1}{\XXi_2}{t}$ can be
-understood as a procedure for extracting from the certificate $\XXi$ a
-substitution term $t$ and two continuation certificates $\XXi_1$ and
-$\XXi_2$ for the two premises of this rule.
-%
-If the certificate $\XXi$ does not contain an explicit substitution
-term, the expert predicate can simply return a logic variable which would
-denote any term that satisfies subsequent unification problems arising
-in completing the check of this certificate.
+such as, $\XXi_1$ and $\XXi_2$.  For example, the premise
+$\prodE{\XXi}{\XXi_1}{\XXi_2}{t}$ calls the expert for products which
+should extract from the certificate $\XXi$ a substitution term $t$ and
+two continuation certificates $\XXi_1$ and $\XXi_2$ for the two
+premises of this rule.  If the certificate $\XXi$ does not contain an
+explicit substitution term, the expert predicate can simply return a
+logic variable which would denote any term that satisfies subsequent
+unification problems arising in completing the check of this
+certificate.
 
-*** DM Continue here
-
-%
-%
-%%\todo{MM: Talk about randomized FPC? They mentioned afterwards -am}
 In our case here, an FPC is a collection of \lP clauses that provide
 the remaining details not supplied in Figures~\ref{fig:augmented}
 and~\ref{fig:kernel}: that is, the exact set of constructors for the
-type of certificates \lsti{cert} as well as the specification of the expert
-predicates listed \emph{ibidem}.
-%
-The top of Figure~\ref{fig:resources} displays two FPCs,
-both of which can be used to describe proofs where we bound
-the dimension of  a proof.
-%
-For example, the first FPC dictates that the query \mbox{\lsti{(check (qheight 5) A)}} is
-provable in  the kernel using the clauses in Figures~\ref{fig:kernel}
-and~\ref{fig:resources} if and only if the height of that proof is 5
-or less.
-%
-Similarly, the second FPC can be used to bound the total number of
-instances of the decide rule in a proof.
+type of certificates \lsti{cert} as well as the specification of the
+expert predicates listed \emph{ibidem}.  The top of
+Figure~\ref{fig:resources} displays two FPCs, both of which can be
+used to describe proofs where we bound the dimension of a proof.  For
+example, the first FPC dictates that the query \mbox{\lsti{(check
+    (qheight 5) A)}} is provable in the kernel using the clauses in
+Figures~\ref{fig:kernel} and~\ref{fig:resources} if and only if the
+height of that proof is 5 or less.  Similarly, the second FPC can be
+used to bound the total number of instances of the decide rule in a
+proof.  (Obviously, such proof certificates do not contain, for
+example, substitution terms.)
 %
 %In particular, the query \mbox{\lsti{(check (qsize 5 H) B)}}
 % \begin{lstlisting}
@@ -297,7 +278,8 @@ also succeed for both \lsti{Cert1} and \lsti{Cert2}. Thus, the query
 proof of \lsti{A} that has a height less than or equal to 4 while also
 being of size less than or equal to 10.
 
-%\newpage
+%%\todo{MM: Talk about randomized FPC? They mentioned afterwards -am}
+
 
 \subsection{A Prolog-like tactic}
 
