@@ -34,18 +34,19 @@ solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 i_n : insert x [] [x]
 | i_s : forall y: nat, forall ys: list nat, x <= y -> insert x (y :: ys) (x :: y :: ys)
-| i_c : forall y: nat, forall ys: list nat, forall rs: list nat,  insert x ys rs -> insert x (y :: ys) (y :: rs).
+| i_c : forall y: nat, forall ys: list nat, forall rs: list nat,  y <= x -> insert x ys rs -> insert x (y :: ys) (y :: rs).
 
 Goal insert 1 [] [1].
 elpi dprolog 10.
 Qed.
-Lemma i1:  exists R, insert 2 [0;1] R.
+Lemma i1:  exists R, insert 2 ([0] ++ [1])  R.
 elpi  dprolog 10.
 Qed.
-Lemma i2:  exists R, insert 2 [0;1] R.
+Print i1.
+Lemma i2:  exists R, insert 2 ([0] ++ [1]) R.
 eexists.
-apply i_c.
-apply i_c.
+apply i_c. auto.
+apply i_c. auto.
 apply i_n.
 Qed.
 Print i2.

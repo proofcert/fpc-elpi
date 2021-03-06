@@ -1,10 +1,11 @@
 List of current examples:
 
-## Property-based testing
+## Property-based testing:
+ -- all to be called by dep_pbt. Old examples with pbt are under non-dep
 ### Completed examples
 - `list.v`: some definitions of list predicate (insert, ordered, reverse)
 
-- `list-queries.v`: various properties, to be called both by pbt and dep_pbt
+- `list-queries.v`: various properties,
 
 - `aexp.v`: static and dynamic semantics of an arithmetical language (adapted
 by `SF/Types.v`), with properties such as preservation, progress,

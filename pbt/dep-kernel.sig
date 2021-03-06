@@ -1,4 +1,4 @@
-sig kernel.
+sig dep-kernel.
 
 % Formulas and their terms
 kind   term        type.

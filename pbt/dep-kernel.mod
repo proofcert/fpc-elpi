@@ -1,4 +1,4 @@
-module kernel.
+module dep-kernel.
 
 %% Experimental kernel with dependent types and proof terms
 

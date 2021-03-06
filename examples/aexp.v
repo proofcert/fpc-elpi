@@ -5,7 +5,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
 
  From elpi Require Import elpi.
  Require Import Arith List. Import ListNotations.
- Require Import pbt.
+ (*Require Import pbt.*)
  Require Import dep_pbt.
  
  
@@ -101,7 +101,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Goal forall e, progress e has_type step.
  unfold progress.
  intros e t Ht.    
- Fail elpi pbt (Ht) (True) 5 (e).
+ (*Fail elpi pbt (Ht) (True) 5 (e).*)
  Fail elpi dep_pbt 5 (Ht) (e).
  Abort.
  
@@ -149,7 +149,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Goal forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
- elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *)
+ (*elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *) *)
  elpi dep_pbt 2 (Ht) (e) . (* does not work gen (t)*)   
  Abort.
  
@@ -199,7 +199,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Goal deterministic M3.step.
  unfold deterministic.
  intros.
- elpi pbt (H ) (H0)  5 (x).
+ (*elpi pbt (H ) (H0)  5 (x).*)
  elpi dep_pbt 3 (H /\ H0) (x). 
  Abort.
  
@@ -241,7 +241,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Goal forall e e', preservation e e' M6.has_type step.
  unfold preservation.
  intros e e' t Hs Ht.    
- elpi pbt (Ht) (Hs)  3 (e).
+ (* elpi pbt (Ht) (Hs)  3 (e).*)
  elpi dep_pbt 2 (Ht /\ Hs) (e). 
  Abort.
  
