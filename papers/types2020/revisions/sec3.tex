@@ -1,4 +1,3 @@
-
 \section{Proof theory and proof certificates}
 \label{sec:three}
 
@@ -92,15 +91,15 @@ proof system.
   \item Instead of having separate connectives for $\forall$ and
     $\supset$, we have the dependent product connective $(x:A)D$. 
   \item We account for \emph{computation} inside atoms by generalizing
-    the \emph{init} rule to allow for term-level conversion.
-  \item We have incorporated both \emph{proof
+    the \emph{init} rule to allow type-level conversion.
+  \item We have incorporated  \emph{proof
   certificates}~\cite{chihani17jar} (using the schematic variable
-    $\XXi$) along with expert predicates (predicates with the $e$
+    $\XXi$) along with \emph{expert predicates} (predicates with the $e$
     subscript). We explain these in Section~\ref{ssec:cert}.
   \item The inference rules are  annotated by terms structures that
     can be given directly to the Coq kernel for checking.
   \item We have added various premises which are responsible for
-    pulling information from Coq's global environment.
+    interacting with Coq.
 \end{enumerate}
 The proof system described in Figure~\ref{fig:augmented} (and
 implemented in Figure~\ref{fig:kernel}) corresponds to a subset of the Calculus
@@ -112,7 +111,7 @@ This  system is inspired by the calculus for proof search in
 Pure Type Systems introduced in \cite{LengrandDM06}, based in turn on
 ideas stemming from focusing (in particular, the LJT calculus of
 Herbelin \cite{Herbelin94}). Similar to that calculus, we have a
-term language that includes terms and lists of terms, and two distinct
+term language that includes terms and lists of terms, and two %distinct
 typing judgments for the two categories.
 % %
 % In our case, the \lP goal formula \lsti{(check Xi (go B T))}
@@ -132,15 +131,15 @@ reference manual, inductive definition are denoted by
 $\mathrm{Ind}[p] (\Gamma_I := \Gamma_C)$, where $\Gamma_I$ determines
 the names and types of the (possibly mutually) inductive type and
 $\Gamma_C$ the names and types of its constructors; finally $p$
-denotes the number of parameters and plays here no role. We delegate to
-Coq's type checking the enforcement of the well-sortedness of
-inductive types. The \emph{local context} is empty, since we are only
+denotes the number of parameters and plays here no role. The {local context} is empty, since we are only
 dealing with types that correspond to Horn clauses, and atomic types
 are inductively defined. In fact, we do not have a $\forall$ rule on
 the right, although the proof theory would gladly allow it. This means
-at the term level that there are no variables in our grammar of
+that there are no variables in our grammar of
 terms. Terms are always applied to a (possibly empty) list of
-arguments.  The \emph{decide} rule, % is the equivalent in our
+arguments.   We delegate to
+Coq's type checking the enforcement of the well-sortedness of
+inductive types.  The {decide} rule, % is the equivalent in our
 % a \emph{decide} rule in an explicitly focused system
 % \cite{liang09tcs}.  
 as in the previous proof system for Horn logic,  given an atom,
@@ -162,8 +161,8 @@ of proof-terms is rather simple.
 \label{ssec:cert}
 Figure~\ref{fig:kernel} contains the Elpi implementation of the
 inference rules in Figure~\ref{fig:augmented}: $\XXi\vdash t \colon A$ corresponds to
-\lsti{check $\XXi$ (go A T)} and $\XXi \Downarrow  l \colon D\vdash A$ corresponds to
-\lsti{check $\XXi$ (bc D A L)}.
+\lsti{check Cert (go A T)} and $\XXi \Downarrow  l \colon D\vdash A$ corresponds to
+\lsti{check Cert (bc D A L)}.
 %
 The code in that figure mixes both Coq-specific and
 FPC-specific items.  We describe both of these separately.
@@ -322,14 +321,14 @@ The glue code between Coq-Elpi and the implementation of our calculus
 is straightforward: the goal consists of a quadruple of a (here
 inactive) context, an \emph{evar}, a type (goal) and a list of extra
 information, also inactive. In addition, we supply the certificate: it
-is simply an integer and a string to identify the ``resource'' FPC that we
-will use in this case. We just need to call \lsti{check} on the goal  \lsti{G},
-together with the certificate, in order to obtain a reconstructed
-proof term. We do not call the reconstruction directly on the evar
-because Coq-Elpi ensures that evars manipulated by \lP are well-typed
-at all times; since we cannot guarantee that, as we work with
-partially reconstructed term, we get around this by an explicit
-unification.
+consists of an integer (or two in the case of pairing) and a string to
+identify the ``resource'' FPC that we will use in this case. We just
+need to call \lsti{check} on the goal \lsti{G}, together with the
+certificate, in order to obtain a reconstructed proof term. We do not
+call the reconstruction directly on the evar because Coq-Elpi ensures
+that evars manipulated by \lP are well-typed at all times; since we
+cannot guarantee that, as we work with partially reconstructed term,
+we get around this by an explicit unification.
 
 The following
 example shows how we can use the above tactic to do FPC-driven logic
@@ -355,7 +354,7 @@ faster) version of Coq's \lsti{eauto}% , although it currently lacks the
 ; % as well as the modularity of using
 % \lsti{Hints} as introduction rules
  \lsti{dprolog} is not restricted to depth-first search, since
-it follows the dictate of the given FPC; for example we could easily add
+it follows the dictates of the given FPC; for example we could easily add
 iterative-deepening search. Furthermore,
 %% commented out till we know for sure:
 %%the tactic can still use\lsti{Hints} via Elpi's \lsti{Db} feature, and
