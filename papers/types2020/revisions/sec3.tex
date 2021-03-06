@@ -52,11 +52,11 @@ Andreoli's proof system for linear logic \cite{andreoli92jlc}.
 \begin{figure}[t]
 \centering
   \[
-\infer{\XXi_1\vdash k\ l : A}
+\infer{\XXi\vdash k\ l : A}
       { \mathrm{Ind}[p] \ (\Gamma_I := \Gamma_C) \in E\quad 
        (\mathit{head} \ A) : T \in \Gamma_I\quad  
        k : D \in \Gamma_C\quad 
-       \bc{\XXi_2}{} l D A \quad\unfoldExpert{\XXi_1}{\XXi_2}} 
+       \bc{\XXi_1}{} l D A \quad\unfoldExpert{\XXi}{\XXi_1}} 
 \]
 \vskip -18pt
 \[
@@ -144,7 +144,7 @@ arguments.  The \emph{decide} rule, % is the equivalent in our
 % a \emph{decide} rule in an explicitly focused system
 % \cite{liang09tcs}.  
 as in the previous proof system for Horn logic,  given an atom,
- selects a clause on which to back-chain on: we lookup the
+ selects a clause on which to backchain on: we lookup the
 constructors of an inductive definition from the global
 environment, one that matches the head symbol of the atom we aim to backchain on, and then
 call the latter judgment that will find a correct instantiation, if any. The rules for backchaining include
@@ -153,10 +153,10 @@ $\forall$ and $\supset$, as well as the \emph{init} rule, which incorporates Coq
 
 It may be at first surprising that there are no
 introduction rules for propositional connectives, nor equality for
-that matter. However, one of the beauty of the Calculus of Inductive
-Construction is that they are, in fact,  defined inductively and
-therefore the \emph{decide} rule will handle those; this also
-simplifies the syntax of proof-terms.
+that matter. However, one of the beauties of the Calculus of Inductive
+Construction is that they are, in fact, defined inductively and
+therefore the \emph{decide} rule will handle those.  Thus, the syntax
+of proof-terms is rather simple.
 
 \subsection{Proof certificate checking}
 \label{ssec:cert}
@@ -171,10 +171,10 @@ FPC-specific items.  We describe both of these separately.
 \subsubsection{Coq-specific code}
 Coq terms are accessed through the Coq-Elpi API, and their representation
 in \lP takes advantage of native \lP constructs such as lists and binders.
-The following is part of the Coq-Elpi API signature of constants that we use:
+The following is part of the Coq-Elpi API signature of constants that we use.
 \begin{lstlisting}[language=lprolog]
-kind term   type.                                 % reification of Coq terms
-kind gref   type.                                 % reif. of references to global terms
+kind term   type.                                   % reification of Coq terms
+kind gref   type.                                   % reification of refs to globals
 type global gref -> term.                            % coercion to term
 type indt   inductive -> gref.                       % reification of inductive types
 type indc   constructor -> gref.                     % reification of their constructors 
@@ -203,20 +203,55 @@ obtain the type of the selected constructor, and initiate the backchaining
 phase. The latter is terminated when the focused atom unifies with the current goal, via
 Elpi's primitive \lsti{coq.unify-eq}.
 
+
+\newpage
 \subsubsection{FPC-specific code}
 \label{ssec:fpc}
 
-Each inference rule in Figure~\ref{fig:augmented} is augmented with an
-additional premise involving an \emph{expert predicate} and is
-annotated with variables $\Xi$, $\Xi'$, $\Xi_1$, $\Xi_2$ that range
-over proof certificates.  These expert predicates are used to extract
-information from a certificate.  For example, the premise
-$\prodE{\XXi}{\XXi_1}{\XXi_2}{t}$ can be understood as a procedure for
-extracting from the certificate $\XXi$ a substitution term $t$ and two
-continuation certificates $\XXi_1$ and $\XXi_2$.
+The \emph{foundational proof certificates} (FPC) framework was
+proposed in \cite{chihani17jar} as a flexible approach to specifying a
+range of proof structures in first-order classical and intuitionistic
+logics.
 %
-These notions are taken from the general setting of \emph{foundational
-  proof certificates}~\cite{chihani17jar}.
+Such specifications are also executable using a simple logic
+programming interpreter.
+%
+As a result of using logic programming, proof certificates in this
+framework are allowed to drop details that could be reconstructed during
+the checking phase.
+%
+For example, substitution instances of quantifiers do not need to be
+explicitly described within a certificate since unification within the
+logic programming checker is often capable of reconstructing such
+substitutions.
+
+In this and the next section, we shall only use a much reduced subset
+of the FPC framework.
+%
+In particular, a proof certificate, denoted by the schematic variable
+$\XXi$, is a particular term that is threaded throughout a logic
+programming interperter.
+%
+For example, the inference rules in Figure~\ref{fig:augmented} are
+augmented with an additional premise called an \emph{expert predicate}
+with are responsible for extracting relevant information from a proof
+certificate $\XXi$ as well as constructing continuation certificates,
+such as, $\XXi_1$ and $\XXi_2$.
+%
+For example, the premise $\prodE{\XXi}{\XXi_1}{\XXi_2}{t}$ can be
+understood as a procedure for extracting from the certificate $\XXi$ a
+substitution term $t$ and two continuation certificates $\XXi_1$ and
+$\XXi_2$ for the two premises of this rule.
+%
+If the certificate $\XXi$ does not contain an explicit substitution
+term, the expert predicate can simply return a logic variable which would
+denote any term that satisfies subsequent unification problems arising
+in completing the check of this certificate.
+
+***
+
+
+%
 %
 %%\todo{MM: Talk about randomized FPC? They mentioned afterwards -am}
 In our case here, an FPC is a collection of \lP clauses that provide
@@ -263,6 +298,8 @@ also succeed for both \lsti{Cert1} and \lsti{Cert2}. Thus, the query
 \verb+check ((qheight 4) <c> (qsize 10)) A+ will succeed if there is a
 proof of \lsti{A} that has a height less than or equal to 4 while also
 being of size less than or equal to 10.
+
+\newpage
 
 \subsection{A Prolog-like tactic}
 
