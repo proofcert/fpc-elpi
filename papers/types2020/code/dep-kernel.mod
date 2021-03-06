@@ -39,8 +39,8 @@ backchain D A :- is_uni D D',  backchain (D' X) A.
 %%%%%%%%%%%
 /* check */
 check Cert (go (sort S) A):-
-  coq.typecheck A (sort S) ok,
-  sortE Cert.
+  sortE Cert,
+  coq.typecheck A (sort S) ok.
 check Cert (go A Tm) :-
   coq.safe-dest-app A (global (indt Prog)) _,
   coq.env.indt Prog _ _ _ _ Kn KTypes,
@@ -54,6 +54,6 @@ check Cert (bc (prod _ B D) A [Tm|L]) :-
   check Cert1 (bc (D Tm) A L),
   check Cert2 (go B Tm).
 check Cert (bc A A' []) :-
-  coq.unify-eq A A' ok,
-  initialE Cert.
+  initialE Cert,
+  coq.unify-eq A A' ok.
 /* end */
