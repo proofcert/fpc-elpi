@@ -20,17 +20,18 @@ to the often ad hoc process of proof automation.
 
 ## Prerequisites
 
-The development depends on the following software. We have tested the following
-combinations of package versions, which we recommend installing through the
-OPAM package manager, using the standard [OCaml OPAM
-repository](https://opam.ocaml.org/) as well as the official [Coq OPAM
-repository](https://coq.inria.fr/opam/released/).
+The software depends on the following packages, with minimal versions:
 
-`coq` 8.11.0
+- `coq` 8.11.0
 
 - `coq-elpi` 1.6.0
 
 - `elpi` 1.11.2
+ 
+We recommend installing the latest versions through the OPAM package manager,
+using the standard [OCaml OPAM repository](https://opam.ocaml.org/) as well as
+the official [Coq OPAM repository](https://coq.inria.fr/opam/released/). Builds
+are tested with the latest package versions.
 
 These toolchains should work with recent versions of OCaml (between 4.05.0 and
 4.10.0).
@@ -41,19 +42,13 @@ installed.
 
 ## Examples
 
-The main entry point is file `coq_fpc.v`. In it we define a number of
-tactics for intuitionistic formulas in Coq-Elpi using the FPC definitions
-contained in the homonymous `fpc` directory:
+The `examples` directory contains some examples for both Property Based Testing
+and proof elaboration.
 
-- A tactic that looks for proofs that take up to a given number of decide
-  rules.
+The `_CoqProject` file is automatically recognized by `CoqIDE` and Visual Studio Code.
+Alternatively, a Makefile can be generated with `coq_makefile -f _CoqProject -o Makefile`.
+Running `make` will compile the tactics and run all the examples.
 
-- A tactic that looks for proofs guided by lambda term certificates expressed
-  in de Bruijn format.
-
-For each of these, a collection of theorems shows how each of the defined
-tactics acts on the goal of the theorem and solves it by using the information
-provided in the certificate associated to the corresponding FPC format.
 
 ## References
 
