@@ -206,6 +206,10 @@ Elpi's primitive \lsti{coq.unify-eq}.
 \subsubsection{FPC-specific code}
 \label{ssec:fpc}
 
+% DM I tried to down play FPC here so we would not need to say too
+% much about the general picture.  Hopefully, the examples we provide
+% and the few motivating sentences will make the reviewers happier.
+
 The \emph{foundational proof certificates} (FPC) framework was
 proposed in \cite{chihani17jar} as a flexible approach to specifying a
 range of proof structures in first-order classical and intuitionistic
@@ -219,22 +223,23 @@ programming checker is often capable of reconstructing such
 substitutions.
 
 In this and the next section, we shall only use a much reduced subset
-of the FPC framework.  In particular, a proof certificate, denoted by
-the schematic variable $\XXi$, is a particular term that is threaded
-throughout a logic programming interperter.  For example, the
-inference rules in Figure~\ref{fig:augmented} are augmented with an
-additional premise that invokes an \emph{expert predicate} with is
-responsible for extracting relevant information from a proof
-certificate $\XXi$ as well as constructing continuation certificates,
-such as, $\XXi_1$ and $\XXi_2$.  For example, the premise
-$\prodE{\XXi}{\XXi_1}{\XXi_2}{t}$ calls the expert for products which
-should extract from the certificate $\XXi$ a substitution term $t$ and
-two continuation certificates $\XXi_1$ and $\XXi_2$ for the two
-premises of this rule.  If the certificate $\XXi$ does not contain an
-explicit substitution term, the expert predicate can simply return a
-logic variable which would denote any term that satisfies subsequent
-unification problems arising in completing the check of this
-certificate.
+of the FPC framework: in essence, an FPC will be used as a simple
+mechanism for bounding the search for proofs.  In our examples, a
+proof certificate, denoted by the schematic variable $\XXi$, is a
+particular term that is threaded throughout a logic programming
+interperter.  For example, the inference rules in
+Figure~\ref{fig:augmented} are augmented with an additional premise
+that invokes an \emph{expert predicate} with is responsible for
+extracting relevant information from a proof certificate $\XXi$ as
+well as constructing continuation certificates, such as, $\XXi_1$ and
+$\XXi_2$.  For example, the premise $\prodE{\XXi}{\XXi_1}{\XXi_2}{t}$
+calls the expert for products which should extract from the
+certificate $\XXi$ a substitution term $t$ and two continuation
+certificates $\XXi_1$ and $\XXi_2$ for the two premises of this rule.
+If the certificate $\XXi$ does not contain an explicit substitution
+term, the expert predicate can simply return a logic variable which
+would denote any term that satisfies subsequent unification problems
+arising in completing the check of this certificate.
 
 In our case here, an FPC is a collection of \lP clauses that provide
 the remaining details not supplied in Figures~\ref{fig:augmented}

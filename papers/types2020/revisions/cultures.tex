@@ -18,19 +18,23 @@ within the system.  In contrast, proof theory treats logical
 propositions and proofs as separate.  For example, proof theory does
 not assume that there are terms within the logic that describe proofs.
 
+%% DM Reviewer 1 want more references to claims made here.  I
+%% lightened the claims and added two references.
+
 Gentzen's discovered that the key to treating classical and
 intuitionistic logics in the same proof system was identifying the
-structural rules of the weakening and contraction and
-placing them on the right-side of sequents~\cite{gentzen35}.
-This discovery lead him away from natural deduction to
-multiple-conclusion sequent calculus, a very important kind of proof
-system that has not been given a satisfactory representation in type
-theory.  This same innovation of Gentzen's also opened the way to
+structural rules of the weakening and contraction and placing them on
+the right-side of sequents~\cite{gentzen35}.  This discovery lead him
+away from natural deduction to multiple-conclusion sequent calculus.
+%
+This same innovation of Gentzen's also opened the way to
 another key proof-theoretic discovery, that of linear logic
-\cite{girard87tcs}.  Similarly, sequent calculus provides an elegant
-presentation of linear logic while most treatments of linear logic in
-type theory have difficulty treating linear negation and the
-multiplicative disjunction and its unit.
+and the linear negation~\cite{girard87tcs}.
+%
+While sequent calculus provides an elegant presentation of full linear
+logic, most treatments of linear logic in type theory have
+been limited to single-conclusion sequents~\cite{bierman95phd}
+or to restricted, multiple-conclusion variants~\cite{hyland93apal}.
 
 As is often observed, however, sequent calculus is too low-level to be
 used explicitly as capturing the ``essence of a proof''.  Fortunately,
