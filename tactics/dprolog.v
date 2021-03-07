@@ -6,7 +6,7 @@ Require Import Coq.Lists.List.
 
 
 Elpi Tactic dprolog.
-Elpi Accumulate File "pbt/dep-kernel.mod".
+Elpi Accumulate File "pbt/dep-kernel2.mod".
 Elpi Accumulate File "pbt/fpc-qbound.mod".
 Elpi Accumulate File "pbt/fpc-pair.mod".
 
@@ -37,9 +37,18 @@ i_n : insert x [] [x]
 | i_c : forall y: nat, forall ys: list nat, forall rs: list nat,  y <= x -> insert x ys rs -> insert x (y :: ys) (y :: rs).
 
 Goal insert 1 [] [1].
-elpi dprolog 10.
+elpi dprolog 4.
 Qed.
-Lemma i1:  exists R, insert 2 ([0] ++ [1])  R.
+
+Goal le 0 1.
+elpi dprolog 4.
+Qed.
+Lemma i0: insert 2 ([1])  [1;2].
+elpi  dprolog 10.
+Qed.
+Lemma i1:  exists R, insert 2 ([0; 1])  R.
+elpi  dprolog 10. Qed.
+Lemma i1i:  exists R, insert 2 ([0] ++ [1])  R.
 elpi  dprolog 10.
 Qed.
 Print i1.
@@ -49,7 +58,7 @@ apply i_c. auto.
 apply i_c. auto.
 apply i_n.
 Qed.
-Print i2.
+
 Print le.
  Inductive ordered : list nat -> Prop :=
 onl : ordered []

@@ -1,7 +1,7 @@
-module dep-kernel.
+module dep-kernel2.
 
-%% Experimental kernel with dependent types and proof terms
-
+%% Separate forall and imp left
+type get_head term -> term -> o.
 get_head (prod _ _ T) Head :- get_head (T X_) Head.
 get_head (app L) (app L).
 
@@ -118,14 +118,23 @@ check Cert (bc A A' []) :-
   coq.unify-eq A A' ok,
   	coq.say "Init OK" {coq.term->string A}.
 	
-check Cert (bc (prod _ Ty1 Ty2) Goal OutTerm) :-
+% implication
+check Cert (bc (prod _ Ty1 (x\ Ty2)) Goal OutTerm) :-
+!,
    prod_expert Cert Cert1 Cert2,
-coq.say "backchain clause"  {coq.term->string (Ty2 Tm)} "on goal"{coq.term->string Goal},
-  check Cert1 (bc (Ty2 Tm) Goal ListArgs),
+coq.say "backchain IMP clause"  {coq.term->string Ty2} "on goal"{coq.term->string Goal},
+  check Cert1 (bc (Ty2) Goal ListArgs),
   coq.say "go term " {coq.term->string Tm} "on goal" {coq.term->string Ty1},
   check Cert2 (go Ty1 Tm),
-
   OutTerm = [Tm|ListArgs].
 
-
+check Cert (bc (prod _ Ty1 Ty2) Goal OutTerm) :-
+   prod_expert Cert Cert1 Cert2,
+coq.say "backchain UNIV clause"  {coq.term->string (Ty2 Tm)} "on goal"{coq.term->string Goal},
+  check Cert1 (bc (Ty2 Tm) Goal ListArgs),
+  coq.say "check " {coq.term->string Tm} "on type" {coq.term->string Ty1},
+  coq.typecheck Tm Ty1 ok,
+%  check Cert2 (go Ty1 Tm),
+ Cert2 = Cert,
+  OutTerm = [Tm|ListArgs].
 
