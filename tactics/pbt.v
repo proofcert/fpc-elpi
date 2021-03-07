@@ -3,7 +3,7 @@ Require Import Arith.
 Require Import Coq.Lists.List.
 Import ListNotations.
 Elpi Tactic pbt.
-Elpi Accumulate File "pbt/kernel.mod".
+Elpi Accumulate File "pbt/unused/kernel.mod".
 Elpi Accumulate File "pbt/fpc-qbound.mod".
 Elpi Accumulate File "pbt/fpc-pair.mod".
 
