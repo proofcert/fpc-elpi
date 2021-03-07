@@ -1,3 +1,13 @@
+
+(* AM: generalize to other fpc: could use more parametrization
+in preprocess 
+
+- qheight is the default (same call)
+- can do qsize or pairing of height and size
+
+    call dep_pbt size 10 
+*)
+
 From elpi Require Import elpi.
 
 Elpi Tactic dep_pbt.
@@ -5,6 +15,7 @@ Elpi Accumulate File "pbt/dep-kernel.mod".
 Elpi Accumulate File "pbt/fpc-qbound.mod".
 Elpi Accumulate File "pbt/fpc-pair.mod".
 Elpi Accumulate lp:{{
+
   %% build_clauses: given a Coq context, creates copy clauses associating
   %% the eigenvariables to fresh logic variables
   % goal-ctx is a list of predicates of the form "decl Var Name Type",
@@ -14,6 +25,7 @@ Elpi Accumulate lp:{{
   % eigenvariable to a fresh (hence the Elpi syntax X_) lProlog logic variable.
   % Morally, this turns universally quantified eigenvariables into existentially
   % quantified logic variables.
+
   type build_clauses goal-ctx -> list prop -> prop.
   build_clauses [decl Var _Name _Ty] [(copy Var X_ :- !)].
   build_clauses [decl Var _Name _Ty | Ds] [(copy Var X_ :- !)| Cs] :-
@@ -25,34 +37,29 @@ Elpi Accumulate lp:{{
   % copies each eigenvariable to its type. Indeed, the tactic will be invoked
   % with a list of parameters that are simply eigenvariables: c1, c3, ... With
   % this predicate, we wish to create goals of the intended types.
+
+
   type env_clauses goal-ctx -> list prop -> prop.
   env_clauses [decl Var _ Ty] [(copy Var Ty :- !)].
   env_clauses [decl Var _ Ty |L] [(copy Var Ty :- !)|Cs] :-
     env_clauses L Cs.
+
   %% remove_trm: removes the coercion trm on the argument and returns a list of terms
   type remove_trm list argument -> list term -> prop.
   remove_trm [trm A] [A].
   remove_trm [trm A | R] [A|R'] :- remove_trm R R'.
-  solve [int N, trm Prog | SpecT] [goal Ctx _Ev Goal _] _OutGoals :-
+  %          +   +     -   -     -
+  % type preprocess goal-ctx -> list argument -> list term -> ? -> ? -> prop.
+  preprocess Ctx SpecT Spec  Cs Progs :-
     remove_trm SpecT Spec,
     build_clauses Ctx Cs,
-    env_clauses Ctx Progs,
-    %% First copy: assume the clauses copying the context's eigenvariables to
-    %% their types. Then, apply the replacement to the terms given as
-    %% specification and program. Thus: if the specification is [c1], the program [c3]
-    %% and the context is ["c1: list nat", "c2: list nat", "c3: rev c1 c2"], we will output
-    %% [list nat] for SpecTypes, [rev c1 c2] for ProgType
-    (Progs => (std.map Spec (x\ y\ copy x y) SpecTypes,
+    env_clauses Ctx Progs.
+  
+  % default fpc: height
+solve [int N, trm Prog | SpecT] [goal Ctx _Ev Goal _] _OutGoals :-
+        preprocess Ctx SpecT Spec Cs Progs,
+        (Progs => (std.map Spec (x\ y\ copy x y) SpecTypes,
     copy Prog ProgType)),
-    %% Second copy: assume the clauses copying the context's eigenvariables to
-    %% fresh logic variables. Then, apply the replacement to the specification
-    %% types and program types obtained in the previous step, to the specification
-    %% variables given as parameter to the tactic, and to the goal.
-    %% Thus, following the example from the previous step, we will get
-    %% [list nat] for SpecGoals, [X0] for SpecVars, [rev X0 X1] for ProgGoal
-    %% If the Goal is "ordered c1", then PropGoal is "ordered X1".
-    %% (note that fresh variables are present for the entire context, even if
-    %% it has not been declared as specification)
     (Cs => (std.map SpecTypes (x\y\ copy x y) SpecGoals,
     std.map Spec (x\y\ copy x y) SpecVars,
     copy ProgType ProgGoal,
@@ -68,5 +75,39 @@ Elpi Accumulate lp:{{
     % coq.say "Run" {coq.term->string PropGoal},
     not (interp PropGoal),
     coq.say "Counterexample:" {coq.term->string ProgGoal}.
+% qsize
+solve [str "size", int N, trm Prog | SpecT] [goal Ctx _Ev Goal _] _OutGoals :-
+      preprocess Ctx SpecT Spec Cs Progs,
+        
+        (Progs => (std.map Spec (x\ y\ copy x y) SpecTypes,
+    copy Prog ProgType)),
+    (Cs => (std.map SpecTypes (x\y\ copy x y) SpecGoals,
+    std.map Spec (x\y\ copy x y) SpecVars,
+    copy ProgType ProgGoal,
+    copy Goal PropGoal)),
+ 
+    std.map SpecGoals (g\t\ check (qgen (qsize N M_)) (go g t)) SpecVars,
+    interp ProgGoal,
+    not (interp PropGoal),
+    coq.say "Counterexample:" {coq.term->string ProgGoal}.
+
+    
+% pair
+solve [str "pair", int N, int S, trm Prog | SpecT] [goal Ctx _Ev Goal _] _OutGoals :-
+      preprocess Ctx SpecT Spec Cs Progs,
+        
+        (Progs => (std.map Spec (x\ y\ copy x y) SpecTypes,
+    copy Prog ProgType)),
+    (Cs => (std.map SpecTypes (x\y\ copy x y) SpecGoals,
+    std.map Spec (x\y\ copy x y) SpecVars,
+    copy ProgType ProgGoal,
+    copy Goal PropGoal)),
+ 
+    std.map SpecGoals 
+       (g\t\ check (pair (qgen (qheight N)) (qgen (qsize S S2_ )))
+                  (go g t)) SpecVars,
+    interp ProgGoal,
+    not (interp PropGoal),
+    coq.say "Counterexample:" {coq.term->string ProgGoal}.        
 }}.
 Elpi Typecheck.
