@@ -1,7 +1,8 @@
 \documentclass{article}
 
 \begin{document}
-\title{Cover letter for ``Two applications\dots''}
+\title{Revisions made to the paper \\
+  ``Two applications of logic programming to Coq''}
 \maketitle{}
 
 \section*{Main Changes}
@@ -11,20 +12,85 @@
 \item ``auto'' with Hints (?)
 \item other \dots
 \end{itemize}
+
 \section*{Reviewer 1}
 \begin{verbatim}
-An introduction to the topic, or at
-least a section explaining the application in the paper, would be
-necessary to open the paper to a larger audience.
+An introduction to the topic, or at least a section explaining
+ the application in the paper, would be necessary to open the
+ paper to a larger audience.
 \end{verbatim}
-comment
+
+The reviewer is asking for more of an introduction about FPC.  We
+have done two things to the paper.  First, we have added a
+paragraph providing more of an explanation about FPC in Section
+3.2.2.  Second, since the FPCs in the ``property-based testing''
+part of his paper are rather simple, we illustrate their
+operation on a few examples.  Those examples can be understood
+fully from the little bit of Prolog code used to describe them.
+The role of FPCs in Section 5 is more substantial but we are able
+to treat them more as a blackbox: the elaboration aspect of FPCs
+come from using parallel interpretation within logic programming:
+these concepts have now been illustrated in Section 4.
+
 \begin{verbatim}
-It is misterious why you choosed to only use constructors: you never
-justify this restriction. There is also an hint that you can use the Hints
-that eauto uses, but this is not reflected in your code. How can it be?
+page 5, Figure 1: the first inference rule (the decide inference
+ rule) seems wrong. Indeed you are adopting Coq's syntx
+ Ind[p](\Gamma_I := \Gamma_C) where p is a list of abstractions
+ over so called uniform parameters.  You seem to never
+ instantiate them in the rule. Moverover, the premise "(head A :
+ T) \in \Gamma_I" is also suspicious. I would expect that premise
+ to compute a substitution \sigma for p, to be applied to D in
+ both premises (e.g. D\sigma).
+\end{verbatim}
+
+comment
+
+\begin{verbatim}
+It is mysterious why you choose to only use constructors: you
+ never justify this restriction. There is also an hint that you
+ can use the Hints that eauto uses, but this is not reflected in
+ your code. How can it be?
 \end{verbatim}
 comment
+
+\begin{verbatim}
+page 1: put some references for "that has not been given a
+ satisfactory representation in type theory" and for "have
+ difficulty treating linear negation and the multiplicative
+ disjunction"
+\end{verbatim}
+
+We modified the claims in that paragraph and added two references
+to help support those modified claims.
+
 \section*{Reviewer 2}
 
+\begin{verbatim}
+1. The paper is centered on the idea that it is possible to use
+ Coq-elpi to construct tactics following the ideas from FPC, but
+ it lacks a proper evaluation of the tactics to show its
+ benefits. It would make for a stronger story to have a thorough
+ evaluation with its competitors (eauto for the first tactic and
+ QuickChick for the second), even in restricted scenarios.
+\end{verbatim}
+comment
+
+\begin{verbatim}
+2. The code is not available. The cited
+ https://github.com/proofcert/fpc-elpi returns 404, and the
+ search for fpc-elpi failed, as well inspecting the repos from
+ the proofcert organization.
+\end{verbatim}
+
+We are sorry for not having converted our repository from private
+to public.  We have fixed this problem now.
+
+\begin{verbatim}
+1. The proof term shown as the result of calling the tactic to
+ prove i1 is missing some terms, namely, the inequalities
+ proofs. Are these also automatically obtained by the tactic?
+\end{verbatim}
+
+comment
 
 \end{document}
