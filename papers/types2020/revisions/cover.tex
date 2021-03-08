@@ -7,11 +7,17 @@
 
 \section*{Main Changes}
 
-\begin{itemize}
-\item ``auto'' with conversion
-\item ``auto'' with Hints (?)
-\item other \dots
-\end{itemize}
+From the implementation point of view, we have extended the kernel to
+account for conversion: this allows us to do prolog search and
+therefore PBT on Inductive definitions that mix deduction and
+computation. We have also implemented some optimizations to the kernel
+itself, as briefly mentioned in the conclusion. We have experimented
+with adding Hints to the kernel via Coq-Elpi's \texttt{Accumulate DB}
+and while this is doable, it is not particularly useful for the
+intended application, namely PBT. What we're working on is modifying
+the elaboration tactic of Sec 5, which already sees the local context,
+to handle Hints and Inductive. However,  given the deadline, this
+will be future work.
 
 \section*{Reviewer 1}
 \begin{verbatim}
@@ -36,14 +42,14 @@ these concepts have now been illustrated in Section 4.
 page 5, Figure 1: the first inference rule (the decide inference
  rule) seems wrong. Indeed you are adopting Coq's syntx
  Ind[p](\Gamma_I := \Gamma_C) where p is a list of abstractions
- over so called uniform parameters.  You seem to never
- instantiate them in the rule. Moverover, the premise "(head A :
- T) \in \Gamma_I" is also suspicious. I would expect that premise
- to compute a substitution \sigma for p, to be applied to D in
- both premises (e.g. D\sigma).
+ over so called uniform parameters ...
+The alternative is that the parameters are explicitly quantified both in
+\Gamma_i and \Gamma_C (the way the inductive type packet is represented
+internally into Coq) and p becomes just a number that says how many of the
+abstractions are parameters.
 \end{verbatim}
 
-comment
+We meant the latter alternative. This is now made explicit in the text.ù
 
 \begin{verbatim}
 It is mysterious why you choose to only use constructors: you
@@ -51,7 +57,12 @@ It is mysterious why you choose to only use constructors: you
  can use the Hints that eauto uses, but this is not reflected in
  your code. How can it be?
 \end{verbatim}
-comment
+As anticipated before, it is immediate to add another ``decide'' rule
+that picks up previously proven lemmas. That would be close to the
+functionality of \texttt{Hint Resolve}, but does not literally uses
+Coq's Hints facility. It is conceivable that we could write some glue
+code to connect the two, but handling all the fairly sophistcated features of the Hint
+mechanism is out of the scope of this paper.
 
 \begin{verbatim}
 page 1: put some references for "that has not been given a
@@ -91,6 +102,8 @@ to public.  We have fixed this problem now.
  proofs. Are these also automatically obtained by the tactic?
 \end{verbatim}
 
-comment
+Well spotted: we had forgot the guard in the third clause of \texttt{insert}. The roof terms now reflects those evidence.
 
 \end{document}
+
+% LocalWords:  FPC FPCs blackbox
