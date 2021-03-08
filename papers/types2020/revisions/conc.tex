@@ -18,7 +18,7 @@ There are many avenues of developments for this line of research.
 The code reported in Fig.~\ref{fig:augmented} is somewhat idealized in
 so far that we omitted a rule performing weak-head reduction (allowing
 to handle directly existential goals) and more importantly one that uses
- Elpi's \emph{delay} mechanism. % This a distinguished feature of Elpi, whose
+ Elpi's \emph{delay} mechanism.\ednote{This may not be accurate anymore -am} % This a distinguished feature of Elpi, whose
 % usef has been advocated in ~\cite{DunchevCT16,coen19mscs}.
 The
 use of constraints for data generation is well
@@ -28,10 +28,10 @@ say lists with at least two elements as \texttt{[1,2|Tail]}, without
 recurring to needed narrowing as in 
 LazySmallCheck~\cite{smallcheck}. On the more practical side, it would be worthwhile to investigate \emph{random} generation, following the ideas in~\cite{pltredexconstraintlogic,blanco19ppdp}.
 
-Another current limitation of our PBT tactic is that it does not
-handle conversion within an inductive relation. One way to address
-this is to have the \emph{init} rule use Coq's unification rather than
-\lP's, via Coq-Elpi's \lsti{coq.unif-eq} hook.
+% Another current limitation of our PBT tactic is that it does not
+% handle conversion within an inductive relation. One way to address
+% this is to have the \emph{init} rule use Coq's unification rather than
+% \lP's, via Coq-Elpi's \lsti{coq.unif-eq} hook.
 %We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
 % Mention \emph{Harpoon}, Beluga's new tactic language?
 
@@ -41,7 +41,7 @@ this is to have the \emph{init} rule use Coq's unification rather than
  can go as far as FPC for inductive proofs~\cite{blanco15wof}.
 
  \smallskip
- The source files mentioned in this paper are available at \url{https://github.com/proofcert/fpc-elpi}.
+ The source files mentioned in this paper are available at \url{https://github.com/proofcert/fpc-elpi}.\ednote{Or not. Fix this -am}
 
  % \begin{metanote}
 %   Decided against a related work section: most is already discussed in the intro, the rest can be mentioned in passing --am

@@ -150,7 +150,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  unfold progress.
  intros e t Ht.    
  (*elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *) *)
- elpi dep_pbt 2 (Ht) (e) . (* does not work gen (t)*)   
+ elpi dep_pbt 2 (Ht) (e) . (* loops if gen (t)*)   
  Abort.
  
  (* variation 3: failure of step det *)
@@ -193,8 +193,8 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  End M3.  
  
- (* (tif tfalse ?e1 ?e0 = tif ttrue ?e0 ?e6) 
- Finds the cex, albeit not fully instantiated: 
+ (* 
+ pbt Finds the cex, albeit not fully instantiated: 
  dep_pbt does it! *)
  Goal deterministic M3.step.
  unfold deterministic.
@@ -235,17 +235,18 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  
  (* pres  fail for M6: M = tpred(tzero) M' = tzero T = tBool
- [Note: it loops if step is the generator*)
+ [Note: it loops if step is the generator
+ but I can use typing as a gen*)
  
  
  Goal forall e e', preservation e e' M6.has_type step.
  unfold preservation.
  intros e e' t Hs Ht.    
  (* elpi pbt (Ht) (Hs)  3 (e).*)
- elpi dep_pbt 2 (Ht /\ Hs) (e). 
+ elpi dep_pbt 2 (Hs) (Ht). (* can also be e*) 
  Abort.
  
- (* Next  fails with same cex
+ (* Next  fails with cex
  E = tpred(tzero)
  T1 = tnat
  T2 = tbool

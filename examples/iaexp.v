@@ -14,11 +14,11 @@ Inductive typ : Type :=
  Inductive tm : typ -> Type :=
  | ttrue : tm TBool
  | tfalse : tm TBool
- | tif T: tm  TBool-> tm T -> tm T -> tm T
  | tzero : tm TNat
  | tsucc : tm TNat -> tm TNat
  | tpred : tm TNat-> tm TNat
- | tiszero : tm TNat-> tm TBool.
+ | tiszero : tm TNat-> tm TBool
+ | tif T: tm  TBool-> tm T -> tm T -> tm T.
 
  Inductive value : forall {T:typ}, tm T -> Prop :=
    | iNz : value tzero

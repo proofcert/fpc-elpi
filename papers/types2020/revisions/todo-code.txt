@@ -1,3 +1,8 @@
+Lemma i1:  exists R, insert 2 ([0; 1])  R.
+
+check  (fun R : list nat => insert 2 [0; 1] R) on type (list nat -> Prop)
+
+---------
 bugs?
 
 in iaexp.elf, progress is found to be false with cex

@@ -47,6 +47,7 @@ Lemma i0: insert 2 ([1])  [1;2].
 elpi  dprolog 10.
 Qed.
 Lemma i1:  exists R, insert 2 ([0; 1])  R.
+eexists.
 elpi  dprolog 10. Qed.
 Lemma i1i:  exists R, insert 2 ([0] ++ [1])  R.
 elpi  dprolog 10.
@@ -73,7 +74,7 @@ Qed.
 
  Goal ordered [0;1;2;6].
    
-   elpi dprolog 20.
+   elpi dprolog 10.
    Qed.
 
    Inductive append : list nat -> list nat -> list nat -> Prop :=
