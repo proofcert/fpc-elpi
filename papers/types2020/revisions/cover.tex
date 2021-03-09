@@ -16,8 +16,8 @@ with adding Hints to the kernel via Coq-Elpi's \texttt{Accumulate DB}
 and while this is doable, it is not particularly useful for the
 intended application, namely PBT. What we're working on is modifying
 the elaboration tactic of Sec 5, which already sees the local context,
-to handle Hints and Inductive. However,  given the deadline, this
-will be future work.
+to handle Hints and Inductive. All the peices are in place, however,  given the deadline, this
+will not be part of this submission.
 
 \section*{Reviewer 1}
 \begin{verbatim}
@@ -49,7 +49,7 @@ internally into Coq) and p becomes just a number that says how many of the
 abstractions are parameters.
 \end{verbatim}
 
-We meant the latter alternative. This is now made explicit in the text.ù
+We meant the latter alternative. This is now made explicit in the text.
 
 \begin{verbatim}
 It is mysterious why you choose to only use constructors: you
@@ -60,7 +60,7 @@ It is mysterious why you choose to only use constructors: you
 As anticipated before, it is immediate to add another ``decide'' rule
 that picks up previously proven lemmas. That would be close to the
 functionality of \texttt{Hint Resolve}, but does not literally uses
-Coq's Hints facility. It is conceivable that we could write some glue
+Coq's Hints facility. It is feasable that to write some glue
 code to connect the two, but handling all the fairly sophistcated features of the Hint
 mechanism is out of the scope of this paper.
 
@@ -84,7 +84,11 @@ to help support those modified claims.
  evaluation with its competitors (eauto for the first tactic and
  QuickChick for the second), even in restricted scenarios.
 \end{verbatim}
-comment
+
+We meant this paper to be a proof-of-concept rather than a system
+paper. We are not in the position to carry out a ``thorough evaluation'' with
+Coq's automation not with QuickChick, if not for the high-level, qualitative remarks we have made in the paper. [AM: add more if I do more about dependent terms]
+
 
 \begin{verbatim}
 2. The code is not available. The cited
@@ -102,8 +106,14 @@ to public.  We have fixed this problem now.
  proofs. Are these also automatically obtained by the tactic?
 \end{verbatim}
 
-Well spotted: we had forgot the guard in the third clause of \texttt{insert}. The roof terms now reflects those evidence.
+Well spotted: we had forgot the inequality guard in the third clause of
+\texttt{insert}. The proof terms now reflects those evidence.
 
 \end{document}
 
 % LocalWords:  FPC FPCs blackbox
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
