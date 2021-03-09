@@ -1,6 +1,7 @@
 -R tactics/ fpc_elpi.tactics
 -R examples/ fpc_elpi.examples
 tactics/pbt.v
+tactics/dprolog.v
 tactics/coq_fpc.v
 tactics/dep_pbt.v
 examples/aexp.v

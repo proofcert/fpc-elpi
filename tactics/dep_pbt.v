@@ -11,6 +11,15 @@ in preprocess
 From elpi Require Import elpi.
 
 Elpi Tactic dep_pbt.
+(* Debugging symbols:
+RAW means no pretty printing is used for Coq terms, and
+the HOAS encoding is printed.
+INTERP prints calls to the prolog interpreter
+KERNEL prints call to the kernel *)
+(* Elpi Debug "DEBUG_INTERP". *)
+(* Elpi Debug "DEBUG_INTERP_RAW". *)
+(* Elpi Debug "DEBUG_KERNEL". *)
+(* Elpi Debug "DEBUG_KERNEL_RAW". *)
 Elpi Accumulate File "pbt/dep-kernel.mod".
 Elpi Accumulate File "pbt/fpc-qbound.mod".
 Elpi Accumulate File "pbt/fpc-pair.mod".

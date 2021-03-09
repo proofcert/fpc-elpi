@@ -6,7 +6,11 @@ Require Import Coq.Lists.List.
 
 
 Elpi Tactic dprolog.
-Elpi Accumulate File "pbt/dep-kernel2.mod".
+(* Debugging symbols: RAW means no pretty printing is used for Coq terms, and
+the HOAS encoding is printed. *)
+(* Elpi Debug "DEBUG_KERNEL". *)
+(* Elpi Debug "DEBUG_KERNEL_RAW". *)
+Elpi Accumulate File "pbt/dep-kernel.mod".
 Elpi Accumulate File "pbt/fpc-qbound.mod".
 Elpi Accumulate File "pbt/fpc-pair.mod".
 
@@ -27,9 +31,7 @@ solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
   }}.
- Elpi Typecheck. 
-
- Elpi Bound Steps 1000000.
+Elpi Typecheck. 
 
 Inductive insert (x:nat) : list nat -> list nat -> Prop :=
 i_n : insert x [] [x]
@@ -65,29 +67,27 @@ Print le.
 onl : ordered []
 | oss : forall x : nat, ordered [x]
 | ocn : forall (x y : nat) (l : list nat),
-     ordered (y :: l) -> x <= y -> ordered (x :: y :: l).
+        ordered (y :: l) -> x <= y -> ordered (x :: y :: l).
 
 Goal exists Xs, ordered Xs.
-eexists.
-elpi dprolog 10.
+  eexists.
+  elpi dprolog 10.
 Qed.
 
- Goal ordered [0;1;2;6].
-   
-   elpi dprolog 10.
-   Qed.
+Goal ordered [0;1;2;6].
+  elpi dprolog 10.
+Qed.
 
-   Inductive append : list nat -> list nat -> list nat -> Prop :=
-   anl : forall xs, append [] xs xs
-   |acn : forall xs ys zs x, 
-        append xs ys zs -> append (x :: xs) ys (x :: zs).
+Inductive append : list nat -> list nat -> list nat -> Prop :=
+  anl : forall xs, append [] xs xs
+ |acn : forall xs ys zs x, append xs ys zs -> append (x :: xs) ys (x :: zs).
 
-  (* Goal exists L1 L2, append L1 L2 [0;1;2;6]. *)
-  Goal append  [0] [1;2;6] [0;1;2;6].
+(* Goal exists L1 L2, append L1 L2 [0;1;2;6]. *)
+Goal append  [0] [1;2;6] [0;1;2;6].
   elpi dprolog 20.
 Qed.
 
- Goal exists L, append  L [1;2;6] [0;1;2;6].
- eexists.
- elpi dprolog  20.
- Qed.
+Goal exists L, append  L [1;2;6] [0;1;2;6].
+  eexists.
+  elpi dprolog  20.
+Qed.

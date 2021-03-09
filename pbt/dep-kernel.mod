@@ -52,12 +52,12 @@ check Cert (bc A1 A2 Terms) :-
   coq.term->string A1 S1,
   coq.term->string A2 S2,
   std.map Terms (x\y\ coq.term->string x y) T1,
-  coq.say "Backchain: " S1 ", goal " S2 ", proofterm " T1, fail.
+  coq.say "Backchain:" S1 "\nBC-Goal:" S2 "\nPT-List:" T1, fail.
 :if "DEBUG_KERNEL"
 check Cert (go A Term):-
   coq.term->string A S,
   coq.term->string Term T1,
-  coq.say "Goal: " A ", proofterm " Term, fail.
+  coq.say "Goal:" A "\nProofterm" Term, fail.
 
 % check Cert (go X Term ):-
 %   var X,
@@ -65,7 +65,7 @@ check Cert (go A Term):-
 
 check Cert (go (sort S) Term ):-
  	tt_expert Cert,
-  coq.say "Term " {coq.term->string Term}  "has Sort" {coq.term->string (sort S)},
+  % coq.say "Term " {coq.term->string Term}  "has Sort" {coq.term->string (sort S)},
   coq.typecheck Term (sort S) ok. %% Resort to Coq typechecking: we could do better
 
 check Cert (go {{lp:G1 = lp:G2}} {{eq_refl}}):-
@@ -73,7 +73,7 @@ check Cert (go {{lp:G1 = lp:G2}} {{eq_refl}}):-
 	eq_expert Cert.
 
 check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
-	coq.say "calling forall right *****" ,
+	% coq.say "calling forall right *****" ,
 	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).
 
 check Cert (go Atom Term) :-
@@ -84,7 +84,7 @@ check Cert (go Atom Term) :-
 	%% Use the selected constructor as key to find its
 	%% clause in the zipped list of constructors and clauses.
 	std.lookup {std.zip Kn Clauses} K Clause,
-	coq.say "decide clause"  {coq.term->string Clause} "on goal" {coq.term->string Atom},
+	% coq.say "decide clause"  {coq.term->string Clause} "on goal" {coq.term->string Atom},
 	check Cert' (bc Clause Atom ListArgs),
   coq.mk-app Kons ListArgs Term.
 
@@ -108,23 +108,23 @@ check Cert (go (app [(fun A B C)| Args]) Term) :-
 
 check Cert (bc A A' []) :-
 	tt_expert Cert,
-  coq.unify-eq A A' ok,
-  coq.say "Init OK" {coq.term->string A}.
+  coq.unify-eq A A' ok.
+  % coq.say "Init OK" {coq.term->string A}.
 
 check Cert (bc (prod _ Ty1 (x\ Ty2)) Goal OutTerm) :-
   !,
   prod_expert Cert Cert1 Cert2,
-  coq.say "backchain IMP clause"  {coq.term->string Ty2} "on goal"{coq.term->string Goal},
+  % coq.say "backchain IMP clause"  {coq.term->string Ty2} "on goal"{coq.term->string Goal},
   check Cert1 (bc Ty2 Goal ListArgs),
-  coq.say "go term " {coq.term->string Tm} "on goal" {coq.term->string Ty1},
+  % coq.say "go term " {coq.term->string Tm} "on goal" {coq.term->string Ty1},
   check Cert2 (go Ty1 Tm),
   OutTerm = [Tm|ListArgs].
 
 check Cert (bc (prod _ Ty1 Ty2) Goal OutTerm) :-
   prod_expert Cert Cert1 Cert2,
-  coq.say "backchain UNIV clause"  {coq.term->string (Ty2 Tm)} "on goal"{coq.term->string Goal},
+  % coq.say "backchain UNIV clause"  {coq.term->string (Ty2 Tm)} "on goal"{coq.term->string Goal},
   check Cert1 (bc (Ty2 Tm) Goal ListArgs),
-  coq.say "check " {coq.term->string Tm} "on type" {coq.term->string Ty1},
+  % coq.say "check " {coq.term->string Tm} "on type" {coq.term->string Ty1},
   coq.typecheck Tm Ty1 ok,
 %  check Cert2 (go Ty1 Tm),
   Cert2 = Cert,
