@@ -8,7 +8,7 @@
 \section*{Main Changes}
 
 From the implementation point of view, we have extended the kernel to
-account for conversion: this allows us to do prolog search and
+account for conversion: this allows us to do Prolog search and
 therefore PBT on Inductive definitions that mix deduction and
 computation. We have also implemented some optimizations to the kernel
 itself, as briefly mentioned in the conclusion. We have experimented
@@ -16,7 +16,7 @@ with adding Hints to the kernel via Coq-Elpi's \texttt{Accumulate DB}
 and while this is doable, it is not particularly useful for the
 intended application, namely PBT. What we're working on is modifying
 the elaboration tactic of Sec 5, which already sees the local context,
-to handle Hints and Inductive. All the peices are in place, however,  given the deadline, this
+to handle Hints and Inductive. All the pieces are in place, however,  given the deadline, this
 will not be part of this submission.
 
 \section*{Reviewer 1}
@@ -60,9 +60,23 @@ It is mysterious why you choose to only use constructors: you
 As anticipated before, it is immediate to add another ``decide'' rule
 that picks up previously proven lemmas. That would be close to the
 functionality of \texttt{Hint Resolve}, but does not literally uses
-Coq's Hints facility. It is feasable that to write some glue
-code to connect the two, but handling all the fairly sophistcated features of the Hint
+Coq's Hints facility. It is feasible that to write some glue
+code to connect the two, but handling all the fairly sophisticated features of the Hint
 mechanism is out of the scope of this paper.
+\begin{verbatim}
+you are re-implementing a better eauto. However, your
+implementation only applies as lemmas constructors of an inductive type.
+Note: I understand, because I know it in advance, that a reason could be
+that you plan to use LP negation as failure in the later section on testing.
+Therefore you need a close world specification. If that's the main reason,
+it should be made explicit in the paper.
+\end{verbatim}
+If we have an inductive predicate $p$ and then prove a lemma about it,
+this does not violate the CWA, since the lemma is true in the same
+least model of $p$.  Operationally though, it could alter NF's
+capability of finding \emph{finite} failure, since the latter is
+implemented by the vanilla meta-interpreter, which is not FPC-driven. At this stage
+we do not see a reason to have lemmata in PBT. We have mentioned this in the paper.
 
 \begin{verbatim}
 page 1: put some references for "that has not been given a
@@ -86,8 +100,17 @@ to help support those modified claims.
 \end{verbatim}
 
 We meant this paper to be a proof-of-concept rather than a system
-paper. We are not in the position to carry out a ``thorough evaluation'' with
-Coq's automation not with QuickChick, if not for the high-level, qualitative remarks we have made in the paper. [AM: add more if I do more about dependent terms]
+paper. We are not in the position to carry out a ``thorough
+evaluation'' with Coq's automation not with QuickChick, if not for the
+high-level, qualitative remarks we have made in the paper.  We have
+carried out in QuickChick the example in Section 4, both with a
+functional and a relational encoding. The code is present in our
+examples repo. We have added a few remarks in the paper but space
+prevents us form explaining the features of QuickChick and their
+peculiarity. [AM: add more if I do more about dependent
+terms]. Finally, we may have misstated the ambitions of our Prolog
+tactic, which does not mean to compete with eauto, but merely is the
+building block of FPC-driven PBT of relational specifications. We have rephrased its characterization in the paper.
 
 
 \begin{verbatim}
@@ -106,14 +129,15 @@ to public.  We have fixed this problem now.
  proofs. Are these also automatically obtained by the tactic?
 \end{verbatim}
 
-Well spotted: we had forgot the inequality guard in the third clause of
+Well spotted: we had simply forgot the inequality guard in the third clause of
 \texttt{insert}. The proof terms now reflects those evidence.
 
 \end{document}
 
-% LocalWords:  FPC FPCs blackbox
+% LocalWords:  FPC FPCs blackbox Coq PBT QuickChick repo CWA NF's
 
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
 %%% End:
+% LocalWords:  lemmata

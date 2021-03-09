@@ -227,7 +227,7 @@ of the FPC framework: in essence, an FPC will be used as a simple
 mechanism for bounding the search for proofs.  In our examples, a
 proof certificate, denoted by the schematic variable $\XXi$, is a
 particular term that is threaded throughout a logic programming
-interperter.  For example, the inference rules in
+interpreter.  For example, the inference rules in
 Figure~\ref{fig:augmented} are augmented with an additional premise
 that invokes an \emph{expert predicate} with is responsible for
 extracting relevant information from a proof certificate $\XXi$ as
@@ -334,13 +334,12 @@ ex_intro (fun R : list nat => insert 2 ([0] $++$ [1]) R)   [0; 1; 2]
 	 (i_c 2 1 [] [2] (le_S 1 1 (le_n 1)) (i_n 2)))
 \end{lstlisting}
 
-The \lsti{dprolog} tactic can be seen as a programmable (and possibly
-faster) version of Coq's \lsti{eauto}% , although it currently lacks the
+The \lsti{dprolog} tactic implements some of the features of Coq's \lsti{eauto}% , although it currently lacks the
 % latter's capability of solving goals by
 % \lsti{reflexivity}
 ; % as well as the modularity of using
 % \lsti{Hints} as introduction rules
- \lsti{dprolog} is not restricted to depth-first search, since
+ it is programmable and as such  not restricted to depth-first search, since
 it follows the dictates of the given FPC; for example we could easily add
 iterative-deepening search. Furthermore,
 %% commented out till we know for sure:

@@ -5,12 +5,12 @@ ttE   (qheight _).
 sortE (qheight _).
 prodE (qheight H) (qheight H) (qheight H) T.
 decideE Kn (qheight H) (qheight H') K :- std.mem Kn K, H  > 0, H' is H  - 1.
-
+%
 ttE   (qsize In In).
 sortE (qsize In In).
 prodE (qsize In Out) (qsize In Mid) (qsize Mid Out) T.
 decideE Kn (qsize In Out) (qsize In' Out) K :- std.mem Kn K, In > 0, In' is In - 1.
-
+%
 ttE   (A <c> B) :- ttE A,   ttE B.
 sortE (A <c> B) :- sortE A, sortE B.
 prodE (C1 <c> C2) (D1 <c> D2) (E1 <c> E2) T :- prodE C1 D1 E1 T, prodE C2 D2 E2 T.

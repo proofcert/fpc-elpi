@@ -8,36 +8,12 @@
 
 -- keep the dir structure? the kernel is under pbt, not ideal.
 
--- the code right now does not coincide with what is in the paper; e.g. the kernel has
-additional clauses (forall right, a clause with constraints). The prod expert does not collect the term etc. 
-
 - paper -
 
 -- we have to add DOI to bib entries
 
 
-
-
- R1:
-  An introduction to the topic, or at
-least a section explaining the application in the paper, would be
-necessary to open the paper to a larger audience. However, that
-requires space. Personally, I would suggest the authors to sacrifice
-part of Section 2 for this.
-[TODO DALE]
-
-
-
 -----------------------------------------------
-R1
-you are re-implementing a better eauto. However, your
-implementation only applies as lemmas constructors of an inductive type.
-Note: I understand, because I know it in advance, that a reason could be
-that you plan to use LP negation as failure in the later section on testing.
-Therefore you need a close world specification. If that's the main reason,
-it should be made explicit in the paper.
-
-[AM: I don't think that's it. If i have an inductive predicate p and then prove a lemma about p, this does not violate the CWA, since, well, the lemma is true in the same least model of p]
 
 -------------
 
@@ -45,6 +21,6 @@ NEW
 
 -- if we get the tactics to work with Hints, we need a new decide rule
    (or change the one we have).
-
+[not happening]
 
 

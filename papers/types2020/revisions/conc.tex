@@ -7,38 +7,44 @@ many tasks concerning the development, enrichment and even formal
 verification of proof assistants. The development of the Coq-Elpi
 plug-in has made this connection tighter.
 
-We have presented two application of this synergy: one geared towards
-providing a flexible approach to connecting external provers of
-first-order intuitionistic logic to Coq; the other supporting an out-of-the-box way to do property-based testing for pure inductive relations.
+We have presented two application of this synergy: one supporting an
+out-of-the-box way to do property-based testing for inductive
+relations; the other geared towards providing a flexible approach to
+connecting external provers of first-order intuitionistic logic to Coq
 %
 
 %\todo{sum up contribution}
 
-There are many avenues of developments for this line of research.
-The code reported in Fig.~\ref{fig:augmented} is somewhat idealized in
-so far that we omitted a rule performing weak-head reduction (allowing
-to handle directly existential goals) and more importantly one that uses
- Elpi's \emph{delay} mechanism.\ednote{This may not be accurate anymore -am} % This a distinguished feature of Elpi, whose
-% usef has been advocated in ~\cite{DunchevCT16,coen19mscs}.
-The
-use of constraints for data generation is well
-developed~\cite{FioravantiPS15} and we could try to leverage it to
-improve our PBT tactic so that it can use partially instantiated terms: for example generating
-say lists with at least two elements as \texttt{[1,2|Tail]}, without
-recurring to needed narrowing as in 
-LazySmallCheck~\cite{smallcheck}. On the more practical side, it would be worthwhile to investigate \emph{random} generation, following the ideas in~\cite{pltredexconstraintlogic,blanco19ppdp}.
+ The
+code reported in Fig.~\ref{fig:augmented} is a simplification for
+exposition purposes of the real implementation of the
+kernel. Following ideas from bidirectional type checking, we have
+factored out the product left rule in $\forall-L$ and $\supset-L$,
+where the former delegates to Coq the \emph{check} that the
+instantiation term $t$ is well-typed w.r.t.~$B$, while in the latter
+proof search will \emph{generate} such a term, given the type
+$B$. There are also other minor tweaks, such as
+a rule performing weak-head reduction (allowing
+us to handle directly existential goals).
 
-% Another current limitation of our PBT tactic is that it does not
-% handle conversion within an inductive relation. One way to address
-% this is to have the \emph{init} rule use Coq's unification rather than
-% \lP's, via Coq-Elpi's \lsti{coq.unif-eq} hook.
-%We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
-% Mention \emph{Harpoon}, Beluga's new tactic language?
+There are many avenues of developments for this line of research. 
+We would like to exploit one of distinguished features of Elpi: the
+\emph{delay} mechanism.  The use of constraints for data generation is
+well developed~\cite{FioravantiPS15} and we could try to leverage it
+to improve our PBT tactic so as to generate partially instantiated
+terms, % : for example generating say lists with at least two elements as
+% \texttt{[1,2|Tail]}
+without recurring to needed narrowing as in
+LazySmallCheck~\cite{smallcheck}. On the more practical side, it would
+be worthwhile to investigate \emph{random} generation, following the
+ideas in~\cite{pltredexconstraintlogic,blanco19ppdp}.
 
- Finally it makes sense to tie together the two threads of this paper
- and provide a way of checking and elaborating proof evidence for
- intuitionistic logic \emph{with} (inductively) defined atoms. This
- can go as far as FPC for inductive proofs~\cite{blanco15wof}.
+
+Finally it makes sense to tie together the two threads of this paper
+and provide a way of checking and elaborating proof evidence for
+intuitionistic logic \emph{over} (inductively) defined atoms and
+previously proven lemmata. This can go as far as FPC for inductive
+proofs~\cite{blanco15wof}.
 
  \smallskip
  The source files mentioned in this paper are available at \url{https://github.com/proofcert/fpc-elpi}.\ednote{Or not. Fix this -am}
@@ -58,7 +64,14 @@ LazySmallCheck~\cite{smallcheck}. On the more practical side, it would be worthw
 % \subsection{Future work}
 % \label{ssec:fut}
 %\todo{finish future work}
+% Another current limitation of our PBT tactic is that it does not
+% handle conversion within an inductive relation. One way to address
+% this is to have the \emph{init} rule use Coq's unification rather than
+% \lP's, via Coq-Elpi's \lsti{coq.unif-eq} hook.
+%We plan to tackle this either at the Ltac level by co-routining it with simplification tactics and/or by adding rewriting features to our FPC system~\cite{ChihaniM16}.
+% Mention \emph{Harpoon}, Beluga's new tactic language?
 
+ 
  % \todo{Link to the repo. Use \url{https://github.com/proofcert/fpc-elpi}, make it public andmove papers to parsifal}
  
 %%% Local Variables:
@@ -66,4 +79,5 @@ LazySmallCheck~\cite{smallcheck}. On the more practical side, it would be worthw
 %%% TeX-master: "main"
 %%% End:
 
-% LocalWords:  Elpi simp LJF PBT LazySmallCheck Ltac
+% LocalWords:  Elpi simp LJF PBT LazySmallCheck Ltac Coq provers FPC
+% LocalWords:  lemmata
