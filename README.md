@@ -18,15 +18,20 @@ then write or import their own specialized FPCs and use them as
 tactics inside Coq, providing a programmable and rigorous alternative
 to the often ad hoc process of proof automation.
 
+We present two application of this synergy: one supporting an
+out-of-the-box way to do property-based testing for inductive
+relations; the other geared towards providing a flexible approach to
+connecting external provers of first-order intuitionistic logic to Coq
+
 ## Prerequisites
 
 The software depends on the following packages, with minimal versions:
 
-- `coq` 8.11.0
+- `coq` 8.13.1
 
-- `coq-elpi` 1.6.0
+- `coq-elpi` 1.8.1
 
-- `elpi` 1.11.2
+- `elpi` 1.12.0
  
 We recommend installing the latest versions through the OPAM package manager,
 using the standard [OCaml OPAM repository](https://opam.ocaml.org/) as well as
@@ -52,11 +57,10 @@ Running `make` will compile the tactics and run all the examples.
 
 ## References
 
-A two-page extended abstract describing this project is available as 
-*FPC-Coq: Using ELPI to elaborate external proof evidence into Coq
-proofs* by Roberto Blanco, Matteo Managhetti, and Dale Miller.  This
-[draft](http://www.lix.polytechnique.fr/Labo/Dale.Miller/papers/fpccoq-draft.pdf)
-is dated 27 April 2020. 
+Matteo Manighetti, Dale Miller, and Alberto Momigliano. 
+Two applications of logic programming to Coq.  Draft dated 10 November 2020. 
+http://www.lix.polytechnique.fr/Labo/Dale.Miller/papers/lp-coq.pdf
+ 
 
 Other related references are listed below.
 
@@ -92,4 +96,4 @@ Other related references are listed below.
  LIPIcs 141, pages 29:1--29:18, Dagstuhl, Germany, 2019.
  http://doi.org/10.4230/LIPIcs.ITP.2019.29.
 
- 7. Enrico Tassi.  Coq plugin embedding ELPI. https://github.com/LPCIC/coq-elpi, 2020.
+ 7. Enrico Tassi.  Coq plugin embedding ELPI. https://github.com/LPCIC/coq-elpi, 2021.
