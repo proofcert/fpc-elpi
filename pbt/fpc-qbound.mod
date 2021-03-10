@@ -16,8 +16,11 @@ and_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
 or_expert (qgen (qheight H)) (qgen (qheight H)) _Ch.
 or_expert (qgen (qsize In Out)) (qgen (qsize In Out)) _Ch.
 
-prod_expert (qgen (qheight H)) (qgen (qheight H)) (qgen (qheight H)).
-prod_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
+prod_expert (qgen (qheight H)) (qgen (qheight H)).
+prod_expert (qgen (qsize In Out)) (qgen (qsize In Out)).
+
+imp_expert (qgen (qheight H)) (qgen (qheight H)) (qgen (qheight H)).
+imp_expert (qgen (qsize In Out)) (qgen (qsize In Mid)) (qgen (qsize Mid Out)).
 
 /* removed the bound decrease --am
 prod_expert (qgen (qheight H)) (qgen (qheight H')) (qgen (qheight H')) :-

@@ -29,7 +29,8 @@ type   tt_expert       cert -> o.
 type   eq_expert       cert -> o.
 type   or_expert       cert -> cert -> choice -> o.
 type   and_expert      cert -> cert -> cert -> o.
-type   prod_expert     cert -> cert -> cert -> o.
+type   imp_expert      cert -> cert -> cert -> o.
+type   prod_expert     cert -> cert -> o.
 type   prod_clerk      cert -> cert -> o.
 type   some_expert     cert -> cert -> A -> o.
 type   unfold_expert   list constructor -> cert -> cert -> constructor -> o.

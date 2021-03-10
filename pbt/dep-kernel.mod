@@ -57,24 +57,24 @@ check Cert (bc A1 A2 Terms) :-
 check Cert (go A Term):-
   coq.term->string A S,
   coq.term->string Term T1,
-  coq.say "Goal:" A "\nProofterm" Term, fail.
+  coq.say "Goal:" S "\nProofterm" T1, fail.
 
 % check Cert (go X Term ):-
 %   var X,
 %   declare_constraint (check Cert (go X Term)) [X].
 
-check Cert (go (sort S) Term ):-
- 	tt_expert Cert,
-  % coq.say "Term " {coq.term->string Term}  "has Sort" {coq.term->string (sort S)},
-  coq.typecheck Term (sort S) ok. %% Resort to Coq typechecking: we could do better
+% check Cert (go (sort S) Term ):-
+%  	tt_expert Cert,
+%   % coq.say "Term " {coq.term->string Term}  "has Sort" {coq.term->string (sort S)},
+%   coq.typecheck Term (sort S) ok. %% Resort to Coq typechecking: we could do better
 
 check Cert (go {{lp:G1 = lp:G2}} {{eq_refl}}):-
   coq.unify-eq G1 G2 ok,
 	eq_expert Cert.
 
-check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
-	% coq.say "calling forall right *****" ,
-	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).
+% check Cert (go (prod _ Ty1 Ty2) (fun _ Ty1 T)) :-
+% 	% coq.say "calling forall right *****" ,
+% 	pi x\ decl x _ Ty1 => check Cert (go (Ty2 x) (T x)).
 
 check Cert (go Atom Term) :-
   coq.safe-dest-app Atom (global (indt Prog)) _Args,
@@ -113,19 +113,20 @@ check Cert (bc A A' []) :-
 
 check Cert (bc (prod _ Ty1 (x\ Ty2)) Goal OutTerm) :-
   !,
-  prod_expert Cert Cert1 Cert2,
+  imp_expert Cert Cert1 Cert2,
   % coq.say "backchain IMP clause"  {coq.term->string Ty2} "on goal"{coq.term->string Goal},
   check Cert1 (bc Ty2 Goal ListArgs),
   % coq.say "go term " {coq.term->string Tm} "on goal" {coq.term->string Ty1},
+  coq.say "Cert" Cert2,
   check Cert2 (go Ty1 Tm),
   OutTerm = [Tm|ListArgs].
 
 check Cert (bc (prod _ Ty1 Ty2) Goal OutTerm) :-
-  prod_expert Cert Cert1 Cert2,
+  prod_expert Cert Cert1,
   % coq.say "backchain UNIV clause"  {coq.term->string (Ty2 Tm)} "on goal"{coq.term->string Goal},
   check Cert1 (bc (Ty2 Tm) Goal ListArgs),
   % coq.say "check " {coq.term->string Tm} "on type" {coq.term->string Ty1},
   coq.typecheck Tm Ty1 ok,
 %  check Cert2 (go Ty1 Tm),
-  Cert2 = Cert,
+  % Cert2 = Cert,
   OutTerm = [Tm|ListArgs].

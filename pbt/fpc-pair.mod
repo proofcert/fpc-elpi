@@ -20,9 +20,12 @@ or_expert (pair C1 C2) (pair C1' C2') Ch :-
 	or_expert C1 C1' Ch,
 	or_expert C2 C2' Ch.
 
-prod_expert (pair C1 C2) (pair C1' C2') (pair C1'' C2'') :-
-	and_expert C1 C1' C1'',
-	and_expert C2 C2' C2''.
+prod_expert (pair C1 C2) (pair C1' C2') :-
+	prod_expert C1 C1',
+	prod_expert C2 C2'.
+imp_expert (pair C1 C2) (pair C1' C2') (pair C1'' C2'') :-
+	imp_expert C1 C1' C1'',
+	imp_expert C2 C2' C2''.
 prod_clerk (pair C1 C2) (pair C1' C2') :-
 	   prod_clerk C1 C1',
 	   prod_clerk C2 C2'.
