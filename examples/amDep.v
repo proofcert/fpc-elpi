@@ -9,7 +9,7 @@ Fixpoint len (A : Set)(l : list A) : nat :=
   | nil => 0
   | _ :: l' => S (len _ l')
                  end.
-Print len.
+(* Print len. *)
 
 (** Indexed lists*)
 Set Implicit Arguments.
@@ -25,10 +25,10 @@ Inductive ilist : nat -> Set :=
   | Nil : ilist O
   | Cons : forall n, A -> ilist n -> ilist (S n).
 
-Check Nil. 
-Check (Cons a Nil).
+(* Check Nil. 
+Check (Cons a Nil). *)
 
-Print ilist.
+(* Print ilist. *)
 
 (** build a list of [n] copies of [a] *)
 
@@ -38,8 +38,8 @@ Fixpoint repeat n  : ilist n :=
       | S m => Cons a (repeat m)
   end.
 
-Print repeat.
-Eval compute  in  repeat 5.
+(* Print repeat.
+Eval compute  in  repeat 5. *)
 
 Fixpoint app n1 n2 (ls1 : ilist n1) (ls2 : ilist n2) : ilist (n1 + n2) :=
     match ls1 with
@@ -47,15 +47,15 @@ Fixpoint app n1 n2 (ls1 : ilist n1) (ls2 : ilist n2) : ilist (n1 + n2) :=
       | Cons  x ls1' => Cons x (app ls1' ls2)
     end.
 
-Check app.
-Print app.
+(* Check app.
+Print app. *)
 
 Definition hd n (ls : ilist (S n)) : A :=
     match ls with
       | Cons  h _ => h
     end.
 
-Check hd.
+(* Check hd. *)
 
 
 Definition tl n (ls : ilist (S n)) : (ilist n) :=
@@ -63,7 +63,7 @@ Definition tl n (ls : ilist (S n)) : (ilist n) :=
       | Cons   _ t => t
     end.
 
-Check tl.
+(* Check tl. *)
 
 
 Fixpoint snoc n (ls : ilist n) (x : A) : ilist (S n) :=
@@ -78,15 +78,15 @@ Fixpoint rev n (ls : ilist n)  : ilist n :=
       | Cons  x ys => (snoc (rev  ys) x)
     end.
 
-Print rev.
+(* Print rev. *)
 
 (** Why didn't we define [rev] via [app]? Because it is not immediate:*)
 
-Fail Fixpoint revapp n (ls : ilist n)  : ilist n :=
+(* Fail Fixpoint revapp n (ls : ilist n)  : ilist n :=
   match ls in (ilist n0)   return (ilist n0 ) with
       | Nil => Nil
       | Cons  x ys => app (revapp  ys) (Cons x Nil)
-    end.
+    end. *)
 (* The term "app (revapp n0 ys) (Cons x Nil)" has type "ilist (n0 + 1)" while it is expected to have type "ilist (S n0)".*)
 
 (** Since types depend on terms, namely [nats], type inference entails some theorem proving, here 
@@ -170,9 +170,9 @@ Definition pred_s1 (n : nat) : n > 0 -> nat :=
   end.
 
 
-Print pred_s1.
+(* Print pred_s1. *)
 (** Let's see what it looks like in OCaml:*)
-Extraction pred_s1.
+(* Extraction pred_s1. *)
 
 (** The _irrelevant_ proving part has been erased.*)
 
@@ -184,8 +184,8 @@ destruct n.
 - intros. apply  zgtz in H. destruct H.
 - intros. exact n.
 Defined.
-Print pred_ss.
-Extraction pred_ss.
+(* Print pred_ss. *)
+(* Extraction pred_ss. *)
 
 (** or we can use the [Program] library and*)
 Program Definition pred_sp1 (n : nat)(pf:  n > 0 ) :  nat :=
@@ -194,10 +194,10 @@ Program Definition pred_sp1 (n : nat)(pf:  n > 0 ) :  nat :=
     | S n' => n'
     end.
 Obligation 1.
-apply zgtz in pf.exfalso. assumption.
+apply zgtz in pf. exfalso. assumption.
 Defined.
 
-Extraction pred_s1.
+(* Extraction pred_s1. *)
 
 
 (* The strongest spec, where we use subset types to say exactly what [pred] does:*)
