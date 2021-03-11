@@ -103,6 +103,8 @@ Elpi Accumulate lp:{{
     interp ProgGoal,
     % coq.say "Run" {coq.term->string PropGoal},
     not (interp PropGoal),
-    coq.say "Counterexample:" {coq.term->string ProgGoal}.
+    coq.say "Counterexample found!",
+    coq.say "Assignment:" {std.map SpecVars (t\s\ coq.term->string t s)},
+    coq.say "Violation:" {coq.term->string PropGoal}.
 }}.
 Elpi Typecheck.
