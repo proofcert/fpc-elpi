@@ -26,7 +26,6 @@ Inductive typ : Type :=
    | ibv_t : value ttrue
    | ibv_f : value tfalse.
 
-   Print value.
  
 
  Inductive step : forall {T : typ}, tm T -> tm T -> Prop :=
@@ -51,26 +50,17 @@ Inductive typ : Type :=
        step t1  t1' -> step (tiszero t1) (tiszero t1').
    
  
-  (*parametric defs of progress *) 
+  (*defs of progress *) 
  
-  Inductive progress {T : typ }(e : tm T) (Step : tm T -> tm T -> Prop) : Prop :=
-  | pb : value e  -> progress e Step
-  | ps e' : Step e e' -> progress e Step.
+  Inductive progress {T : typ }(e : tm T)  : Prop :=
+  | pb : value e  -> progress e 
+  | ps e' : step e e' -> progress e.
  
  
-  Goal progress (tif TBool ttrue ttrue ttrue) step.
-  econstructor 2.
-  econstructor.
-  Qed.
- (* progress falsified???
- 
- Run (progress (tif TBool ttrue ttrue ttrue) step)
-Counterexample: True
-
-This is wrong*)
- Goal forall T (e : tm T), progress e  step.
+(* progress holds *)
+ Goal forall T (e : tm T), progress e.
  intros.    
- elpi dep_pbt 2 (True) (e).
+ Fail elpi dep_pbt pair 3 5 (True) (e).
  Abort.
 
 
@@ -113,19 +103,16 @@ This is wrong*)
                     
  where "t1 '====>' t2" := (step t1 t2).
  
- End M3.  
- 
-
- 
- (* e = (tif TBool tfalse (tif TBool ttrue ttrue ttrue) ttrue)  *)
  Goal  forall (T : typ) (x y1 y2 : tm T ), M3.step x y1 -> M3.step  x y2 -> y1 = y2.
  
  intros.
- elpi dep_pbt 3 (H /\ H0)  (x). 
+ elpi dep_pbt pair 3 5 (H /\ H0)  (x). 
  Abort.
+  End M3.  
  
+
  
- (* M1
+ (* variation M1 introduces a typing bug, 
  when changing tm, so repeat the whole thing:
 
 *)
@@ -133,14 +120,13 @@ This is wrong*)
  
  Inductive tmb : typ -> Type :=
  | tiszerob : tmb TNat-> tmb TBool
- 
  | ttrueb : tmb TBool
  | tfalseb : tmb TBool
- | tifb T: tmb  TBool-> tmb T -> tmb T -> tmb T
  | tzerob : tmb TNat
  | tsuccb : tmb TNat -> tmb TNat
  | tpredb : tmb TNat-> tmb TNat
- | tsuccbug : tmb TBool-> tmb TBool. (*bug*)
+ | tsuccbug : tmb TBool-> tmb TBool (*bug*)
+ | tifb T: tmb  TBool-> tmb T -> tmb T -> tmb T  .                            
 
  
  Inductive valueb : forall {T:typ}, tmb T -> Prop :=
@@ -170,16 +156,12 @@ This is wrong*)
    | ST_Iszerob : forall t1 t1',
        stepb t1  t1' -> stepb (tiszerob t1) (tiszerob t1').
    
-       Inductive progressb {T : typ }(e : tmb T) (
-           Step : tmb T -> tmb T -> Prop) : Prop :=
-       | pbb : valueb e  -> progressb e Step
-       | psb e' : Step e e' -> progressb e Step.
+       Inductive progressb {T : typ }(e : tmb T)  : Prop :=
+       | pbb : valueb e  -> progressb e
+       | psb e' : stepb e e' -> progressb e.
        
        
-       (* NO! false negative un 
-   (tiszerob tzerob)
-*)
-       Goal forall T (e : tmb T), progressb e  stepb.
+       Goal forall T (e : tmb T), progressb e .
        intros.    
        elpi dep_pbt 2 (True) (e).
        Abort.

@@ -5,7 +5,6 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
 
  From elpi Require Import elpi.
  Require Import Arith List. Import ListNotations.
- (*Require Import pbt.*)
  Require Import dep_pbt.
  
  
@@ -25,18 +24,19 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Inductive has_type : tm -> typ -> Prop :=
    | T_Tru : has_type ttrue TBool
    | T_Fls : has_type tfalse TBool
-    | T_Test : forall t1 t2 t3 T,
-        has_type t1 TBool ->
-        has_type t2 T ->
-        has_type t3 T ->
-        has_type (tif  t1 t2 t3) T 
    | T_Zro : has_type tzero TNat
    | T_Scc : forall t1,
          has_type t1 TNat -> has_type (tsucc t1) TNat
    | T_Prd : forall t1,
         has_type t1 TNat -> has_type (tpred t1 ) TNat
    | T_Iszro : forall t1,
-        has_type t1 TNat ->  has_type (tiszero t1) TBool.
+       has_type t1 TNat ->  has_type (tiszero t1) TBool
+                                         | T_Test : forall t1 t2 t3 T,
+        has_type t1 TBool ->
+        has_type t2 T ->
+        has_type t3 T ->
+        has_type (tif  t1 t2 t3) T 
+.
  
  
  Inductive nvalue : tm -> Prop :=
@@ -73,12 +73,13 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  where "t1 '===>' t2" := (step t1 t2).
 
  
- (* subject expansion*)
+ (* Failure of subject expansion*)
  Goal forall e e' t, step e e' -> has_type e' t -> has_type e t. 
  intros e e' t HS HT.
  elpi dep_pbt 2 (HS /\ HT) (e).
  Abort.
-  (*parametric defs of progress and preservation *) 
+
+ (*parametric defs of progress and preservation *) 
  
   Inductive notstuck (e : tm) (Step : tm -> tm -> Prop) : Prop :=
   | pn : nvalue e  -> notstuck e Step
@@ -101,8 +102,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  Goal forall e, progress e has_type step.
  unfold progress.
  intros e t Ht.    
- (*Fail elpi pbt (Ht) (True) 5 (e).*)
- Fail elpi dep_pbt 5 (Ht) (e).
+ Fail elpi dep_pbt 3 (Ht) (e).
  Abort.
  
  
@@ -117,11 +117,6 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
          has_type ttrue TBool
    | T_Fls :
         has_type tfalse TBool
-    | T_Test : forall t1 t2 t3 T,
-        has_type t1 TBool ->
-        has_type t2 T ->
-        has_type t3 T ->
-        has_type (tif  t1 t2 t3) T 
    | T_Zro :
         has_type tzero TNat
    | T_Scc : forall t1,
@@ -134,6 +129,11 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
    | T_Iszro : forall t1,
         has_type t1 TNat ->
         has_type (tiszero t1) TBool
+  | T_Test : forall t1 t2 t3 T,
+        has_type t1 TBool ->
+        has_type t2 T ->
+        has_type t3 T ->
+        has_type (tif  t1 t2 t3) T 
  
  (* bug 1*)
     | T_SuccBool : forall t,
@@ -144,13 +144,14 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  Elpi Bound Steps 1000000.
 
- (* Adapted from Types.v in volume  of SF *)
+
   (* OK : (M1.has_type (tsucc ttrue) TBool)*)
  Goal forall e, progress e M1.has_type step.
  unfold progress.
  intros e t Ht.    
- (*elpi pbt (Ht) (True) 2 (e). (* it finds cex:  *) *)
- elpi dep_pbt 2 (Ht) (e) . (* loops if gen (t)*)   
+ elpi dep_pbt 2 (Ht) (e) . (* loops if gen (t)*)
+  elpi dep_pbt size 4 (Ht) (e) . 
+  elpi dep_pbt pair 2 4 (Ht) (e) . 
  Abort.
  
  (* variation 3: failure of step det *)
@@ -185,7 +186,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
    | ST_Iszero : forall t1 t1',
        t1 ====> t1' ->
        (tiszero t1) ====> (tiszero t1')
-  | ST_Funny2 : forall t1 t2 t2' t3,
+  | ST_Funny2 : forall t1 t2 t2' t3, (* bug *)
             t2 ====> t2' ->
             (tif t1 t2 t3) ====> (tif t1 t2' t3)
                     
@@ -193,17 +194,13 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  End M3.  
  
- (* 
- pbt Finds the cex, albeit not fully instantiated: 
- dep_pbt does it! *)
+ (*   pair quickest: optimal bound*)
  Goal deterministic M3.step.
  unfold deterministic.
  intros.
- (*elpi pbt (H ) (H0)  5 (x).*)
- elpi dep_pbt 3 (H /\ H0) (x). 
+ elpi dep_pbt pair 3 5 (H /\ H0) (x).  
  Abort.
- 
- 
+
  
  (*variation 6*)
  Module M6.
@@ -212,11 +209,6 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
          has_type ttrue TBool
    | T_Fls :
         has_type tfalse TBool
-    | T_Test : forall t1 t2 t3 T,
-        has_type t1 TBool ->
-        has_type t2 T ->
-        has_type t3 T ->
-        has_type (tif  t1 t2 t3) T 
    | T_Zro :
         has_type tzero TNat
    | T_Scc : forall t1,
@@ -226,18 +218,20 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
         has_type t1 TNat ->
         has_type (tpred t1 ) TNat
    | T_Prd_B6: has_type (tpred tzero) TBool(*bug6*)
+    | T_Test : forall t1 t2 t3 T,
+        has_type t1 TBool ->
+        has_type t2 T ->
+        has_type t3 T ->
+        has_type (tif  t1 t2 t3) T 
    | T_Iszro : forall t1,
         has_type t1 TNat ->
         has_type (tiszero t1) TBool.
- 
- 
- End M6.
+  End M6.
  
  
  (* pres  fail for M6: M = tpred(tzero) M' = tzero T = tBool
  [Note: it loops if step is the generator
  but I can use typing as a gen*)
- 
  
  Goal forall e e', preservation e e' M6.has_type step.
  unfold preservation.
@@ -250,13 +244,13 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  E = tpred(tzero)
  T1 = tnat
  T2 = tbool
- Recall: set a low bound. Strangely, it's not monotonic*)
+ Recall: set a low bound.*)
  
- Elpi Bound Steps 1000000.
+
  Goal deterministic M6.has_type.
  unfold deterministic.
  intros.
- elpi dep_pbt 2 (H  /\ H0) (x). 
+ elpi dep_pbt size 3 (H  /\ H0) (x). 
  Abort.
  
  (* a typo-like mutation*)
@@ -267,11 +261,6 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
          has_type ttrue TBool
    | T_Fls :
         has_type tfalse TBool
-    | T_Test : forall t1 t2 t3 T,
-        has_type t1 TBool ->
-        has_type t2 T ->
-        has_type t3 T ->
-        has_type (tif  t1 t2 t3) T 
    | T_Zro :
         has_type tzero TNat
    | T_Scc : forall t1,
@@ -279,50 +268,22 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
    | T_Prd : forall t1,
         has_type t1 TNat ->
         has_type (tpred t1 ) TNat
+    | T_Test : forall t1 t2 t3 T,
+        has_type t1 TBool ->
+        has_type t2 T ->
+        has_type t3 T ->
+        has_type (tif  t1 t2 t3) T 
+                 
    | T_Iszro : forall t1,
         has_type t1 TBool ->
         has_type (tiszero t1) TNat. (* bug *)
  
  End Mty.
  
- Goal exists e t,  Mty.has_type e t /\  (notstuck e step -> False).
- exists (tiszero ttrue) .
- exists TNat.
- split.
- - repeat constructor.
- - intros. inversion_clear H;subst; inversion_clear H0. 
-inversion H.
-Qed.
- (* why does it not find it ??*)
-  Elpi Bound Steps 1000000.
+
+
  Goal forall e, progress e Mty.has_type step.
  unfold progress.
  intros e t Ht.
- Fail elpi dep_pbt 5 (Ht) (e).    
- (*Fail elpi pbt (Ht) (True) 5 (e).  it finds cex:  tiszero(ttrue)
- T = tnat*)
+ elpi dep_pbt 2 (Ht) (e).    
  Abort.
- (*
- (* now obsolete, given dep_pbt*)
- Inductive is_tm : tm  -> Prop :=
-   | I_Tru :        is_tm ttrue 
-   | I_Fls :       is_tm tfalse 
-    | I_Test : forall t1 t2 t3 ,
-        is_tm t1 ->
-        is_tm t2  ->
-        is_tm t3  ->
-        is_tm (tif  t1 t2 t3)  
-   | I_Zro :       is_tm tzero 
-   | I_Scc : forall t1,
-         is_tm t1  ->        is_tm (tsucc t1) 
-   | I_Prd : forall t1,
-        is_tm t1  ->       is_tm (tpred t1 ) 
-   | I_Iszro : forall t1,
-        is_tm t1  ->       is_tm (tiszero t1) .
- 
- Goal forall (e1 e2 e3  : tm), is_tm e1 ->  M3.step e1 e2 -> M3.step e1 e3 -> e2 = e3.
-   intros.
-   elpi pbt (H) (H0 /\ H1) 4 (e2).
- Abort.
- 
- *)

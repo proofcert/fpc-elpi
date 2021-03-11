@@ -117,7 +117,7 @@ check Cert (bc (prod _ Ty1 (x\ Ty2)) Goal OutTerm) :-
   % coq.say "backchain IMP clause"  {coq.term->string Ty2} "on goal"{coq.term->string Goal},
   check Cert1 (bc Ty2 Goal ListArgs),
   % coq.say "go term " {coq.term->string Tm} "on goal" {coq.term->string Ty1},
-  coq.say "Cert" Cert2,
+%  coq.say "Cert" Cert2,
   check Cert2 (go Ty1 Tm),
   OutTerm = [Tm|ListArgs].
 

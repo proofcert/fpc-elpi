@@ -6,6 +6,7 @@ Authors: Andrea Colò & Alberto Momigliano
 *)
 From QuickChick Require Import QuickChick.
 Require Import Arith Bool List ZArith. 
+Require Import Coq.Logic.JMeq.
 (* Require Export ExtLib.Structures.Monads. *)
 Export MonadNotation. 
 Open Scope monad_scope.
@@ -460,6 +461,7 @@ Definition subject_expansionP1 :=
         end
         )
      ).
+   Print value.
 (*! QuickCheck subject_expansionP1.*)
 (*QuickChecking subject_expansionP1
 Some tif tfalse (tiszero tzero) tzero
@@ -499,7 +501,139 @@ Some tif tfalse (tif (tiszero (tiszero tfalse)) (tif (tif ttrue (tpred ttrue) (t
 *** Failed after 5 tests and 0 shrinks. (0 discards)
  *)
 
+(* -------------------
 
+Going dependent:
+*)
+
+Module Intrinsic.
+
+Inductive typ : Type :=
+       |TBool : typ
+       |TNat : typ.
+       
+Derive(Arbitrary,Show) for tm.
+       
+
+ Inductive tm : typ -> Type :=
+ | ttrue : tm TBool
+ | tfalse : tm TBool
+ | tzero : tm TNat
+ | tsucc : tm TNat -> tm TNat
+ | tpred : tm TNat-> tm TNat
+ | tiszero : tm TNat-> tm TBool
+ | tif T: tm  TBool-> tm T -> tm T -> tm T.
+
+(* cannot derive automatically such generator*)
+ Fail Derive(Arbitrary,Show) for (tm nat).
+
+
+Fixpoint gen_term_size (n:nat) (t:typ) : G (tm t) :=
+  match n with
+    | 0 =>
+      match t with
+      |TNat => returnGen  tzero
+      |TBool => oneOf [returnGen ttrue; returnGen tfalse]
+      end 
+    | S n' =>
+        m <- choose (0, n');;
+        match t with
+        | TNat =>
+          oneOf [returnGen  tzero ;
+                 liftGen tsucc (gen_term_size (n'-m) TNat) ;
+                  liftGen tpred (gen_term_size (n'-m) TNat);
+                  liftGen3 (tif TNat) (gen_term_size (n'-m) TBool)
+                               (gen_term_size (n'-m) TNat)
+                               (gen_term_size (n'-m) TNat)] 
+               
+        | TBool =>
+          oneOf [returnGen ttrue; returnGen tfalse;
+           liftGen tiszero (gen_term_size (n'-m) TNat);
+               liftGen3 (tif TBool) (gen_term_size (n'-m) TBool)
+                               (gen_term_size (n'-m) TBool)
+                               (gen_term_size (n'-m) TBool)
+                ]
+        end
+    end.
+ Inductive value : forall {T:typ}, tm T -> Prop :=
+   | iNz : value tzero
+   | invs : forall t, value t -> value (tsucc t)
+   | ibv_t : value ttrue
+   | ibv_f : value tfalse.
+
+ 
+
+ Inductive step : forall {T : typ}, tm T -> tm T -> Prop :=
+   | ST_IfTrue : forall  T (t1  t2 : tm T),
+       step (tif _ ttrue t1 t2) t1
+   | ST_IfFalse : forall T (t1 t2 : tm T),
+       step (tif _ tfalse t1 t2) t2
+    | ST_If (T : typ): forall (t1 : tm TBool) t1' (t2 t3 : tm T),
+       step t1 t1' -> step (tif _ t1 t2 t3) (tif _ t1' t2 t3)
+   
+   | ST_Succ : forall t1 t1',
+       step t1 t1' -> step (tsucc t1) (tsucc t1')
+   | ST_PredZero : step (tpred tzero)  tzero
+   | ST_PredSucc : forall t1,
+       value t1 -> step (tpred (tsucc t1)) t1
+   | ST_Pred : forall t1 t1',
+       step t1 t1' -> step (tpred t1) (tpred t1')
+   | ST_IszeroZero : step (tiszero tzero)  ttrue
+   | ST_IszeroSucc : forall t1,
+        value t1 ->  step (tiszero (tsucc t1)) tfalse
+   | ST_Iszero : forall t1 t1',
+       step t1  t1' -> step (tiszero t1) (tiszero t1').
+   
+ 
+  (*parametric defs of progress *) 
+ 
+  Inductive progress {T : typ }(e : tm T) (Step : tm T -> tm T -> Prop) : Prop :=
+  | pb : value e  -> progress e Step
+  | ps e' : Step e e' -> progress e Step.
+  
+Fail  Derive ArbitrarySizedSuchThat for (fun T t1 : tm T => nvalue t1).
+
+
+(*
+Fixpoint eval1Monad (T : typ) (t : tm T) : option (tm T) :=
+   match t with
+      | tif T ttrue t2 t3 => ret t2
+      | tif T tfalse t2 t3 => ret t3
+      | tif T t1 t2 t3 =>
+           t1' <- eval1Monad t1 ;;
+           ret (tif T t1' t2 t3)
+      | _ => ttrue end.
+      |tsucc(t1) =>
+           t1' <- eval1Monad t1 ;;
+           ret (tsucc(t1'))
+      |tpred  tzero => ret  tzero
+      |tpred(tsucc(nv1)) =>
+          if (isnumericval nv1) then ret nv1
+          else
+            t1' <- eval1Monad nv1 ;;
+            ret (tpred(tsucc(t1')))
+      |tpred(t1) =>
+           t1' <- eval1Monad t1 ;;
+           ret (tpred(t1'))
+      |tiszero  tzero => ret ttrue
+      |tiszero(tsucc(nv1)) =>
+          if (isnumericval nv1) then ret tfalse
+          else
+           t1' <- eval1Monad nv1 ;;
+           ret (tiszero(tsucc( t1')))
+      | tiszero(t1)  =>
+           t1' <- eval1Monad t1 ;;
+           ret (tiszero( t1'))
+      |_ =>  None
+  end.
+
+Definition canStep e :=
+    match eval1Monad e with
+    | Some _ => true
+    | None => false
+    end.
+*) 
+End Intrinsic.
 
 
 
