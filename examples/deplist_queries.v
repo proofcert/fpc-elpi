@@ -1,6 +1,6 @@
 From elpi Require Import elpi.
 Require Import dep_pbt.
-Load amDep.
+Load deplist.
 
 Goal forall (n: nat) (l: ilist nat n), rev l = l.
 intros.

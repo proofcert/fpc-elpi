@@ -592,9 +592,12 @@ Fixpoint gen_term_size (n:nat) (t:typ) : G (tm t) :=
   | ps e' : Step e e' -> progress e Step.
   
 Fail  Derive ArbitrarySizedSuchThat for (fun T t1 : tm T => nvalue t1).
-
-
 (*
+Fixpoint eval1Monad (T : typ) (t : tm T) : option (tm T) :=
+   match t in ( (tm T)) return (option (tm T)) with
+      | tif T ttrue t2 t3 => Some t2
+      | _ => Some ttrue end.
+
 Fixpoint eval1Monad (T : typ) (t : tm T) : option (tm T) :=
    match t with
       | tif T ttrue t2 t3 => ret t2

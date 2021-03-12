@@ -5,16 +5,17 @@ List of current examples:
 ### Completed examples
 - `list.v`: some definitions of list predicate (insert, ordered, reverse)
 
-- `list-queries.v`: various properties,
+- `list-queries.v`: various properties.
 
 - `aexp.v`: static and dynamic semantics of an arithmetical language (adapted
 by `SF/Types.v`), with properties such as preservation, progress,
 determinacy. Some mutations are introduced that falsifies those properties.
 
-### In progress
 - `iaexp.v`: same language, but intrinsically typed, so that terms depend on their
 type. Preservation is implicit, so we check determinacy, since even for
 progress it is hard to write mutants.
+
+### In progress
 
 - `cfg.v` Encoding of contect free grammar. `mut1-cfg.v` is the bugged
 version. Currently not working due to Coq-Elpi not supporting mutually
