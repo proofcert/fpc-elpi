@@ -4,29 +4,32 @@ From elpi Require Import elpi.
 Require Import Arith List. Import ListNotations.
 Require Import Coq.Lists.List.
 
-
 Elpi Tactic dprolog.
 (* Debugging symbols: RAW means no pretty printing is used for Coq terms, and
 the HOAS encoding is printed. *)
 (* Elpi Debug "DEBUG_KERNEL". *)
 (* Elpi Debug "DEBUG_KERNEL_RAW". *)
-Elpi Accumulate File "pbt/dep-kernel.mod".
-Elpi Accumulate File "pbt/fpc-qbound.mod".
-Elpi Accumulate File "pbt/fpc-pair.mod".
+From fpc_elpi.pbt Extra Dependency "dep-kernel.mod" as dep_kernel.
+From fpc_elpi.pbt Extra Dependency "fpc-qbound.mod" as fpc_qbound.
+From fpc_elpi.pbt Extra Dependency "fpc-pair.mod" as fpc_pair.
+
+Elpi Accumulate File dep_kernel.
+Elpi Accumulate File fpc_qbound.
+Elpi Accumulate File fpc_pair.
 
 Elpi Accumulate lp:{{
-  solve [int N] [goal _Ctx Ev Goal _Who] _OutGoals :-
+  solve (goal _Ctx _RawEv Goal Ev [int N]) _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qheight N)) (go Goal Term),
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
- solve [str "size", int N] [goal _Ctx Ev Goal _Who] _OutGoals :-
+ solve (goal _Ctx _RawEv Goal Ev [str "size", int N]) _OutGoals :-
     coq.say "Goal:" {coq.term->string Goal},
     check (qgen (qsize N M_)) (go Goal Term),
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.
-solve [str "pair", int H, int S ] [goal _Ctx Ev Goal _Who] _OutGoals :-
-      coq.say "Goal:" {coq.term->string Goal},
+solve (goal _Ctx _RawEv Goal Ev [str "pair", int H, int S ]) _OutGoals :-
+    coq.say "Goal:" {coq.term->string Goal},
     check (pair (qgen (qheight H)) (qgen (qsize S S2_ ))) (go Goal Term),
     Ev = Term,
     coq.say "Proof:" {coq.term->string Ev}.

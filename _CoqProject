@@ -1,12 +1,13 @@
--R tactics/ fpc_elpi.tactics
--R examples/ fpc_elpi.examples
-tactics/pbt.v
+-Q fpc fpc_elpi.fpc
+-Q pbt fpc_elpi.pbt
+-R tactics fpc_elpi.tactics
+-R examples fpc_elpi.examples
 tactics/dprolog.v
- tactics/coq_fpc.v
+tactics/coq_fpc.v
 tactics/dep_pbt.v
 examples/aexp.v
 examples/iaexp.v
 examples/list.v
 examples/list_queries.v
- examples/dd_fpc.v
-  examples/deb_fpc.v
+examples/dd_fpc.v
+examples/deb_fpc.v

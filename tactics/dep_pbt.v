@@ -9,6 +9,9 @@ in preprocess
 *)
 
 From elpi Require Import elpi.
+From fpc_elpi.pbt Extra Dependency "dep-kernel.mod" as dep_kernel.
+From fpc_elpi.pbt Extra Dependency "fpc-qbound.mod" as fpc_qbound.
+From fpc_elpi.pbt Extra Dependency "fpc-pair.mod" as fpc_pair.
 
 Elpi Tactic dep_pbt.
 (* Debugging symbols:
@@ -20,9 +23,9 @@ KERNEL prints call to the kernel *)
 (* Elpi Debug "DEBUG_INTERP_RAW". *)
 (* Elpi Debug "DEBUG_KERNEL". *)
 (* Elpi Debug "DEBUG_KERNEL_RAW". *)
-Elpi Accumulate File "pbt/dep-kernel.mod".
-Elpi Accumulate File "pbt/fpc-qbound.mod".
-Elpi Accumulate File "pbt/fpc-pair.mod".
+Elpi Accumulate File dep_kernel.
+Elpi Accumulate File fpc_qbound.
+Elpi Accumulate File fpc_pair.
 Elpi Accumulate lp:{{
 
   %% build_clauses: given a Coq context, creates copy clauses associating
@@ -84,7 +87,7 @@ Elpi Accumulate lp:{{
   parse_arguments [str "size", int N, trm Prog | SpecT] (qgen (qsize N M_)) Prog SpecT.
   parse_arguments [str "pair", int N, int S, trm Prog | SpecT] (pair (qgen (qheight N)) (qgen (qsize S S2_ ))) Prog SpecT.
 
-  solve Args [goal Ctx _Ev Goal _] _OutGoals :-
+  solve (goal Ctx _RawSol Goal _Ev Args) _OutGoals :-
     parse_arguments Args Cert Prog SpecT,
     preprocess Ctx SpecT Spec Cs Progs,
     (Progs => (std.map Spec (x\ y\ copy x y) SpecTypes,

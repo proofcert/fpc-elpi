@@ -4,19 +4,19 @@ From elpi Require Import elpi.
 (* The first tactic uses the kernel together with the Decide-depth 
    Proof Certificate definition, specifying a depth bound for the proof *)
 Elpi Tactic dd_fpc.
-Elpi Accumulate File "fpc/ljf-dep.mod".
-Elpi Accumulate File "fpc/dd-fpc.mod".
+From fpc_elpi.fpc Extra Dependency "ljf-dep.mod" as ljf_dep.
+From fpc_elpi.fpc Extra Dependency "dd-fpc.mod" as dd_fpc.
+Elpi Accumulate File ljf_dep.
+Elpi Accumulate File dd_fpc.
 Elpi Accumulate lp:{{
-  solve [(int N)] [goal _Ctx Ev Ty _] [] :- 
+  solve (goal _Ctx _RawEv Ty Ev [int N] as G) Out :- 
     int_to_nat N Nat,
-    ljf_entry (dd Nat) Ty Ev1,
-    Ev = Ev1.
+    ljf_entry (dd Nat) Ty Ev1, coq.say "Great",
+    (refine Ev1 G Out), coq.say "Yay" {coq.term->string Ev1}.
     %% The kernel runs without the constraints imposed on Ev, and we only unify
     %% afterwards, so that only the complete term is checked.
 }}.
 Elpi Typecheck.
-(* Elpi Debug "DEBUG". *)
-(* Elpi Trace. *)
 
 (* The second tactic uses the Proof Certificate format of lambda terms
    in De Brujin format *)
@@ -37,15 +37,15 @@ Elpi Accumulate lp:{{
   deb_certificate 7 (lambda (lambda (apply 0 [lambda (apply 2 [apply 0 []])]))).
   deb_certificate 8 (lambda (apply 0 [lambda (apply 0 [lambda (apply 2 [lambda (apply 1 [])])])])).
 }}.
-Elpi Accumulate File "fpc/ljf-dep.mod".
-Elpi Accumulate File "fpc/deb-fpc.sig".
-Elpi Accumulate File "fpc/deb-fpc.mod".
+From fpc_elpi.fpc Extra Dependency "deb-fpc.mod" as deb_fpc.
+Elpi Accumulate File ljf_dep.
+Elpi Accumulate File deb_fpc.
 (* The tactic is built in the same way as before: we accumulate the code
    for the kernel and the fpc specification, and we provide a "solve"
    predicate that simply calls the kernel on the formula, together with
    the provided certificate. *)
 Elpi Accumulate lp:{{
-  solve [(int Indx)] [goal Ctx Ev Ty _] [] :- 
+  solve (goal Ctx _RawEv Ty Ev [int Indx]) [] :- 
     deb_certificate Indx Deb,  
     Ctx => ljf_entry (lc 0 Deb) Ty Ev1,
     Ev = Ev1.
