@@ -1,4 +1,10 @@
-module fpc-pair.
+%% sig fpc-pair.
+accumulate fpc_elpi.pbt/dep-kernel.
+
+% Certificate pairing
+type   pair   cert -> cert -> cert.
+
+%% module fpc-pair.
 
 %%%%%%%%%%%%%%%%%%%%%%%
 % Certificate pairing %

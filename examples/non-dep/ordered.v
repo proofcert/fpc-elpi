@@ -21,7 +21,6 @@ Elpi Accumulate lp:{{
     check (qgen (qheight N)) [] Ty,
     coq.say "Ottenuto" Ty.
 }}.
-Elpi Typecheck.
 
  Inductive ordered : list nat -> Prop :=
 	onl : ordered []

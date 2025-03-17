@@ -82,4 +82,3 @@ solve [str "pair", trm Spec, trm Prog, int N, int S, trm Monitor_] [goal Ctx _Ev
     not (interp PropGoal),
     coq.say "Counterexample:" {coq.term->string PropGoal}.
 }}.
-Elpi Typecheck.

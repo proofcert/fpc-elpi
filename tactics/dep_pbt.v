@@ -9,11 +9,11 @@ in preprocess
 *)
 
 From elpi Require Import elpi.
-From fpc_elpi.pbt Extra Dependency "dep-kernel.mod" as dep_kernel.
-From fpc_elpi.pbt Extra Dependency "fpc-qbound.mod" as fpc_qbound.
-From fpc_elpi.pbt Extra Dependency "fpc-pair.mod" as fpc_pair.
+From fpc_elpi.pbt Extra Dependency "dep-kernel.elpi" as dep_kernel.
+From fpc_elpi.pbt Extra Dependency "fpc-qbound.elpi" as fpc_qbound.
+From fpc_elpi.pbt Extra Dependency "fpc-pair.elpi" as fpc_pair.
 
-Elpi Tactic dep_pbt.
+Elpi Command dep_pbt.
 (* Debugging symbols:
 RAW means no pretty printing is used for Coq terms, and
 the HOAS encoding is printed.
@@ -90,16 +90,21 @@ Elpi Accumulate lp:{{
   solve (goal Ctx _RawSol Goal _Ev Args) _OutGoals :-
     parse_arguments Args Cert Prog SpecT,
     preprocess Ctx SpecT Spec Cs Progs,
-    (Progs => (std.map Spec (x\ y\ copy x y) SpecTypes,
-    copy Prog ProgType)),
-    (Cs => (std.map SpecTypes (x\y\ copy x y) SpecGoals,
-    std.map Spec (x\y\ copy x y) SpecVars,
-    copy ProgType ProgGoal,
-    copy Goal PropGoal)),
-%    coq.say "Specs:" {std.map SpecGoals (t\s\ coq.term->string t s)},
-%    coq.say "Spec Vars:" {std.map SpecVars (t\s\ coq.term->string t s)},
-%    coq.say "Prog:" {coq.term->string ProgGoal},
-%    coq.say "Prop:" {coq.term->string PropGoal},
+    (Progs =>
+      (std.map Spec (x\ y\ copy x y) SpecTypes,
+      copy Prog ProgType)
+    ),
+    (Cs =>
+      (std.map SpecTypes (x\y\ copy x y) SpecGoals,
+      std.map Spec (x\y\ copy x y) SpecVars,
+      copy ProgType ProgGoal,
+      copy Goal PropGoal)
+    ),
+    % coq.say "Specs:" {std.map SpecGoals (t\s\ coq.term->string t s)},
+    % coq.say "Spec Vars:" {std.map SpecVars (t\s\ coq.term->string t s)},
+    % coq.say "Prog:" {coq.term->string ProgGoal},
+    % coq.say "Prop:" {coq.term->string PropGoal},
+    !,
     std.map SpecGoals (g\t\ check Cert (go g t)) SpecVars,
     % coq.say "Proof Term:" {std.map SpecVars (t\s\ coq.term->string t s)},
     % coq.say "Interp" {coq.term->string ProgGoal},
@@ -109,5 +114,8 @@ Elpi Accumulate lp:{{
     coq.say "Counterexample found!",
     coq.say "Assignment:" {std.map SpecVars (t\s\ coq.term->string t s)},
     coq.say "Violation:" {coq.term->string PropGoal}.
+  
+  %% If the search for a counterexample fails, we return a message
+  solve _ _ :-
+    coq.say "No counterexample found!".
 }}.
-Elpi Typecheck.

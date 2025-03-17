@@ -1,19 +1,71 @@
-module dep-kernel.
+%%sig dep-kernel.
 
-type get_head term -> term -> o.
-get_head (prod _ _ T) Head :- get_head (T X_) Head.
-get_head (app L) (app L).
+% Formulas and their terms
+kind   term        type.
+type   tt            term.
+type   and, or       term -> term -> term.
+type   some, nabla   (A -> term) -> term.
+type   eq            A -> A -> term.
+
+% Program and interpreter
+% type   prog      term -> term -> o.
+
+% kind   nterm   type.
+% type   np        string -> term -> nterm.
+% type   progs     term -> list nterm -> o.
+
+type   interp    term -> o.
+% added -AM
+type   backchain    term -> term -> o.
+
+% Certificates
+kind   choice        type.
+type   left, right   choice.
+
+%kind   idx   type.
+
+kind   cert            type.
+type   tt_expert       cert -> o.
+type   eq_expert       cert -> o.
+type   or_expert       cert -> cert -> choice -> o.
+type   and_expert      cert -> cert -> cert -> o.
+type   imp_expert      cert -> cert -> cert -> o.
+type   prod_expert     cert -> cert -> o.
+type   prod_clerk      cert -> cert -> o.
+type   some_expert     cert -> cert -> A -> o.
+type   unfold_expert   list constructor -> cert -> cert -> constructor -> o.
+
+% Checker
+kind   goal type.
+type   go   term -> term -> goal.
+type   bc   term -> term -> list term -> goal.
+type   check   cert -> goal -> o.
+type   flatten_app term -> term -> o.
+
+
+%%module dep-kernel.
+
+%% this becomes very inefficient when doing negation-as-failure
+%% (appeared/worsened when updating from elpi 1.12.0 to 2.0.7, coq-elpi 1.8.1 to 2.5.0)
+% type get_head term -> term -> o.
+% get_head (prod _ _ T) Head :- get_head (T X_) Head.
+% get_head (app L) (app L).
 
 %%%%%%%%%%%%%%%
 % Interpreter %
 %%%%%%%%%%%%%%%
 
-:if "DEBUG_INTERP_RAW" interp X :- coq.say X, fail.
-:if "DEBUG_INTERP_RAW" backchain A B :- coq.say A B, fail.
-:if "DEBUG_INTERP" interp X :- coq.say {coq.term->string X}, fail.
-:if "DEBUG_INTERP" backchain A B :- coq.say {coq.term->string A} {coq.term->string B}, fail.
-interp {{True}}.
-interp (sort _). %:- coq.says "axiom sort".
+:if "DEBUG_INTERP_RAW"
+interp X :- coq.say "Interp goal:" X, fail.
+:if "DEBUG_INTERP_RAW"
+backchain A B :- coq.say "Interp backchain" A B, fail.
+:if "DEBUG_INTERP"
+interp X :- coq.say {coq.term->string X}, fail.
+:if "DEBUG_INTERP"
+backchain A B :- coq.say {coq.term->string A} {coq.term->string B}, fail.
+
+interp {{True}} :- !.
+interp (sort _) :- !. %:- coq.says "axiom sort".
 
 interp {{lp:G1 /\ lp:G2}} :-
   !,
@@ -30,16 +82,17 @@ interp {{lp:G1 = lp:G2}} :-
   coq.unify-eq G1 G2 ok.
 
 interp (app [global (indt Prog) | _Args] as Atom) :-
-%   coq.say "prog: " Prog,
-%   coq.say "args: " Args,
+  % coq.say "prog: " Prog,
+  % coq.say "args: " Args,
   coq.env.indt Prog _ _ _ _Type _Kn Clauses,
+  !,
 	std.mem Clauses D,
-	get_head D Atom,
+	% get_head D Atom,
 	backchain D Atom.
 
 backchain (prod _ Ty (x\P)) G :- !, backchain P G, interp Ty.
 backchain (prod _ _Ty (x\P x)) G :- !, backchain (P X_) G.
-backchain G G' :- coq.unify-eq G G' ok.
+backchain G G' :- !, coq.unify-eq G G' ok.
 
 %%%%%%%%%%%
 % Checker %
@@ -48,16 +101,15 @@ backchain G G' :- coq.unify-eq G G' ok.
 :if "DEBUG_KERNEL_RAW"
 check A B :- coq.say "check" A B, fail.
 :if "DEBUG_KERNEL"
-check Cert (bc A1 A2 Terms) :-
+check _Cert (bc A1 A2 Terms) :-
   coq.term->string A1 S1,
   coq.term->string A2 S2,
-  std.map Terms (x\y\ coq.term->string x y) T1,
-  coq.say "Backchain:" S1 "\nBC-Goal:" S2 "\nPT-List:" T1, fail.
+  % std.map Terms (x\y\ coq.term->string x y) T1,
+  coq.say "Backchain:" S1 "\nBC-Goal:" S2 "\nPT-List:" Terms, fail.
 :if "DEBUG_KERNEL"
-check Cert (go A Term):-
+check Cert (go A _Term):-
   coq.term->string A S,
-  coq.term->string Term T1,
-  coq.say "Goal:" S "\nProofterm" T1, fail.
+  coq.say "Goal:" S "\nCert" Cert, fail.
 
 % check Cert (go X Term ):-
 %   var X,
@@ -80,10 +132,14 @@ check Cert (go Atom Term) :-
   coq.safe-dest-app Atom (global (indt Prog)) _Args,
   coq.env.indt Prog _ _ _ _Type Kn Clauses,
 	Kons = global (indc K),
+  List = {std.zip Kn Clauses},
+  !,
 	unfold_expert Kn Cert Cert' K,
 	%% Use the selected constructor as key to find its
 	%% clause in the zipped list of constructors and clauses.
-	std.lookup {std.zip Kn Clauses} K Clause,
+  % std.map Kn (x\y\ coq.term->string x y) KnS,
+  % coq.say "The possible constructors are" Kn,
+	std.lookup List K Clause,
 	% coq.say "decide clause"  {coq.term->string Clause} "on goal" {coq.term->string Atom},
 	check Cert' (bc Clause Atom ListArgs),
   coq.mk-app Kons ListArgs Term.
@@ -106,27 +162,31 @@ check Cert (go (app [(fun A B C)| Args]) Term) :-
 
 %% backchain
 
-check Cert (bc A A' []) :-
-	tt_expert Cert,
-  coq.unify-eq A A' ok.
-  % coq.say "Init OK" {coq.term->string A}.
-
 check Cert (bc (prod _ Ty1 (x\ Ty2)) Goal OutTerm) :-
   !,
   imp_expert Cert Cert1 Cert2,
   % coq.say "backchain IMP clause"  {coq.term->string Ty2} "on goal"{coq.term->string Goal},
   check Cert1 (bc Ty2 Goal ListArgs),
   % coq.say "go term " {coq.term->string Tm} "on goal" {coq.term->string Ty1},
-%  coq.say "Cert" Cert2,
+  % coq.say "Cert" Cert2,
   check Cert2 (go Ty1 Tm),
   OutTerm = [Tm|ListArgs].
 
 check Cert (bc (prod _ Ty1 Ty2) Goal OutTerm) :-
+  !,
   prod_expert Cert Cert1,
   % coq.say "backchain UNIV clause"  {coq.term->string (Ty2 Tm)} "on goal"{coq.term->string Goal},
   check Cert1 (bc (Ty2 Tm) Goal ListArgs),
   % coq.say "check " {coq.term->string Tm} "on type" {coq.term->string Ty1},
   coq.typecheck Tm Ty1 ok,
-%  check Cert2 (go Ty1 Tm),
+  % check Cert2 (go Ty1 Tm),
   % Cert2 = Cert,
   OutTerm = [Tm|ListArgs].
+
+check Cert (bc (app _ as A) (app _ as A') []) :-
+	tt_expert Cert,
+  coq.unify-eq A A' ok.
+  % coq.say "Init OK" {coq.term->string A}.
+check Cert (bc (global _ as A) (global _ as A') []) :-
+	tt_expert Cert,
+  coq.unify-eq A A' ok.

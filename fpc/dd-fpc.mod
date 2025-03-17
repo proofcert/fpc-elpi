@@ -1,3 +1,4 @@
+accumulate fpc_elpi.fpc/ljf-lambda-certificates.
 type dd     nat -> cert.
 type indx   index.
 kind nat    type.

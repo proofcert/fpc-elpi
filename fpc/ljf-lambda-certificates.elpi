@@ -1,5 +1,5 @@
 sig ljf-certificates.
-accum_sig ljf-formulas.
+accumulate "fpc_elpi.fpc/ljf-formulas".
 
 kind cert, index                         type.
 kind choice                              type.

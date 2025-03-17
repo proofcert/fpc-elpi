@@ -2,8 +2,8 @@
 % intuitionistic formulas
 % module ljf-dep.
 % accumulate spy.
-accum_sig ljf-lambda-certificates.
-accumulate tools.
+accumulate fpc_elpi.fpc/ljf-lambda-certificates.
+accumulate fpc_elpi.fpc/tools.
 
 type isNegForm, isNegAtm, isPosForm, isPosAtm, isNeg, isPos     term -> prop. 
 type ljf_entry      cert -> term -> term -> prop.
@@ -29,7 +29,8 @@ type abs               (term -> term) -> term.  % Handle abstractions during pro
 type look list (pair A B) -> A -> B -> prop.
 look [pr X Y|_] X Y.
 look [_|LS]       X Y :- look LS X Y.
-isNegForm {{lp:_ /\ lp:_}} & isNegForm {{lp:_ -> lp:_}}.
+isNegForm {{lp:_ /\ lp:_}}.
+isNegForm {{lp:_ -> lp:_}}.
 isNegForm (prod _ _ _).
 isNegAtm (app [Hd|_Rest]) :- isNegAtm Hd.
 isNeg A :- isNegForm A ; isNegAtm A.

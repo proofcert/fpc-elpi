@@ -27,7 +27,6 @@ Elpi Accumulate lp:{{
     check (pair (qgen (qheight H)) (qgen (qsize S S2_ ))) (go Goal).
 
   }}. 
-Elpi Typecheck.
 
 Elpi Db hints.db lp:{{ 
   type hint term -> term -> prop.
@@ -47,7 +46,6 @@ Elpi Accumulate lp:{{
     % coq.say "Type" Type,
     coq.elpi.accumulate _ "hints.db" (clause _ _ (hint Term Type)).
 }}.
-Elpi Typecheck.
 
 Elpi Tactic dprolog.
 Elpi Accumulate File "pbt/dep-kernel.mod".

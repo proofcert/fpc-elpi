@@ -1,4 +1,26 @@
-module fpc-qbound.
+%%sig fpc-qbound.
+accumulate fpc_elpi.pbt/dep-kernel.
+
+% A "quick"-style FP
+kind   qbound    type.
+type   qheight   int -> qbound.
+type   qsize     int -> int -> qbound.
+type   qgen      qbound -> cert.
+
+/*
+% An integer strict size (e.g., 4) becomes a range 4 .. 0, whose
+% subtraction denotes exactly the size of a subterm to be generated.
+type   qidsize    int -> qbound.
+type   qidsize'   int -> int -> qbound.
+type   qrgsize    int -> int -> qbound.
+
+% Iterated and strict term heights.
+type   qidheight    int -> qbound.
+type   qidheight'   int -> int -> qbound.
+type   qrgheight    int -> int -> qbound.
+*/
+
+%%module fpc-qbound.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Simple term height and size bounds %
@@ -42,9 +64,9 @@ prod_clerk (qgen (qheight H)) (qgen (qheight H)).
 prod_clerk (qgen (qsize In Out)) (qgen (qsize In Out)).
 
 unfold_expert Kn (qgen (qheight H)) (qgen (qheight H')) K :-
-	std.mem Kn K,
 	H > 0,
-	H' is H - 1.
+	H' is H - 1,
+	std.mem Kn K.
 unfold_expert Kn (qgen (qsize In Out)) (qgen (qsize In' Out)) K :-
 	std.mem Kn K,
 	In > 0,

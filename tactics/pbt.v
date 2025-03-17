@@ -4,8 +4,8 @@ Require Import Coq.Lists.List.
 Import ListNotations.
 Elpi Tactic pbt.
 Elpi Accumulate File "pbt/unused/kernel.mod".
-Elpi Accumulate File "pbt/fpc-qbound.mod".
-Elpi Accumulate File "pbt/fpc-pair.mod".
+Elpi Accumulate File "pbt/fpc-qbound.elpi".
+Elpi Accumulate File "pbt/fpc-pair.elpi".
 
 Elpi Accumulate lp:{{
   %% build_clauses: given a Coq context, creates copy clauses associating
@@ -82,4 +82,3 @@ solve [str "pair", trm Spec, trm Prog, int N, int S, trm Monitor_] [goal Ctx _Ev
     not (interp PropGoal),
     coq.say "Counterexample:" {coq.term->string PropGoal}.
 }}.
-Elpi Typecheck.

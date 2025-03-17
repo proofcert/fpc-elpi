@@ -74,7 +74,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
 
  
  (* Failure of subject expansion*)
- Goal forall e e' t, step e e' -> has_type e' t -> has_type e t. 
+ Goal forall e e' t, e ===> e' -> has_type e' t -> has_type e t. 
  intros e e' t HS HT.
  elpi dep_pbt 2 (HS /\ HT) (e).
  Abort.
@@ -97,7 +97,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
          forall (x : X) (y1 y2 : Y), R x y1 -> R x y2 -> y1 = y2.
  
  (* progress holds*)
- Elpi Bound Steps 100000.
+ Elpi Bound Steps 200000.
 
  Goal forall e, progress e has_type step.
  unfold progress.
@@ -142,7 +142,7 @@ inductive defs of static and dynamic semantics of a simple arithmetic language
  
  End M1.
  
- Elpi Bound Steps 1000000.
+ Elpi Bound Steps 5000000.
 
 
   (* OK : (M1.has_type (tsucc ttrue) TBool)*)
